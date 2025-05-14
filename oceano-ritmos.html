@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oceano-ritmos - OlitAI</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="bg-overlay"></div>
+
+    <header>
+        <div class="logo">OlitAI</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="oceano-ritmos.html" class="active">Oceano-ritmos</a></li>
+                <li><a href="about.html">Acerca del autor</a></li>
+            </ul>
+        </nav>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="main-title">Oceano-ritmos</h1>
+            <p class="subtitle">Algoritmos oceánicos y visualizaciones dinámicas</p>
+            <div class="wave"></div>
+        </section>
+
+        <section class="content">
+            <div class="container">
+                <div class="card">
+                    <h2>Visualizaciones oceánicas</h2>
+                    <p>Esta sección presenta algoritmos y visualizaciones que exploran los patrones y ritmos de los sistemas oceánicos. Cada visualización está acompañada por una explicación de los datos utilizados y los métodos de análisis aplicados.</p>
+                </div>
+                
+                <!-- Visualización 1 -->
+                <div class="card">
+                    <h2>Corrientes oceánicas y temperatura superficial</h2>
+                    <div class="viz-description">
+                        <p>Esta visualización muestra la relación entre las corrientes oceánicas y la temperatura superficial del mar en la región de la Península Antártica. Los datos provienen de mediciones in situ realizadas durante la expedición ECA-58 (2021-2022).</p>
+                        <p>El algoritmo utiliza técnicas de interpolación espacial (Kriging) para generar un campo continuo a partir de mediciones puntuales, y luego aplica visualización de flujo para representar la dirección e intensidad de las corrientes.</p>
+                    </div>
+                    
+                    <div class="viz-container">
+                        <img src="https://images.unsplash.com/photo-1527482797697-8795b05a13fe?q=80&w=1200" alt="Visualización de corrientes oceánicas" style="width: 100%; height: auto; border-radius: 8px;">
+                        <p style="text-align: center; font-style: italic; margin-top: 10px;">Visualización de ejemplo - Las implementaciones reales utilizarán datos específicos</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3>Implementación en Python</h3>
+                        <pre style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; overflow-x: auto;">
+import numpy as np
+import matplotlib.pyplot as plt
+import xarray as xr
+import cartopy.crs as ccrs
+import cmocean.cm as cmo
+
+# Cargar datos oceanográficos (ejemplo)
+ds = xr.open_dataset('antarctic_peninsula_data.nc')
+
+# Configurar la figura
+fig, ax = plt.subplots(figsize=(12, 8), 
+                       subplot_kw={'projection': ccrs.SouthPolarStereo()})
+
+# Establecer límites del mapa
+ax.set_extent([-65, -55, -65, -60], crs=ccrs.PlateCarree())
+
+# Visualizar temperatura superficial del mar
+sst = ds.sst.isel(time=0)
+im = sst.plot.pcolormesh(ax=ax, transform=ccrs.PlateCarree(),
+                         cmap=cmo.thermal, add_colorbar=False)
+
+# Añadir barra de color para temperatura
+cbar = plt.colorbar(im, ax=ax, shrink=0.8, pad=0.05)
+cbar.set_label('Temperatura Superficial del Mar (°C)')
+
+# Visualizar corrientes como vectores de flujo
+u = ds.u.isel(time=0, depth=0)
+v = ds.v.isel(time=0, depth=0)
+
+# Submuestreo para claridad visual
+step = 4
+q = ax.quiver(ds.lon[::step], ds.lat[::step], 
+              u[::step, ::step], v[::step, ::step],
+              transform=ccrs.PlateCarree(),
+              scale=30, width=0.003, color='black')
+
+# Añadir características del mapa
+ax.coastlines()
+ax.gridlines(draw_labels=True)
+
+# Añadir título
+plt.title('Temperatura Superficial y Corrientes Oceánicas\nPenínsula Antártica', 
+          fontsize=14)
+
+plt.tight_layout()
+plt.savefig('antarctic_currents.png', dpi=300)
+plt.show()
+                        </pre>
+                    </div>
+                </div>
+                
+                <!-- Visualización 2 -->
+                <div class="card">
+                    <h2>Análisis de dinámicas de fitoplancton</h2>
+                    <div class="viz-description">
+                        <p>Esta visualización explora la relación entre la concentración de clorofila-a (como indicador de biomasa de fitoplancton) y las variables oceanográficas como temperatura, salinidad y disponibilidad de nutrientes.</p>
+                        <p>El modelo implementa un análisis de componentes principales (PCA) para identificar los factores que más influyen en la variabilidad de las comunidades de fitoplancton en el tiempo y espacio.</p>
+                    </div>
+                    
+                    <div class="viz-container">
+                        <img src="https://images.unsplash.com/photo-1545133875-55b651cbf4aa?q=80&w=1200" alt="Visualización de dinámicas de fitoplancton" style="width: 100%; height: auto; border-radius: 8px;">
+                        <p style="text-align: center; font-style: italic; margin-top: 10px;">Visualización de ejemplo - Las implementaciones reales utilizarán datos específicos</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3>Próximamente</h3>
+                        <p>Estoy trabajando en nuevas visualizaciones y algoritmos que explorarán diferentes aspectos de los sistemas oceánicos. Visita esta sección regularmente para ver nuevas adiciones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Diego Hernández-Cerón. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
