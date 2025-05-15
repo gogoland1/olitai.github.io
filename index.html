@@ -4,33 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OlitAI: Corrientes de encuentro, fluidez y pensamientos</title>
-    <!-- Estilo con múltiples opciones de respaldo -->
+    <!-- Estilo en línea para crear un efecto de océano con gradientes y animaciones -->
     <style>
         body {
-            background-color: #0a1929;
             margin: 0;
             padding: 0;
+            background-color: #0a1929;
         }
         
+        /* Fondo de océano animado usando gradientes */
         .bg-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* Múltiples opciones de respaldo */
-            background-image: 
-                url('https://gogoland1.github.io/olitai.github.io/assets/main.jpg'),
-                url('/olitai.github.io/assets/main.jpg'),
-                url('./assets/main.jpg'),
-                url('assets/main.jpg'),
-                url('https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?q=80&w=1600&auto=format');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            filter: brightness(0.8);
+            background: linear-gradient(
+                135deg, 
+                #0a1929 0%, 
+                #0c2342 20%, 
+                #0e3066 40%, 
+                #0c2342 60%, 
+                #0a1929 100%
+            );
+            background-size: 400% 400%;
             z-index: -1;
+            animation: oceanWave 20s ease-in-out infinite;
+        }
+        
+        /* Efecto de olas */
+        .ocean-wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(11, 39, 65, 0.2) 0%,
+                rgba(7, 28, 48, 0.1) 50%,
+                rgba(4, 19, 33, 0) 70%
+            );
+            opacity: 0.4;
+            z-index: -1;
+            animation: waveEffect 15s ease-in-out infinite alternate;
+        }
+        
+        /* Segunda capa de olas */
+        .ocean-wave-2 {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(14, 53, 86, 0.2) 0%,
+                rgba(10, 40, 71, 0.1) 40%,
+                rgba(7, 29, 52, 0) 60%
+            );
+            opacity: 0.3;
+            z-index: -1;
+            animation: waveEffect2 18s ease-in-out infinite alternate;
+        }
+        
+        /* Destellos de luz en el océano */
+        .ocean-sparkle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 20% 20%, rgba(255, 255, 255, 0.2) 50%, transparent 100%),
+                radial-gradient(2px 2px at 30% 30%, rgba(255, 255, 255, 0.2) 50%, transparent 100%),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 50% 90%, rgba(255, 255, 255, 0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 60% 70%, rgba(255, 255, 255, 0.2) 50%, transparent 100%),
+                radial-gradient(2px 2px at 70% 40%, rgba(255, 255, 255, 0.2) 50%, transparent 100%),
+                radial-gradient(2px 2px at 80% 30%, rgba(255, 255, 255, 0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 90% 20%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            background-size: 100% 100%;
+            opacity: 0.05;
+            z-index: -1;
+            animation: sparkle 8s ease-in-out infinite alternate;
+        }
+        
+        @keyframes oceanWave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes waveEffect {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.02) translate(1%, 1%); }
+            100% { transform: scale(1) translate(2%, 0); }
+        }
+        
+        @keyframes waveEffect2 {
+            0% { transform: scale(1.02) translate(2%, 2%); }
+            50% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.02) translate(-2%, 2%); }
+        }
+        
+        @keyframes sparkle {
+            0% { opacity: 0.03; }
+            50% { opacity: 0.07; }
+            100% { opacity: 0.03; }
+        }
+
+        /* Mejoras al título principal para que destaque más */
+        .main-title {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 
+                         0 0 40px rgba(255, 255, 255, 0.1),
+                         0 0 60px rgba(10, 93, 124, 0.1);
+            animation: glow 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 
+                             0 0 40px rgba(255, 255, 255, 0.1),
+                             0 0 60px rgba(10, 93, 124, 0.1);
+            }
+            to {
+                text-shadow: 0 0 25px rgba(255, 255, 255, 0.4), 
+                             0 0 50px rgba(255, 255, 255, 0.2),
+                             0 0 75px rgba(10, 93, 124, 0.2);
+            }
         }
     </style>
     <link rel="stylesheet" href="./css/styles.css">
@@ -38,6 +141,9 @@
 </head>
 <body>
     <div class="bg-overlay"></div>
+    <div class="ocean-wave"></div>
+    <div class="ocean-wave-2"></div>
+    <div class="ocean-sparkle"></div>
 
     <header>
         <div class="logo">OlitAI</div>
