@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acerca del autor - OlitAI</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -14,10 +14,10 @@
         <div class="logo">OlitAI</div>
         <nav>
             <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="oceano-ritmos.html">Oceano-ritmos</a></li>
-                <li><a href="about.html" class="active">Acerca del autor</a></li>
+                <li><a href="./index.html">Inicio</a></li>
+                <li><a href="./blog.html">Blog</a></li>
+                <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
+                <li><a href="./about.html" class="active">Acerca de</a></li>
             </ul>
         </nav>
         <div class="menu-toggle">
@@ -29,14 +29,16 @@
         <section class="hero">
             <h1 class="main-title">Acerca del autor</h1>
             <p class="subtitle">Especialista en ecología marina, fiscalización ambiental y big data</p>
-            <div class="wave"></div>
+            <div class="scroll-indicator">
+                <a href="#content"><i class="fas fa-chevron-down"></i></a>
+            </div>
         </section>
 
-        <section class="content">
+        <section id="content" class="content">
             <div class="container">
                 <div class="profile">
                     <div class="profile-img">
-                        <img src="assets/profile.jpg" alt="Diego Hernández-Cerón">
+                        <img src="./assets/profile.jpg" alt="Diego Hernández-Cerón">
                     </div>
                     <div class="profile-info">
                         <h2>Diego Hernández-Cerón</h2>
@@ -130,6 +132,6 @@
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 </html>
