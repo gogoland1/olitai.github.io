@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OlitAI: Corrientes de encuentro, fluidez y pensamientos</title>
-    <!-- Estilo en línea para forzar la imagen de fondo -->
+    <!-- Estilo con múltiples opciones de respaldo -->
     <style>
         body {
             background-color: #0a1929;
@@ -18,8 +18,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Probamos con diferentes variaciones de la ruta */
-            background-image: url('https://gogoland1.github.io/olitai.github.io/assets/main.jpg');
+            /* Múltiples opciones de respaldo */
+            background-image: 
+                url('https://gogoland1.github.io/olitai.github.io/assets/main.jpg'),
+                url('/olitai.github.io/assets/main.jpg'),
+                url('./assets/main.jpg'),
+                url('assets/main.jpg'),
+                url('https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?q=80&w=1600&auto=format');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
