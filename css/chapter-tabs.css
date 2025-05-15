@@ -1,0 +1,234 @@
+/* Estos estilos se pueden agregar a tu archivo styles.css existente */
+
+/* Sistema de pestañas para capítulos */
+.chapter-tabs {
+    display: flex;
+    border-bottom: 2px solid #0066cc;
+    margin-bottom: 30px;
+}
+
+.tab {
+    padding: 12px 24px;
+    background-color: #f0f8ff;
+    border: 1px solid #cce5ff;
+    border-bottom: none;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #0066cc;
+    position: relative;
+}
+
+.tab:hover {
+    background-color: #e0f0ff;
+}
+
+.tab.active {
+    background-color: #0066cc;
+    color: white;
+    border-color: #0066cc;
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #0066cc;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    background-color: white;
+    border-radius: 0 0 5px 5px;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Estilos para presentación del libro */
+.book-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    position: relative;
+}
+
+.book-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.1) 100%);
+    pointer-events: none;
+}
+
+.book-header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+}
+
+.book-chapter {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #0066cc;
+    margin-bottom: 10px;
+}
+
+.book-title {
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+.book-content {
+    font-family: 'Georgia', serif;
+    font-size: 18px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.book-content p {
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.book-content p:first-child::first-letter {
+    font-size: 3.5em;
+    float: left;
+    line-height: 0.8;
+    margin-right: 10px;
+    color: #0066cc;
+}
+
+/* Estilo para mensajes de SofIA */
+.sofia-message {
+    font-style: italic;
+    color: #0066cc;
+    border-left: 3px solid #0066cc;
+    padding-left: 15px;
+    background-color: rgba(0, 102, 204, 0.05);
+    border-radius: 0 5px 5px 0;
+}
+
+/* Animación de cursor parpadeante */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 18px;
+    background-color: #0066cc;
+    margin-left: 4px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+/* Efectos cibernéticos */
+.binary-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.05;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">01001001</text><text x="30" y="40" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">10110101</text><text x="5" y="60" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">01010111</text><text x="25" y="80" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">11001010</text></svg>');
+}
+
+.code-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.code-border::before, .code-border::after {
+    content: '';
+    position: absolute;
+    background-color: rgba(0, 102, 204, 0.2);
+}
+
+.code-border::before {
+    top: 20px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+}
+
+.code-border::after {
+    top: 0;
+    left: 20px;
+    width: 1px;
+    height: 100%;
+}
+
+/* Para la animación de carga */
+.loading-text {
+    font-family: monospace;
+    color: #0066cc;
+}
+
+/* Diseño responsivo */
+@media (max-width: 768px) {
+    .chapter-tabs {
+        flex-direction: column;
+        border-bottom: none;
+    }
+    
+    .tab {
+        margin-bottom: 5px;
+        border-radius: 5px;
+        border: 1px solid #cce5ff;
+    }
+    
+    .tab.active::after {
+        display: none;
+    }
+    
+    .book-container {
+        padding: 20px 15px;
+    }
+    
+    .book-title {
+        font-size: 26px;
+    }
+    
+    .book-content {
+        font-size: 16px;
+    }
+    
+    .book-content p:first-child::first-letter {
+        font-size: 2.5em;
+    }
+}

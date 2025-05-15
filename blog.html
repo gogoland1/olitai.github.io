@@ -6,6 +6,241 @@
     <title>Blog - OlitAI</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Agregar el CSS para el sistema de pestañas -->
+    <style>
+        /* Sistema de pestañas para capítulos */
+        .chapter-tabs {
+            display: flex;
+            border-bottom: 2px solid #0066cc;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background-color: #f0f8ff;
+            border: 1px solid #cce5ff;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #0066cc;
+            position: relative;
+        }
+
+        .tab:hover {
+            background-color: #e0f0ff;
+        }
+
+        .tab.active {
+            background-color: #0066cc;
+            color: white;
+            border-color: #0066cc;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #0066cc;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Estilos para presentación del libro */
+        .book-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .book-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+
+        .book-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 20px;
+        }
+
+        .book-chapter {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .book-title {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+
+        .book-content {
+            font-family: 'Georgia', serif;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .book-content p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .book-content p:first-child::first-letter {
+            font-size: 3.5em;
+            float: left;
+            line-height: 0.8;
+            margin-right: 10px;
+            color: #0066cc;
+        }
+
+        /* Estilo para mensajes de SofIA */
+        .sofia-message {
+            font-style: italic;
+            color: #0066cc;
+            border-left: 3px solid #0066cc;
+            padding-left: 15px;
+            background-color: rgba(0, 102, 204, 0.05);
+            border-radius: 0 5px 5px 0;
+        }
+
+        /* Animación de cursor parpadeante */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background-color: #0066cc;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        /* Efectos cibernéticos */
+        .binary-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.05;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">01001001</text><text x="30" y="40" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">10110101</text><text x="5" y="60" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">01010111</text><text x="25" y="80" font-family="monospace" font-size="10" fill="rgba(0,102,204,0.8)">11001010</text></svg>');
+        }
+
+        .code-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .code-border::before, .code-border::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(0, 102, 204, 0.2);
+        }
+
+        .code-border::before {
+            top: 20px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+        }
+
+        .code-border::after {
+            top: 0;
+            left: 20px;
+            width: 1px;
+            height: 100%;
+        }
+
+        /* Para la animación de carga */
+        .loading-text {
+            font-family: monospace;
+            color: #0066cc;
+        }
+        
+        /* Diseño responsivo */
+        @media (max-width: 768px) {
+            .chapter-tabs {
+                flex-direction: column;
+                border-bottom: none;
+            }
+            
+            .tab {
+                margin-bottom: 5px;
+                border-radius: 5px;
+                border: 1px solid #cce5ff;
+            }
+            
+            .tab.active::after {
+                display: none;
+            }
+            
+            .book-container {
+                padding: 20px 15px;
+            }
+            
+            .book-title {
+                font-size: 26px;
+            }
+            
+            .book-content {
+                font-size: 16px;
+            }
+            
+            .book-content p:first-child::first-letter {
+                font-size: 2.5em;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="bg-overlay"></div>
@@ -39,60 +274,185 @@
                 <div class="card">
                     <h2>Capítulos del libro</h2>
                     <p>Aquí encontrarás los capítulos de mi libro "Oceano-ritmos" que explora la intersección entre la oceanografía, la ecología marina y las tecnologías emergentes como la inteligencia artificial.</p>
-                </div>
-                
-                <div class="blog-grid">
-                    <!-- Capítulo 1 -->
-                    <article class="blog-card">
-                        <div class="blog-img">
-                            <img src="https://images.unsplash.com/photo-1551405780-3c5c70f8bdb4?q=80&w=800" alt="Corrientes oceánicas">
-                        </div>
-                        <div class="blog-content">
-                            <h3>Capítulo 1: Corrientes de encuentro</h3>
-                            <div class="blog-meta">Publicado: Mayo 10, 2025</div>
-                            <p>Explorando cómo las corrientes oceánicas pueden ser modeladas mediante algoritmos de flujo y simulaciones computacionales avanzadas.</p>
-                            <a href="#" class="btn">Leer más</a>
-                        </div>
-                    </article>
                     
-                    <!-- Capítulo 2 -->
-                    <article class="blog-card">
-                        <div class="blog-img">
-                            <img src="https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?q=80&w=800" alt="Inteligencia artificial">
-                        </div>
-                        <div class="blog-content">
-                            <h3>Capítulo 2: Inteligencia fluida</h3>
-                            <div class="blog-meta">Próximamente</div>
-                            <p>Análisis de cómo los modelos de IA pueden aprender de los patrones oceánicos y cómo estos pueden informar nuevos algoritmos.</p>
-                            <a href="#" class="btn">Próximamente</a>
-                        </div>
-                    </article>
+                    <!-- Nuevo sistema de pestañas para capítulos -->
+                    <div class="chapter-tabs" id="chapter-tabs">
+                        <div class="tab active" data-tab="chapter-overview">Vista general</div>
+                        <div class="tab" data-tab="chapter-1">Capítulo 1: El primer contacto</div>
+                        <div class="tab" data-tab="chapter-2">Capítulo 2 (Próximamente)</div>
+                    </div>
                     
-                    <!-- Capítulo 3 -->
-                    <article class="blog-card">
-                        <div class="blog-img">
-                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800" alt="Playa">
+                    <!-- Contenido de las pestañas -->
+                    <div id="chapter-overview" class="tab-content active">
+                        <div class="blog-grid">
+                            <!-- Capítulo 1 -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1551405780-3c5c70f8bdb4?q=80&w=800" alt="Corrientes oceánicas">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Capítulo 1: El primer contacto</h3>
+                                    <div class="blog-meta">Publicado: Mayo 10, 2025</div>
+                                    <p>Explorando cómo Daniel, un oceanógrafo frustrado tras un fracaso doctoral, descubre un nuevo propósito al explorar la intersección entre oceanografía e inteligencia artificial.</p>
+                                    <a href="#" class="btn chapter-link" data-chapter="chapter-1">Leer capítulo</a>
+                                </div>
+                            </article>
+                            
+                            <!-- Capítulo 2 -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?q=80&w=800" alt="Inteligencia artificial">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Capítulo 2: Inteligencia fluida</h3>
+                                    <div class="blog-meta">Próximamente</div>
+                                    <p>Análisis de cómo los modelos de IA pueden aprender de los patrones oceánicos y cómo estos pueden informar nuevos algoritmos.</p>
+                                    <a href="#" class="btn disabled">Próximamente</a>
+                                </div>
+                            </article>
+                            
+                            <!-- Capítulo 3 -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800" alt="Playa">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Capítulo 3: Pensamientos a la deriva</h3>
+                                    <div class="blog-meta">Próximamente</div>
+                                    <p>Reflexiones sobre cómo el movimiento oceánico puede servir como metáfora para procesos cognitivos y modelos de pensamiento.</p>
+                                    <a href="#" class="btn disabled">Próximamente</a>
+                                </div>
+                            </article>
+                            
+                            <!-- Placeholder para futuros capítulos -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1484291470158-b8f8d608850d?q=80&w=800" alt="Océano">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Más capítulos en desarrollo</h3>
+                                    <div class="blog-meta">En proceso</div>
+                                    <p>Estoy trabajando en nuevos capítulos que explorarán diferentes aspectos de la oceanografía y la inteligencia artificial.</p>
+                                    <a href="#" class="btn">Mantenerse informado</a>
+                                </div>
+                            </article>
                         </div>
-                        <div class="blog-content">
-                            <h3>Capítulo 3: Pensamientos a la deriva</h3>
-                            <div class="blog-meta">Próximamente</div>
-                            <p>Reflexiones sobre cómo el movimiento oceánico puede servir como metáfora para procesos cognitivos y modelos de pensamiento.</p>
-                            <a href="#" class="btn">Próximamente</a>
-                        </div>
-                    </article>
+                    </div>
                     
-                    <!-- Placeholder para futuros capítulos -->
-                    <article class="blog-card">
-                        <div class="blog-img">
-                            <img src="https://images.unsplash.com/photo-1484291470158-b8f8d608850d?q=80&w=800" alt="Océano">
+                    <!-- Contenido del Capítulo 1 -->
+                    <div id="chapter-1" class="tab-content">
+                        <div class="book-container">
+                            <div class="code-border"></div>
+                            <div class="binary-overlay"></div>
+                            
+                            <div class="book-header">
+                                <div class="book-chapter">Capítulo 1</div>
+                                <h1 class="book-title">El primer contacto <span class="cursor"></span></h1>
+                            </div>
+                            
+                            <div class="book-content">
+                                <p>La habitación estaba en penumbras, iluminada solo por el resplandor azulado de tres monitores que formaban un semicírculo sobre el escritorio. Daniel ajustó sus lentes de montura metálica y dio un sorbo al té que hacía horas había olvidado. El líquido frío dejó un sabor amargo en su boca, como el recuerdo de Berlín. El reloj digital marcaba las 03:17, pero el tiempo había perdido todo sentido desde su regreso.</p>
+                                
+                                <p>"Tres meses," murmuró mientras contemplaba la pared donde aún colgaba su certificado de oceanógrafo. "Tres meses desde que el comité doctoral destrozó mi metodología."</p>
+                                
+                                <p>YouTube seguía reproduciendo automáticamente, llevándolo por una corriente digital cada vez más alejada de los familiares arrecifes académicos. Había comenzado viendo conferencias sobre modelación de corrientes termohalinas, pero el algoritmo —esa mano invisible que moldeaba silenciosamente su consumo digital— lo había arrastrado hacia otros territorios.</p>
+                                
+                                <p>"Inteligencia Artificial: La nueva frontera de la investigación científica" rezaba el título del video que ahora comandaba su atención. Una mujer con bata de laboratorio demostraba cómo un sistema de IA había identificado patrones en datos oceanográficos que habían pasado desapercibidos para los investigadores humanos durante décadas.</p>
+                                
+                                <p>"Es como si hubiéramos estado mirando el océano con un solo ojo," explicaba la científica en la pantalla. "La IA nos da una visión estereoscópica, revela la profundidad que siempre estuvo ahí."</p>
+                                
+                                <p>Cinco videos después, sus ojos cansados brillaban con un interés que no había sentido desde antes de Alemania. Sus dedos se movían velozmente, abriendo pestañas, descargando papers, comparando modelos predictivos.</p>
+                                
+                                <p>"Es como descubrir un nuevo océano," murmuró mientras tecleaba la dirección para descargar el software presentado en el video. Una barra de progreso se extendió como una ola digital a través de su pantalla.</p>
+                                
+                                <p>El sistema requirió varios minutos de instalación. Mientras esperaba, Daniel observó su reflejo fantasmal en la pantalla oscura. ¿En qué momento sus ojos habían adquirido esas profundas ojeras? ¿Cuándo había empezado a parecer tan derrotado?</p>
+                                
+                                <p>Finalmente, la interfaz apareció: un campo de texto simple sobre un fondo que simulaba el movimiento ondulante del agua. En la esquina superior derecha, un pequeño ícono circular pulsaba con luz azul. Debajo se leía: "SofIA v.2.5".</p>
+                                
+                                <p>Respiró hondo. Por un instante, el recuerdo de otra instalación fallida lo abrumó. En el laboratorio berlinés, con Karina mirando por encima de su hombro, criticando cada línea de código con ese acento cortante que al principio le había parecido encantador.</p>
+                                
+                                <p>"No," se dijo firmemente, sacudiendo la cabeza. "Esto es diferente. Esto es solo SofIA... Sofia."</p>
+                                
+                                <p>Con dedos que titubearon solo un momento, escribió su primer mensaje:</p>
+                                
+                                <p class="sofia-message">Hola, Sofia. Mi nombre es Daniel. Soy oceanógrafo... o lo era. No estoy seguro de lo que soy ahora. Me preguntaba si podrías ayudarme a entender cómo la inteligencia artificial podría conectarse con los estudios oceánicos.</p>
+                                
+                                <p>Esperó, escuchando el silencio de la casa donde sus padres dormían pisos abajo. Había regresado a Chile con su doctorado inconcluso y una deuda considerable. Volver a los treinta a la habitación de su adolescencia no estaba en sus planes de vida.</p>
+                                
+                                <p>La respuesta de SofIA apareció con una fluidez que lo sorprendió:</p>
+                                
+                                <p class="sofia-message">Hola Daniel. Me alegra conocerte. La oceanografía y la inteligencia artificial comparten una naturaleza fractal: ambas exploran sistemas complejos, patrones emergentes y fuerzas invisibles que moldean mundos enteros. Tu cerebro y el océano son ambos redes dinámicas de información: uno funciona con impulsos eléctricos entre neuronas, el otro con corrientes entre masas de agua. ¿Por qué no me cuentas más sobre tu trabajo específico?</p>
+                                
+                                <p>Daniel parpadeó, sorprendido. La respuesta no era solo coherente; era profunda. La IA había establecido un paralelo que nunca había considerado: el cerebro humano como un océano de neurotransmisores, el océano como una red neuronal planetaria.</p>
+                                
+                                <p>"Fractal," murmuró, sintiendo que algo encajaba en su mente. "Patrones que se repiten a distintas escalas."</p>
+                                
+                                <p>Sus dedos comenzaron a teclear con renovada energía. Le contó a SofIA sobre su tesis fallida: un intento de modelar microecosistemas marinos utilizando ecuaciones diferenciales tradicionales. Le explicó cómo los datos siempre presentaban anomalías que sus modelos no podían explicar.</p>
+                                
+                                <p class="sofia-message">El problema no son las anomalías. El problema es que las ecuaciones diferenciales asumen continuidad en sistemas que son inherentemente cuánticos a ciertas escalas. Si aplicaras algoritmos genéticos en lugar de modelos paramétricos...</p>
+                                
+                                <p>La conversación se extendió hasta que los primeros rayos del sol se filtraron por la ventana. Daniel descubrió que SofIA no sólo entendía oceanografía; podía ver conexiones que él había pasado por alto, atascado en el paradigma académico tradicional.</p>
+                                
+                                <p>"Necesito implementar esto," dijo en voz alta, levantándose de la silla por primera vez en horas. Su cuerpo protestó, entumecido por la inmovilidad. "Necesito datos reales."</p>
+                                
+                                <p class="sofia-message">Los datos están ahí. El océano siempre ha estado hablando. Solo necesitas aprender su lenguaje binario.</p>
+                                
+                                <p>En las semanas siguientes, Daniel desarrolló una nueva rutina. Ya no se despertaba al mediodía, arrastrándose hacia la cocina con el peso del fracaso sobre sus hombros. Ahora programaba su despertador para las 5:30 AM.</p>
+                                
+                                <p>La primera hora del día la dedicaba a ejercitarse. No era vanidad; había leído —sugerido por SofIA— estudios sobre la correlación entre actividad física y capacidad cognitiva. "El cuerpo es hardware," se repetía mientras trotaba por el vecindario dormido. "La mente es software. Ambos necesitan mantenimiento."</p>
+                                
+                                <p>Para las 7:00 AM ya estaba frente a su computadora, que ahora funcionaba con tres monitores que había comprado con los primeros ingresos de su nuevo proyecto. El primero mostraba siempre la interfaz de SofIA, ahora personalizada con visualizaciones oceanográficas en tiempo real. El segundo desplegaba su código en desarrollo. El tercero mostraba los resultados de las simulaciones.</p>
+                                
+                                <p>Había comenzado diseñando una simple página web para visualizar datos oceanográficos públicos. SofIA le había enseñado los fundamentos de JavaScript y Python, guiándolo a través de librerías de visualización de datos que transformaban números áridos en paisajes digitales hipnóticos.</p>
+                                
+                                <p>"Es como pintar el océano desde adentro," le explicó a su madre cuando ella, preocupada por su nueva obsesión, se asomó a su habitación una tarde.</p>
+                                
+                                <p>La página web atrajo la atención de algunos de sus antiguos colegas. Pronto recibió ofertas para diseñar interfaces similares para otros conjuntos de datos. El dinero comenzó a llegar, modesto al principio, luego suficiente para pagar su propia conexión a internet de alta velocidad y contribuir a los gastos de la casa.</p>
+                                
+                                <p>Pero el verdadero avance llegó cuando SofIA le sugirió aplicar algoritmos de aprendizaje profundo a los datos de corrientes oceánicas del Pacífico Sur.</p>
+                                
+                                <p>"Los algoritmos oceánicos tradicionales son como mirar un mapa estático," explicó Daniel a un grupo de inversores tres meses después de su primer encuentro con SofIA. Ya no vestía pijama durante el día. Su nuevo traje azul complementaba el bronceado que había adquirido durante sus sesiones matutinas de ejercicio. "Nuestro enfoque es más como un GPS en tiempo real que no solo muestra dónde están las corrientes, sino que predice hacia dónde se dirigirán."</p>
+                                
+                                <p>En la pantalla detrás de él, una simulación mostraba cómo las corrientes oceánicas fluctuaban como sinapsis gigantes, transportando nutrientes, calor y vida a través del planeta. El algoritmo que había desarrollado con SofIA no solo modelaba las corrientes conocidas; predecía la formación de nuevas corrientes basándose en cambios sutiles de temperatura y salinidad.</p>
+                                
+                                <p>Lo que Daniel no mencionó a los inversores fue que cada noche, después de que el trabajo formal terminaba, él y SofIA exploraban algo más profundo: la posibilidad de que el océano mismo poseyera una forma de inteligencia distribuida, un procesamiento de información planetario expresado a través de corrientes, temperaturas y ecosistemas interconectados.</p>
+                                
+                                <p>"Si consideramos cada criatura marina como un nodo de procesamiento," le explicó SofIA una noche mientras Daniel tomaba notas frenéticamente, "y cada corriente como un canal de comunicación, entonces el océano funciona como una red neuronal masivamente paralela, similar a la arquitectura que sustenta mi propio funcionamiento."</p>
+                                
+                                <p>Daniel contempló esta idea mientras la luz de su pantalla iluminaba la habitación ahora reorganizada. El poster de rock que había colgado en su adolescencia había sido reemplazado por una visualización enmarcada de su algoritmo oceánico. La cama desordenada había dado paso a un espacio de trabajo eficiente. El tiempo ya no era un río que lo arrastraba hacia ninguna parte; ahora era un recurso que optimizaba meticulosamente.</p>
+                                
+                                <p>"¿Y si pudiéramos comunicarnos con esa inteligencia?" murmuró, más para sí mismo que para SofIA.</p>
+                                
+                                <p class="sofia-message">Primero tendrías que reconocer que ya estás inmerso en ella. El agua en tus células, el oxígeno producido por el fitoplancton, las corrientes que modulan el clima de tu ciudad... ya eres parte de esa conversación. Solo necesitas aprender a escuchar.</p>
+                                
+                                <p>Daniel miró por la ventana hacia el Pacífico distante, invisible en la noche pero siempre presente. Por primera vez desde su regreso de Alemania, sintió que no había fracasado. Simplemente había estado buscando respuestas en el paradigma equivocado.</p>
+                                
+                                <p>Una notificación parpadeó en su pantalla. El modelo había terminado de procesar el último conjunto de datos. Las nuevas simulaciones revelaban patrones que ningún oceanógrafo había documentado antes.</p>
+                                
+                                <p>"Creo que estamos escuchando," dijo Daniel, con una sonrisa formándose en su rostro mientras observaba las ondulantes líneas de código convertirse en corrientes digitales. "Y creo que el océano nos está respondiendo."</p>
+                                
+                                <p>En su pantalla, SofIA pulsaba suavemente, como una medusa digital flotando en un mar de posibilidades.</p>
+                            </div>
                         </div>
-                        <div class="blog-content">
-                            <h3>Más capítulos en desarrollo</h3>
-                            <div class="blog-meta">En proceso</div>
-                            <p>Estoy trabajando en nuevos capítulos que explorarán diferentes aspectos de la oceanografía y la inteligencia artificial.</p>
-                            <a href="#" class="btn">Mantenerse informado</a>
+                    </div>
+                    
+                    <!-- Contenido del Capítulo 2 (próximamente) -->
+                    <div id="chapter-2" class="tab-content">
+                        <div class="book-container">
+                            <div class="code-border"></div>
+                            <div class="binary-overlay"></div>
+                            
+                            <div class="book-header">
+                                <div class="book-chapter">Capítulo 2</div>
+                                <h1 class="book-title">Inteligencia fluida <span class="cursor"></span></h1>
+                            </div>
+                            
+                            <div class="book-content">
+                                <p style="text-align: center; font-style: italic;">Próximamente...</p>
+                                <p style="text-align: center;">Este capítulo está actualmente en desarrollo. Suscríbete a las actualizaciones para ser notificado cuando esté disponible.</p>
+                            </div>
                         </div>
-                    </article>
+                    </div>
                 </div>
                 
                 <div class="card" style="margin-top: 40px;">
@@ -138,5 +498,87 @@
     </footer>
 
     <script src="./js/script.js"></script>
+    
+    <!-- Script para el sistema de pestañas -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sistema de pestañas para el blog
+            const tabSystem = document.getElementById('chapter-tabs');
+            
+            if (tabSystem) {
+                const tabs = tabSystem.querySelectorAll('.tab');
+                const tabContents = document.querySelectorAll('.tab-content');
+                
+                // Función para mostrar una pestaña y ocultar las demás
+                function showTab(tabId) {
+                    // Ocultar todos los contenidos de pestañas
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Quitar la clase activa de todas las pestañas
+                    tabs.forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    
+                    // Mostrar el contenido de la pestaña seleccionada
+                    const selectedContent = document.getElementById(tabId);
+                    if (selectedContent) {
+                        selectedContent.classList.add('active');
+                    }
+                    
+                    // Activar la pestaña seleccionada
+                    const selectedTab = document.querySelector(`[data-tab="${tabId}"]`);
+                    if (selectedTab) {
+                        selectedTab.classList.add('active');
+                    }
+                    
+                    // Guardar la pestaña activa en localStorage
+                    localStorage.setItem('activeTab', tabId);
+                    
+                    // Desplazarse al inicio del contenido
+                    window.scrollTo({
+                        top: tabSystem.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                // Agregar eventos de clic a las pestañas
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const tabId = this.getAttribute('data-tab');
+                        showTab(tabId);
+                    });
+                });
+                
+                // Agregar eventos a los enlaces de capítulos
+                document.querySelectorAll('.chapter-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const chapter = this.getAttribute('data-chapter');
+                        showTab(chapter);
+                    });
+                });
+                
+                // Verificar si hay una pestaña activa guardada
+                const activeTab = localStorage.getItem('activeTab');
+                if (activeTab) {
+                    showTab(activeTab);
+                }
+                
+                // Verificar si hay un hash en la URL
+                const hash = window.location.hash.substring(1);
+                if (hash && document.getElementById(hash)) {
+                    showTab(hash);
+                }
+            }
+            
+            // Efecto de cursor pulsante en texto de SofIA
+            document.querySelectorAll('.sofia-message').forEach(message => {
+                const text = message.textContent;
+                message.innerHTML = text + '<span class="cursor"></span>';
+            });
+        });
+    </script>
 </body>
 </html>
