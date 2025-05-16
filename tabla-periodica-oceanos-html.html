@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla Periódica de los Océanos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+        
+        .modal-content {
+            background-color: #f9f9f9;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #555;
+        }
+        
+        .element-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .element-info-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .element-info-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        
+        .info-section-title {
+            color: #8B0000;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+        
+        .legends {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-group {
+            margin-right: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border: 1px solid #333;
+        }
+        
+        .border-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border: 2px solid;
+            background-color: white;
+        }
+        
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 55px);
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .element {
+            width: 55px;
+            height: 65px;
+            border: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            padding: 2px;
+            box-sizing: border-box;
+            font-size: 12px;
+            position: relative;
+        }
+        
+        .atomic-number {
+            font-size: 10px;
+            text-align: left;
+        }
+        
+        .symbol {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 2px 0;
+        }
+        
+        .name {
+            font-size: 8px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .concentration {
+            font-size: 8px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Elemento mayoritarios (mM-M) */
+        .cat-1 {
+            background-color: #4295f5;
+        }
+        
+        /* Nutrientes (μM) */
+        .cat-2 {
+            background-color: #42c5f5;
+        }
+        
+        /* Micronutrientes (nM) */
+        .cat-3 {
+            background-color: #42f5a7;
+        }
+        
+        /* Ultratraza (pM) */
+        .cat-4 {
+            background-color: #f5e642;
+        }
+        
+        /* Tierras raras (fM-pM) */
+        .cat-5 {
+            background-color: #f542a1;
+        }
+        
+        /* Gases nobles */
+        .cat-6 {
+            background-color: #c9c9c9;
+        }
+        
+        /* Radiactivos */
+        .cat-7 {
+            background-color: #f5a742;
+        }
+        
+        /* Metales pesados */
+        .cat-8 {
+            background-color: #d342f5;
+        }
+        
+        /* No detectables/Artificiales */
+        .cat-9 {
+            background-color: white;
+        }
+        
+        /* Estilos para los bordes funcionales */
+        .func-1 {
+            border: 2px solid #0000aa; /* Estructural */
+        }
+        
+        .func-2 {
+            border: 2px solid #008800; /* Fotosintético */
+        }
+        
+        .func-3 {
+            border: 2px solid #aa8800; /* Enzimático */
+        }
+        
+        .func-4 {
+            border: 2px solid #880000; /* Osmótico */
+        }
+        
+        .func-5 {
+            border: 2px solid #8800aa; /* Redox */
+        }
+        
+        .func-6 {
+            border: 2px solid #ff0000; /* Lantano especial */
+        }
+        
+        .lanthanide-series, .actinide-series {
+            display: grid;
+            grid-template-columns: repeat(14, 55px);
+            gap: 4px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .element-group-title {
+            grid-column: span 14;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .elements-93-103, .elements-104-118 {
+            grid-column: span 14;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            margin-top: 4px;
+        }
+        
+        .empty-cell {
+            width: 55px;
+            height: 65px;
+        }
+        
+        .info-section {
+            border: 1px solid #777;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            background-color: #f8f8f8;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            margin-left: 10px;
+        }
+        
+        .info-item {
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .info-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #555;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        /* Tooltips para nombres largos */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            background-color: rgba(0,0,0,0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TABLA PERIÓDICA DE LOS OCÉANOS</h1>
+        <div class="subtitle">Elementos químicos, concentraciones y funciones en ecosistemas marinos</div>
+        
+        <div class="legends">
+            <div class="legend-group">
+                <div class="legend-title">Categorías de concentración:</div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #4295f5;"></div>
+                    <div>Mayoritarios (mM-M)</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #42c5f5;"></div>
+                    <div>Nutrientes (μM)</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #42f5a7;"></div>
+                    <div>Micronutrientes (nM)</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #f5e642;"></div>
+                    <div>Ultratraza (pM)</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #f542a1;"></div>
+                    <div>Tierras raras (fM-pM)</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #c9c9c9;"></div>
+                    <div>Gases nobles</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #f5a742;"></div>
+                    <div>Radiactivos</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #d342f5;"></div>
+                    <div>Metales pesados</div>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: white;"></div>
+                    <div>No detectables/Artificiales</div>
+                </div>
+            </div>
+            
+            <div class="legend-group">
+                <div class="legend-title">Grupos funcionales:</div>
+                <div class="legend-item">
+                    <div class="border-box" style="border-color: #0000aa;"></div>
+                    <div>Estructural (esqueletos/conchas)</div>
+                </div>
+                <div class="legend-item">
+                    <div class="border-box" style="border-color: #008800;"></div>
+                    <div>Fotosintético</div>
+                </div>
+                <div class="legend-item">
+                    <div class="border-box" style="border-color: #aa8800;"></div>
+                    <div>Enzimático/Cofactor</div>
+                </div>
+                <div class="legend-item">
+                    <div class="border-box" style="border-color: #880000;"></div>
+                    <div>Osmótico/Regulación iónica</div>
+                </div>
+                <div class="legend-item">
+                    <div class="border-box" style="border-color: #8800aa;"></div>
+                    <div>Redox/Respiración</div>
+                </div>
+            </div>
+            
+            <div class="legend-group">
+                <div class="legend-title">Símbolos:</div>
+                <div class="legend-item">
+                    <div style="width: 20px; text-align: center; margin-right: 8px;">⚠️</div>
+                    <div>Limitante del crecimiento</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 20px; text-align: center; margin-right: 8px;">⚡</div>
+                    <div>Contaminante/Tóxico</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 20px; text-align: center; margin-right: 8px;">🏭</div>
+                    <div>Origen antropogénico</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 20px; text-align: center; margin-right: 8px;">🔍</div>
+                    <div>Trazador oceanográfico</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 20px; text-align: center; margin-right: 8px;">🔎</div>
+                    <div>Potencial biológico por descubrir</div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 20px; text-align: center; margin-right: 8px;">🧪</div>
+                    <div>Elemento sintético</div>
+                </div>
+            </div>
+            
+            <div class="legend-group">
+                <div class="legend-title">Unidades de concentración:</div>
+                <div class="legend-item">
+                    <div>M = molar (mol/L)</div>
+                </div>
+                <div class="legend-item">
+                    <div>mM = milimolar (10⁻³ M)</div>
+                </div>
+                <div class="legend-item">
+                    <div>μM = micromolar (10⁻⁶ M)</div>
+                </div>
+                <div class="legend-item">
+                    <div>nM = nanomolar (10⁻⁹ M)</div>
+                </div>
+                <div class="legend-item">
+                    <div>pM = picomolar (10⁻¹² M)</div>
+                </div>
+                <div class="legend-item">
+                    <div>fM = femtomolar (10⁻¹⁵ M)</div>
+                </div>
+                <div class="legend-item">
+                    <div>aM = attomolar (10⁻¹⁸ M)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla Periódica -->
+        <div class="periodic-table">
+            <!-- Fila 1 -->
+            <div class="element cat-1">
+                <div class="atomic-number">1</div>
+                <div class="symbol">H</div>
+                <div class="name">Hidrógeno</div>
+                <div class="concentration">~110 M</div>
+            </div>
+            <!-- Espacios vacíos hasta llegar al grupo 18 -->
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="element cat-6">
+                <div class="atomic-number">2</div>
+                <div class="symbol">He</div>
+                <div class="name">Helio</div>
+                <div class="concentration">~2 nM 🔍</div>
+            </div>
+            
+            <!-- Fila 2 -->
+            <div class="element cat-1">
+                <div class="atomic-number">3</div>
+                <div class="symbol">Li</div>
+                <div class="name">Litio</div>
+                <div class="concentration">~25 μM</div>
+            </div>
+            <div class="element cat-3">
+                <div class="atomic-number">4</div>
+                <div class="symbol">Be</div>
+                <div class="name">Berilio</div>
+                <div class="concentration">~0.6 pM</div>
+            </div>
+            <!-- Espacios vacíos -->
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <!-- Elementos del grupo 13-18 de la fila 2 -->
+            <div class="element cat-2">
+                <div class="atomic-number">5</div>
+                <div class="symbol">B</div>
+                <div class="name">Boro</div>
+                <div class="concentration">~0.4 mM</div>
+            </div>
+            <div class="element cat-1">
+                <div class="atomic-number">6</div>
+                <div class="symbol">C</div>
+                <div class="name">Carbono</div>
+                <div class="concentration">~2.3 mM</div>
+            </div>
+            <div class="element cat-2 func-4">
+                <div class="atomic-number">7</div>
+                <div class="symbol">N</div>
+                <div class="name">Nitrógeno</div>
+                <div class="concentration">0-40 μM ⚠️</div>
+            </div>
+            <div class="element cat-1 func-5">
+                <div class="atomic-number">8</div>
+                <div class="symbol">O</div>
+                <div class="name">Oxígeno</div>
+                <div class="concentration">~55 M</div>
+            </div>
+            <div class="element cat-1">
+                <div class="atomic-number">9</div>
+                <div class="symbol">F</div>
+                <div class="name">Flúor</div>
+                <div class="concentration">~70 μM</div>
+            </div>
+            <div class="element cat-6">
+                <div class="atomic-number">10</div>
+                <div class="symbol">Ne</div>
+                <div class="name">Neón</div>
+                <div class="concentration">~0.1 μM 🔍</div>
+            </div>
+            
+            <!-- Fila 3 -->
+            <div class="element cat-1 func-4">
+                <div class="atomic-number">11</div>
+                <div class="symbol">Na</div>
+                <div class="name">Sodio</div>
+                <div class="concentration">~0.47 M</div>
+            </div>
+            <div class="element cat-1 func-2">
+                <div class="atomic-number">12</div>
+                <div class="symbol">Mg</div>
+                <div class="name">Magnesio</div>
+                <div class="concentration">~0.05 M</div>
+            </div>
+            <!-- Espacios vacíos -->
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <div class="empty-cell"></div>
+            <!-- Elementos del grupo 13-18 de la fila 3 -->
+            <div class="element cat-3">
+                <div class="atomic-number">13</div>
+                <div class="symbol">Al</div>
+                <div class="name">Aluminio</div>
+                <div class="concentration">~2-40 nM</div>
+            </div>
+            <div class="element cat-2 func-1">
+                <div class="atomic-number">14</div>
+                <div class="symbol">Si</div>
+                <div class="name">Silicio</div>
+                <div class="concentration">0-180 μM ⚠️</div>
+            </div>
+            <div class="element cat-2">
+                <div class="atomic-number">15</div>
+                <div class="symbol">P</div>
+                <div class="name">Fósforo</div>
+                <div class="concentration">0-3 μM ⚠️</div>
+            </div>
+            <div class="element cat-1">
+                <div class="atomic-number">16</div>
+                <div class="symbol">S</div>
+                <div class="name">Azufre</div>
+                <div class="concentration">~0.03 M</div>
+            </div>
+            <div class="element cat-1 func-4">
+                <div class="atomic-number">17</div>
+                <div class="symbol">Cl</div>
+                <div class="name">Cloro</div>
+                <div class="concentration">~0.55 M</div>
+            </div>
+            <div class="element cat-6">
+                <div class="atomic-number">18</div>
+                <div class="symbol">Ar</div>
+                <div class="name">Argón</div>
+                <div class="concentration">~15 μM 🔍</div>
+            </div>
+            
+            <!-- Fila 4 -->
+            <div class="element cat-1 func-4">
+                <div class="atomic-number">19</div>
+                <div class="symbol">K</div>
+                <div class="name">Potasio</div>
+                <div class="concentration">~0.01 M</div>
+            </div>
+            <div class="element cat-1 func-1">
+                <div class="atomic-number">20</div>
+                <div class="symbol">Ca</div>
+                <div class="name">Calcio</div>
+                <div class="concentration">~0.01 M</div>
+            </div>
+            <div class="element cat-5">
+                <div class="atomic-number">21</div>
+                <div class="symbol">Sc</div>
+                <div class="name">Escandio</div>
+                <div class="concentration">~0.01 nM</div>
+            </div>
+            <div class="element cat-3">
+                <div class="atomic-number">22</div>
+                <div class="symbol">Ti</div>
+                <div class="name">Titanio</div>
+                <div class="concentration">~1 pM</div>
+            </div>
+            <div class="element cat-3">
+                <div class="atomic-number">23</div>
+                <div class="symbol">V</div>
+                <div class="name">Vanadio</div>
+                <div class="concentration">20-35 nM</div>
+            </div>
+            <div class="element cat-3">
+                <div class="atomic-number">24</div>
+                <div class="symbol">Cr</div>
+                <div class="name">Cromo</div>
+                <div class="concentration">~4 nM</div>
+            </div>
+            <div class="element cat-3 func-2">
+                <div class="atomic-number">25</div>
+                <div class="symbol">Mn</div>
+                <div class="name">Manganeso</div>
+                <div class="concentration">0.1-4 nM</div>
+            </div>
+            <div class="element cat-3 func-2">
+                <div class="atomic-number">26</div>
+                <div class="symbol">Fe</div>
+                <div class="name">Hierro</div>
+                <div class="concentration">0.05-2 nM ⚠️</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">27</div>
+                <div class="symbol">Co</div>
+                <div class="name">Cobalto</div>
+                <div class="concentration">4-120 pM</div>
+            </div>
+            <div class="element cat-3 func-3">
+                <div class="atomic-number">28</div>
+                <div class="symbol">Ni</div>
+                <div class="name">Níquel</div>
+                <div class="concentration">2-12 nM</div>
+            </div>
+            <div class="element cat-3 func-3">
+                <div class="atomic-number">29</div>
+                <div class="symbol">Cu</div>
+                <div class="name">Cobre</div>
+                <div class="concentration">0.5-5 nM</div>
+            </div>
+            <div class="element cat-3 func-3">
+                <div class="atomic-number">30</div>
+                <div class="symbol">Zn</div>
+                <div class="name">Zinc</div>
+                <div class="concentration">0.1-10 nM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">31</div>
+                <div class="symbol">Ga</div>
+                <div class="name">Galio</div>
+                <div class="concentration">~30 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">32</div>
+                <div class="symbol">Ge</div>
+                <div class="name">Germanio</div>
+                <div class="concentration">~7 pM</div>
+            </div>
+            <div class="element cat-3">
+                <div class="atomic-number">33</div>
+                <div class="symbol">As</div>
+                <div class="name">Arsénico</div>
+                <div class="concentration">15-25 nM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">34</div>
+                <div class="symbol">Se</div>
+                <div class="name">Selenio</div>
+                <div class="concentration">0.5-2 nM</div>
+            </div>
+            <div class="element cat-1">
+                <div class="atomic-number">35</div>
+                <div class="symbol">Br</div>
+                <div class="name">Bromo</div>
+                <div class="concentration">~0.8 mM</div>
+            </div>
+            <div class="element cat-6">
+                <div class="atomic-number">36</div>
+                <div class="symbol">Kr</div>
+                <div class="name">Kriptón</div>
+                <div class="concentration">~3 nM 🔍</div>
+            </div>
+            
+            <!-- Fila 5 -->
+            <div class="element cat-2">
+                <div class="atomic-number">37</div>
+                <div class="symbol">Rb</div>
+                <div class="name">Rubidio</div>
+                <div class="concentration">~1.4 μM</div>
+            </div>
+            <div class="element cat-2 func-1">
+                <div class="atomic-number">38</div>
+                <div class="symbol">Sr</div>
+                <div class="name">Estroncio</div>
+                <div class="concentration">~90 μM</div>
+            </div>
+            <div class="element cat-5">
+                <div class="atomic-number">39</div>
+                <div class="symbol">Y</div>
+                <div class="name">Itrio</div>
+                <div class="concentration">~0.1 nM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">40</div>
+                <div class="symbol">Zr</div>
+                <div class="name">Zirconio</div>
+                <div class="concentration">~0.3 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">41</div>
+                <div class="symbol">Nb</div>
+                <div class="name">Niobio</div>
+                <div class="concentration">~0.01 pM</div>
+            </div>
+            <div class="element cat-3 func-3">
+                <div class="atomic-number">42</div>
+                <div class="symbol">Mo</div>
+                <div class="name">Molibdeno</div>
+                <div class="concentration">~100 nM</div>
+            </div>
+            <div class="element cat-9">
+                <div class="atomic-number">43</div>
+                <div class="symbol">Tc</div>
+                <div class="name">Tecnecio</div>
+                <div class="concentration">Artificial 🧪</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">44</div>
+                <div class="symbol">Ru</div>
+                <div class="name">Rutenio</div>
+                <div class="concentration">~1 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">45</div>
+                <div class="symbol">Rh</div>
+                <div class="name">Rodio</div>
+                <div class="concentration">~0.4 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">46</div>
+                <div class="symbol">Pd</div>
+                <div class="name">Paladio</div>
+                <div class="concentration">~0.06 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">47</div>
+                <div class="symbol">Ag</div>
+                <div class="name">Plata</div>
+                <div class="concentration">~0.2 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">48</div>
+                <div class="symbol">Cd</div>
+                <div class="name">Cadmio</div>
+                <div class="concentration">1-100 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">49</div>
+                <div class="symbol">In</div>
+                <div class="name">Indio</div>
+                <div class="concentration">~1 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">50</div>
+                <div class="symbol">Sn</div>
+                <div class="name">Estaño</div>
+                <div class="concentration">~1 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">51</div>
+                <div class="symbol">Sb</div>
+                <div class="name">Antimonio</div>
+                <div class="concentration">~1.1 nM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">52</div>
+                <div class="symbol">Te</div>
+                <div class="name">Telurio</div>
+                <div class="concentration">~0.1 pM</div>
+            </div>
+            <div class="element cat-2">
+                <div class="atomic-number">53</div>
+                <div class="symbol">I</div>
+                <div class="name">Yodo</div>
+                <div class="concentration">~0.5 μM</div>
+            </div>
+            <div class="element cat-6">
+                <div class="atomic-number">54</div>
+                <div class="symbol">Xe</div>
+                <div class="name">Xenón</div>
+                <div class="concentration">~0.5 nM 🔍</div>
+            </div>
+            
+            <!-- Fila 6 -->
+            <div class="element cat-2">
+                <div class="atomic-number">55</div>
+                <div class="symbol">Cs</div>
+                <div class="name">Cesio</div>
+                <div class="concentration">~2 nM</div>
+            </div>
+            <div class="element cat-2 func-1">
+                <div class="atomic-number">56</div>
+                <div class="symbol">Ba</div>
+                <div class="name">Bario</div>
+                <div class="concentration">~145 nM</div>
+            </div>
+            <div class="element cat-5 func-6">
+                <div class="atomic-number">57</div>
+                <div class="symbol">La</div>
+                <div class="name">Lantano</div>
+                <div class="concentration">~0.04 nM 🔎</div>
+            </div>
+            <!-- Nota: Elementos 58-71 (Lantánidos) van abajo en serie separada -->
+            <div class="element cat-5">
+                <div class="atomic-number">72</div>
+                <div class="symbol">Hf</div>
+                <div class="name">Hafnio</div>
+                <div class="concentration">~0.001 nM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">73</div>
+                <div class="symbol">Ta</div>
+                <div class="name">Tántalo</div>
+                <div class="concentration">~0.001 pM</div>
+            </div>
+            <div class="element cat-3">
+                <div class="atomic-number">74</div>
+                <div class="symbol">W</div>
+                <div class="name">Tungsteno</div>
+                <div class="concentration">~1 nM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">75</div>
+                <div class="symbol">Re</div>
+                <div class="name">Renio</div>
+                <div class="concentration">~40 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">76</div>
+                <div class="symbol">Os</div>
+                <div class="name">Osmio</div>
+                <div class="concentration">~0.01 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">77</div>
+                <div class="symbol">Ir</div>
+                <div class="name">Iridio</div>
+                <div class="concentration">~0.001 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">78</div>
+                <div class="symbol">Pt</div>
+                <div class="name">Platino</div>
+                <div class="concentration">~0.1 pM</div>
+            </div>
+            <div class="element cat-4">
+                <div class="atomic-number">79</div>
+                <div class="symbol">Au</div>
+                <div class="name">Oro</div>
+                <div class="concentration">~0.1 pM</div>
+            </div>
+            <div class="element cat-8">
+                <div class="atomic-number">80</div>
+                <div class="symbol">Hg</div>
+                <div class="name">Mercurio</div>
+                <div class="concentration">~1 pM ⚡</div>
+            </div>
+            <div class="element cat-8">
+                <div class="atomic-number">81</div>
+                <div class="symbol">Tl</div>
+                <div class="name">Talio</div>
+                <div class="concentration">~80 pM</div>
+            </div>
+            <div class="element cat-8">
+                <div class="atomic-number">82</div>
+                <div class="symbol">Pb</div>
+                <div class="name">Plomo</div>
+                <div class="concentration">~0.01 nM 🏭</div>
+            </div>
+            <div class="element cat-8">
+                <div class="atomic-number">83</div>
+                <div class="symbol">Bi</div>
+                <div class="name">Bismuto</div>
+                <div class="concentration">~0.1 pM</div>
+            </div>
+            <div class="element cat-7">
+                <div class="atomic-number">84</div>
+                <div class="symbol">Po</div>
+                <div class="name">Polonio</div>
+                <div class="concentration">Trazas 🔍</div>
+            </div>
+            <div class="element cat-9">
+                <div class="atomic-number">85</div>
+                <div class="symbol">At</div>
+                <div class="name">Astato</div>
+                <div class="concentration">No detect.</div>
+            </div>
+            <div class="element cat-6">
+                <div class="atomic-number">86</div>
+                <div class="symbol">Rn</div>
+                <div class="name">Radón</div>
+                <div class="concentration">Trazas 🔍</div>
+            </div>
+            
+            <!-- Fila 7 -->
+            <div class="element cat-9">
+                <div class="atomic-number">87</div>
+                <div class="symbol">Fr</div>
+                <div class="name">Francio</div>
+                <div class="concentration">No detect.</div>
+            </div>
+            <div class="element cat-7">
+                <div class="atomic-number">88</div>
+                <div class="symbol">Ra</div>
+                <div class="name">Radio</div>
+                <div class="concentration">~0.1 mBq/L</div>
+            </div>
+            <div class="element cat-7">
+                <div class="atomic-number">89</div>
+                <div class="symbol">Ac</div>
+                <div class="name">Actinio</div>
+                <div class="concentration">Trazas</div>
+            </div>
+            <!-- Nota: Elementos 90-103 (Actínidos) van abajo en serie separada -->
+            <div style="grid-column: span 15; text-align: center; background-color: white; border: 1px solid black; padding: 10px;">
+                <strong>Elementos 104-118</strong><br>
+                Sintéticos - No detectables en océanos 🧪
+            </div>
+        </div>
+        
+        <!-- Series de Lantánidos y Actínidos -->
+        <div class="container">
+            <div class="element-group-title">Serie Lantánidos:</div>
+            <div class="lanthanide-series">
+                <!-- Ce - Lu (58-71) -->
+                <div class="element cat-5">
+                    <div class="atomic-number">58</div>
+                    <div class="symbol">Ce</div>
+                    <div class="name">Cerio</div>
+                    <div class="concentration">~0.02 nM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">59</div>
+                    <div class="symbol">Pr</div>
+                    <div class="name">Praseodimio</div>
+                    <div class="concentration">~5 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">60</div>
+                    <div class="symbol">Nd</div>
+                    <div class="name">Neodimio</div>
+                    <div class="concentration">~0.02 nM</div>
+                </div>
+                <div class="element cat-9">
+                    <div class="atomic-number">61</div>
+                    <div class="symbol">Pm</div>
+                    <div class="name">Prometio</div>
+                    <div class="concentration">Artificial 🧪</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">62</div>
+                    <div class="symbol">Sm</div>
+                    <div class="name">Samario</div>
+                    <div class="concentration">~3.9 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">63</div>
+                    <div class="symbol">Eu</div>
+                    <div class="name">Europio</div>
+                    <div class="concentration">~0.9 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">64</div>
+                    <div class="symbol">Gd</div>
+                    <div class="name">Gadolinio</div>
+                    <div class="concentration">~5.5 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">65</div>
+                    <div class="symbol">Tb</div>
+                    <div class="name">Terbio</div>
+                    <div class="concentration">~0.8 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">66</div>
+                    <div class="symbol">Dy</div>
+                    <div class="name">Disprosio</div>
+                    <div class="concentration">~5.0 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">67</div>
+                    <div class="symbol">Ho</div>
+                    <div class="name">Holmio</div>
+                    <div class="concentration">~1.2 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">68</div>
+                    <div class="symbol">Er</div>
+                    <div class="name">Erbio</div>
+                    <div class="concentration">~3.8 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">69</div>
+                    <div class="symbol">Tm</div>
+                    <div class="name">Tulio</div>
+                    <div class="concentration">~0.5 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">70</div>
+                    <div class="symbol">Yb</div>
+                    <div class="name">Iterbio</div>
+                    <div class="concentration">~3.5 pM</div>
+                </div>
+                <div class="element cat-5">
+                    <div class="atomic-number">71</div>
+                    <div class="symbol">Lu</div>
+                    <div class="name">Lutecio</div>
+                    <div class="concentration">~0.6 pM</div>
+                </div>
+            </div>
+
+            <div class="element-group-title">Serie Actínidos:</div>
+            <div class="actinide-series">
+                <!-- Th, Pa, U (90-92) -->
+                <div class="element cat-7">
+                    <div class="atomic-number">90</div>
+                    <div class="symbol">Th</div>
+                    <div class="name">Torio</div>
+                    <div class="concentration">~1 pM</div>
+                </div>
+                <div class="element cat-7">
+                    <div class="atomic-number">91</div>
+                    <div class="symbol">Pa</div>
+                    <div class="name">Protactinio</div>
+                    <div class="concentration">~0.02 pM</div>
+                </div>
+                <div class="element cat-7">
+                    <div class="atomic-number">92</div>
+                    <div class="symbol">U</div>
+                    <div class="name">Uranio</div>
+                    <div class="concentration">~13 nM 🔍</div>
+                </div>
+                <!-- Elementos 93-103 -->
+                <div style="grid-column: span 11; text-align: center; background-color: white; border: 1px solid black; padding: 10px;">
+                    <strong>Elementos 93-103</strong><br>
+                    Neptunio (Np), Plutonio (Pu), Americio (Am), Curio (Cm), Berkelio (Bk), Californio (Cf),<br>
+                    Einstenio (Es), Fermio (Fm), Mendelevio (Md), Nobelio (No), Lawrencio (Lr)<br>
+                    Actínidos sintéticos - Trazas o indetectables en océanos 🧪
+                </div>
+            </div>
+        </div>
+        
+        <!-- Secciones de información adicional -->
+        <div class="info-section">
+            <div class="info-title">Importancia de las Tierras Raras (La-Lu) en los Océanos:</div>
+            <div class="info-content">
+                <div class="info-item">Aunque presentes en concentraciones ultratrazas (pM-fM), son fundamentales como trazadores de procesos oceánicos</div>
+                <div class="info-item">El lantano (La) y otras tierras raras pueden formar carbonatos y fosfatos biogénicos en organismos marinos</div>
+                <div class="info-item">Sus perfiles verticales y distribuciones horizontales funcionan como "huellas dactilares" de masas de agua</div>
+                <div class="info-item">Potencial biológico: algunas bacterias y algas pueden concentrar tierras raras para funciones bioquímicas aún por descubrir</div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-title">Notas sobre elementos indetectables o artificiales:</div>
+            <div class="info-content">
+                <div class="info-item">Los elementos marcados como "No detectables" podrían estar presentes en concentraciones subfemtomolares (menos de 10⁻¹⁵ M)</div>
+                <div class="info-item">La ausencia de detección no implica ausencia de función: podría haber nichos biológicos específicos donde se concentren</div>
+                <div class="info-item">Los elementos artificiales o de vida media corta (Tc, Pm) no persisten naturalmente en océanos</div>
+                <div class="info-item">Las concentraciones de muchos elementos varían con la profundidad, región geográfica y proximidad a fuentes (ríos, surgencias, etc.)</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Basado en datos del MBARI (Monterey Bay Aquarium Research Institute), datos oceanográficos actuales y literatura científica especializada.</p>
+            <p>La concentración y función de los elementos varía según profundidad, región y condiciones oceanográficas.</p>
+            <p>Las técnicas analíticas mejoran constantemente, permitiendo detectar elementos antes considerados ausentes en los océanos.</p>
+        </div>
+    </div>
+    <!-- Modal para información detallada del elemento -->
+    <div id="elementModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="elementDetailContent"></div>
+        </div>
+    </div>
+    
+    <!-- Template para la información del Hidrógeno -->
+    <div id="elementTemplates" style="display: none;">
+        <div id="hydrogen-info">
+            <h1>Hidrógeno (H)</h1>
+            
+            <table class="element-info-table">
+                <tr>
+                    <td>Número atómico:</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Peso atómico:</td>
+                    <td>1.00794</td>
+                </tr>
+                <tr>
+                    <td>Concentración promedio en océano:</td>
+                    <td>12 nmol/kg</td>
+                </tr>
+                <tr>
+                    <td>Tiempo de residencia:</td>
+                    <td>Variable según forma química</td>
+                </tr>
+            </table>
+            
+            <h2 class="info-section-title">Distribución en el océano</h2>
+            <p>Las concentraciones de iones de hidrógeno, frecuentemente expresadas como pH = -log<sub>10</sub> (H<sup>+</sup>), están controladas por la respiración y la fotosíntesis, que alteran la concentración de ácido carbónico en el agua de mar. Existe una fuerte correlación entre el oxígeno y el pH por lo tanto.</p>
+            <p>En los océanos actuales, el pH superficial promedio es de aproximadamente 8.1, aunque está disminuyendo debido a la acidificación oceánica causada por la absorción de CO<sub>2</sub> antropogénico.</p>
+            
+            <h2 class="info-section-title">Especiación</h2>
+            <p>La forma principal del hidrógeno, aparte del agua, es el ion H<sup>+</sup> y sus complejos con sulfato (HSO<sub>4</sub><sup>-</sup>) y fluoruro (HF<sup>0</sup>). También pueden generarse cantidades traza de gas hidrógeno H<sub>2</sub>.</p>
+            <p>Los isótopos del hidrógeno (deuterio, <sup>2</sup>H) se utilizan como trazadores para determinar el origen del agua, ya que la proporción de deuterio/hidrógeno difiere entre el agua continental y oceánica, permitiendo identificar fuentes y procesos de mezcla.</p>
+            
+            <h2 class="info-section-title">Análisis</h2>
+            <p>El ion hidrógeno se determina clásicamente con un electrodo de pH de vidrio. Investigaciones recientes han demostrado que las concentraciones de iones hidrógeno pueden determinarse con mucha mayor precisión en agua de mar mediante colorimetría con indicadores ácido-base.</p>
+            <p>Para mediciones de alta precisión en estudios de acidificación oceánica, se utilizan espectrofotómetros especiales con indicadores como púrpura de m-cresol.</p>
+            
+            <h2 class="info-section-title">Importancia en ecosistemas marinos</h2>
+            <p>El pH oceánico es crítico para muchos procesos biológicos y geoquímicos, incluyendo:</p>
+            <ul>
+                <li>Formación de estructuras calcáreas (conchas, esqueletos) en organismos marinos</li>
+                <li>Disponibilidad de nutrientes</li>
+                <li>Especiación de metales traza</li>
+                <li>Fisiología de organismos marinos</li>
+            </ul>
+            <p>La acidificación oceánica representa una amenaza significativa para ecosistemas como los arrecifes de coral y otras comunidades dependientes de organismos calcificadores.</p>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript para la interactividad de la tabla periódica
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener referencias al modal y elementos relacionados
+            const modal = document.getElementById('elementModal');
+            const closeModal = document.querySelector('.close-modal');
+            const detailContent = document.getElementById('elementDetailContent');
+            
+            // Hacer que todos los elementos sean clickeables
+            document.querySelectorAll('.element').forEach(function(elementDiv) {
+                // Obtener el símbolo del elemento
+                const symbol = elementDiv.querySelector('.symbol').textContent.trim();
+                
+                // Solo añadir interactividad a los elementos que tienen información detallada
+                const infoId = symbol.toLowerCase() + '-info';
+                if (document.getElementById(infoId)) {
+                    elementDiv.style.cursor = 'pointer';
+                    elementDiv.title = 'Haz clic para ver información detallada';
+                    
+                    elementDiv.addEventListener('click', function() {
+                        const elementInfo = document.getElementById(infoId).cloneNode(true);
+                        detailContent.innerHTML = '';
+                        detailContent.appendChild(elementInfo);
+                        modal.style.display = 'block';
+                    });
+                }
+            });
+            
+            // Cerrar el modal cuando se hace clic en X
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Cerrar el modal cuando se hace clic fuera del contenido
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
