@@ -1,0 +1,84 @@
+/* Breadcrumb Styling */
+.breadcrumb {
+    padding: 10px 15px;
+    background-color: #f8f9fa; /* Light background for breadcrumbs */
+    border-radius: 4px;
+    margin-bottom: 20px;
+    list-style: none;
+    display: flex;
+}
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">"; /* Separator for breadcrumb items */
+    padding: 0 8px;
+    color: #6c757d;
+}
+.breadcrumb-item a {
+    color: var(--primary-color); /* Use existing primary color variable */
+    text-decoration: none;
+}
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+.breadcrumb-item.active {
+    color: #495057; /* Darker color for the active page */
+    font-weight: bold;
+}
+
+/* Main Content Area for New Pages */
+.biologia-marina-content {
+    padding: 20px;
+    background-color: #ffffff; /* White background for content area */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.biologia-marina-content h1,
+.biologia-marina-content h2 {
+    font-family: 'Playfair Display', serif; /* Match existing heading font */
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.biologia-marina-content h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--secondary-color); /* Use existing secondary color */
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.biologia-marina-content h4 {
+    font-family: 'Montserrat', sans-serif; /* Match existing body font */
+    color: var(--dark-color);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.biologia-marina-content ul {
+    list-style: disc;
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.biologia-marina-content ul li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.biologia-marina-content .feature-card a.btn {
+    margin-top: auto; /* Ensures button aligns to bottom in flex cards */
+}
+
+/* Ensure the main card on biologia-marina.html also gets the new style for consistency */
+.content .card { /* Targeting the main introductory card */
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    /* padding might be needed if not already present, adjust as necessary */
+}
