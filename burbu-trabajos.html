@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OlitAI: Corrientes de encuentro, fluidez y pensamientos</title>
-    <!-- Estilo en línea para la imagen de Imgur con efectos sutiles -->
+    <title>Burbu-Trabajos - OlitAI</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/burbu-trabajos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Basic styles from index.html for background, can be moved to burbu-trabajos.css later -->
     <style>
         body {
             margin: 0;
@@ -30,7 +33,7 @@
         }
         
         /* Capa de oscurecimiento sutil */
-        .darken-overlay {
+        .darken-overlay { /* Added this as it was in index.html body */
             position: fixed;
             top: 0;
             left: 0;
@@ -45,7 +48,7 @@
         }
         
         /* Efecto de destellos en el agua */
-        .ocean-sparkle {
+        .ocean-sparkle { /* Added this as it was in index.html body */
             position: fixed;
             top: 0;
             left: 0;
@@ -104,22 +107,20 @@
             100% { transform: scale(1.05); }
         }
     </style>
-    <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="bg-overlay"></div>
-    <div class="darken-overlay"></div>
-    <div class="ocean-sparkle"></div>
+    <div class="darken-overlay"></div> <!-- Added from index.html body -->
+    <div class="ocean-sparkle"></div> <!-- Added from index.html body -->
 
     <header>
         <div class="logo">OlitAI</div>
         <nav>
             <ul>
-                <li><a href="./index.html" class="active">Inicio</a></li>
+                <li><a href="./index.html">Inicio</a></li>
                 <li><a href="./blog.html">Blog</a></li>
                 <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
-                <li><a href="./burbu-trabajos.html">Burbu-Trabajos</a></li>
+                <li><a href="./burbu-trabajos.html" class="active">Burbu-Trabajos</a></li>
                 <li><a href="./about.html">Acerca de</a></li>
             </ul>
         </nav>
@@ -130,8 +131,8 @@
 
     <main>
         <section class="hero">
-            <h1 class="main-title">OlitAI</h1>
-            <p class="subtitle">Corrientes de encuentro, fluidez y pensamientos</p>
+            <h1 class="main-title">Burbu-Trabajos</h1>
+            <p class="subtitle">Explorando el futuro laboral co-creado con IA en el sector marino</p>
             <div class="scroll-indicator">
                 <a href="#content"><i class="fas fa-chevron-down"></i></a>
             </div>
@@ -139,35 +140,25 @@
 
         <section id="content" class="content">
             <div class="container">
-                <div class="card">
-                    <h2>Bienvenido a OlitAI</h2>
-                    <p>Un espacio donde la oceanografía y la inteligencia artificial convergen en un flujo de ideas y conocimientos.</p>
-                </div>
-                
-                <div class="card-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-book-open"></i>
-                        <h3>Blog</h3>
-                        <p>Capítulos de mi libro y reflexiones sobre oceanografía y tecnología.</p>
-                        <a href="./blog.html" class="btn">Explorar</a>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <i class="fas fa-wave-square"></i>
-                        <h3>Oceano-ritmos</h3>
-                        <p>Algoritmos y visualizaciones que capturan la complejidad de los sistemas oceánicos.</p>
-                        <a href="./oceano-ritmos.html" class="btn">Descubrir</a>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <i class="fas fa-user-graduate"></i>
-                        <h3>Acerca del autor</h3>
-                        <p>Especialista en ecología marina, fiscalización ambiental y análisis de big data.</p>
-                        <a href="./about.html" class="btn">Conocer más</a>
-                    </div>
+                <h2>Descubre los Trabajos del Futuro Marino</h2>
+                <p>Haz clic en una burbuja para explorar un perfil de trabajo co-creado con IA.</p>
+                <div id="bubble-area">
+                    <!-- Bubbles will be dynamically inserted here by JavaScript -->
                 </div>
             </div>
         </section>
+
+        <!-- The Modal -->
+        <div id="jobModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3 id="modalJobTitle"></h3>
+                <h4>Perfil:</h4>
+                <p id="modalJobProfile"></p>
+                <h4>Función:</h4>
+                <p id="modalJobFunction"></p>
+            </div>
+        </div>
     </main>
 
     <footer>
@@ -177,5 +168,6 @@
     </footer>
 
     <script src="./js/script.js"></script>
+    <script src="./js/burbu-trabajos.js"></script>
 </body>
 </html>
