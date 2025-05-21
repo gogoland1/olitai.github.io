@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biología Marina</title>
+    <style>
+        :root {
+            --primary: #1a5276;
+            --secondary: #2980b9;
+            --accent: #3498db;
+            --light: #ebf5fb;
+            --dark: #1c2833;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .tab-link {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--dark);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-link:hover {
+            background-color: var(--light);
+            border-bottom: 3px solid var(--light);
+        }
+        
+        .tab-link.active {
+            border-bottom: 3px solid var(--accent);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .topic {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin: 20px 0 15px 0;
+            font-weight: 400;
+        }
+        
+        ul {
+            list-style-type: none;
+            margin-left: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        li:before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.2em;
+        }
+        
+        .card {
+            background-color: var(--light);
+            border-radius: 5px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .card h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        footer {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-link {
+                text-align: left;
+                border-left: 3px solid transparent;
+                border-bottom: none;
+                padding: 15px;
+            }
+            
+            .tab-link.active, .tab-link:hover {
+                border-left: 3px solid var(--accent);
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>Biología Marina</h1>
+                <p class="subtitle">Explorando la vida en los océanos</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'taxonomia')">Taxonomía y Biodiversidad</button>
+            <button class="tab-link" onclick="openTab(event, 'metodos')">Métodos Analíticos</button>
+            <button class="tab-link" onclick="openTab(event, 'ecologia')">Ecología Marina</button>
+            <button class="tab-link" onclick="openTab(event, 'aplicaciones')">Aplicaciones y Gestión</button>
+        </div>
+        
+        <div id="taxonomia" class="tab-content active">
+            <div class="topic">
+                <h2>Taxonomía y Biodiversidad Marina</h2>
+                
+                <div class="card">
+                    <h4>Productores Primarios</h4>
+                    <ul>
+                        <li>Fitoplancton (diatomeas, dinoflagelados, cocolitofóridos, cianobacterias)</li>
+                        <li>Algas (pardas, rojas, verdes)</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h4>Consumidores Primarios</h4>
+                    <ul>
+                        <li>Zooplancton (copépodos, krill, larvas planctónicas, medusas)</li>
+                        <li>Comunidades bentónicas (poliquetos, bivalvos, equinodermos, corales)</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h4>Consumidores Secundarios</h4>
+                    <ul>
+                        <li>Necton (peces diversos)</li>
+                        <li>Cefalópodos (calamares, pulpos, sepias)</li>
+                        <li>Crustáceos (cangrejos, langostas, camarones)</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h4>Consumidores Tope</h4>
+                    <ul>
+                        <li>Aves marinas (albatros, petreles, pingüinos, gaviotas)</li>
+                        <li>Mamíferos marinos (cetáceos, pinnípedos, sirenios)</li>
+                    </ul>
+                </div>
+                
+                <h3>Métodos de Identificación y Muestreo</h3>
+                <ul>
+                    <li>Microscopía óptica y electrónica</li>
+                    <li>Análisis de ADN y códigos de barras genéticos</li>
+                    <li>Metabarcoding para comunidades completas</li>
+                    <li>Técnicas de muestreo específicas por grupo taxonómico</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="metodos" class="tab-content">
+            <div class="topic">
+                <h2>Métodos Analíticos y Estadísticos</h2>
+                
+                <h3>Estadística para Ecología Marina</h3>
+                <ul>
+                    <li>Análisis univariados y multivariados</li>
+                    <li>Pruebas paramétricas y no paramétricas</li>
+                    <li>Modelos Lineales Generalizados (GLM)</li>
+                    <li>Análisis de series temporales</li>
+                    <li>Estadística espacial y SIG</li>
+                </ul>
+                
+                <h3>Machine Learning en Ecología Marina</h3>
+                <div class="card">
+                    <h4>Aplicaciones de IA</h4>
+                    <ul>
+                        <li>Clasificación de hábitats y ecosistemas</li>
+                        <li>Predicción de distribución de especies</li>
+                        <li>Detección de patrones espaciales complejos</li>
+                        <li>Reconocimiento automatizado de organismos</li>
+                        <li>Análisis de imágenes submarinas</li>
+                    </ul>
+                </div>
+                
+                <h3>Diseño Experimental y Muestreo</h3>
+                <ul>
+                    <li>Potencia estadística y tamaño muestral</li>
+                    <li>Diseños BACI, anidados y jerárquicos</li>
+                    <li>Métodos de muestreo estadístico</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="ecologia" class="tab-content">
+            <div class="topic">
+                <h2>Ecología Marina Avanzada</h2>
+                
+                <h3>Fundamentos de Ecología Marina</h3>
+                <ul>
+                    <li>Isótopos estables en ecología marina</li>
+                    <li>Caracterización estructural de ecosistemas</li>
+                    <li>Dinámica y procesos comunitarios</li>
+                    <li>Interacciones predador-presa</li>
+                    <li>Dinámica de poblaciones marinas</li>
+                </ul>
+                
+                <div class="card">
+                    <h4>Ecología Bentónica</h4>
+                    <ul>
+                        <li>Estructura de hábitats bentónicos</li>
+                        <li>Zonación vertical y horizontal</li>
+                        <li>Ecosistemas de aguas someras</li>
+                        <li>Comunidades de fondos blandos y duros</li>
+                        <li>Ecosistemas quimiosintéticos</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h4>Conexiones Tierra-Mar y Hielo-Tierra-Océano</h4>
+                    <ul>
+                        <li>Estuarios y zonas costeras como interfaces</li>
+                        <li>Ecosistemas costeros de transición</li>
+                        <li>Comunidades asociadas al hielo marino</li>
+                        <li>Impacto del deshielo en ecosistemas polares</li>
+                    </ul>
+                </div>
+                
+                <h3>Conceptos Ecológicos Avanzados</h3>
+                <ul>
+                    <li>Hipótesis de estados estables alternativos</li>
+                    <li>Dispersión larval y reclutamiento</li>
+                    <li>Teoría de biogeografía de islas</li>
+                    <li>Enfoques multiomics en ecología marina</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="aplicaciones" class="tab-content">
+            <div class="topic">
+                <h2>Aplicaciones y Gestión</h2>
+                
+                <h3>IA Aplicada a Pesquerías</h3>
+                <ul>
+                    <li>Predicción de zonas de pesca y biomasa</li>
+                    <li>Gemelos digitales para ecosistemas pesqueros</li>
+                    <li>Técnicas de upscaling y downscaling</li>
+                </ul>
+                
+                <div class="card">
+                    <h4>IA para Bioacústica y Comunicación Marina</h4>
+                    <ul>
+                        <li>Detección y clasificación de sonidos marinos</li>
+                        <li>Análisis de comunicación en mamíferos marinos</li>
+                        <li>Interfaces humano-cetáceo asistidas por IA</li>
+                    </ul>
+                </div>
+                
+                <h3>IA para Gobernanza Oceánica</h3>
+                <ul>
+                    <li>Minería de textos jurídicos oceánicos</li>
+                    <li>Diseño asistido de normativas ecosistémicas</li>
+                    <li>Vigilancia inteligente de actividades marítimas</li>
+                    <li>Observatorio de gobernanza oceánica global</li>
+                </ul>
+                
+                <div class="card">
+                    <h4>Monitoreo de Fenómenos Oceanográficos</h4>
+                    <ul>
+                        <li>Detección y predicción de floraciones algales nocivas</li>
+                        <li>Seguimiento de derrames de petróleo</li>
+                        <li>Monitoreo de eventos extremos marinos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2025 Biología Marina | Departamento de Ciencias Oceánicas</p>
+        </div>
+    </footer>
+    
+    <script>
+        function openTab(evt, tabName) {
+            // Ocultar todos los contenidos de pestañas
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Desactivar todos los botones de pestañas
+            const tabLinks = document.getElementsByClassName("tab-link");
+            for (let i = 0; i < tabLinks.length; i++) {
+                tabLinks[i].classList.remove("active");
+            }
+            
+            // Mostrar la pestaña actual y activar el botón correspondiente
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
