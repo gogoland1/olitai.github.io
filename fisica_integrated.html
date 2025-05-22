@@ -638,8 +638,522 @@
                     ]
                 }
             },
-            // Aquí incluirías el resto del contenido igual que tienes actualmente...
-            // Para ahorrar espacio, solo muestro una sección pero incluirías todo
+            circulation: {
+                geostrophic: {
+                    title: "Corrientes Geostróficas",
+                    description: "Las corrientes geostróficas representan el flujo oceánico en equilibrio entre la fuerza del gradiente de presión y la fuerza de Coriolis. Este balance geostrófico domina la circulación de gran escala en los océanos fuera de la capa límite superficial y el ecuador, permitiendo calcular velocidades a partir de la distribución de densidad.",
+                    keyPoints: [
+                        "El balance geostrófico es fundamental en escalas espaciales grandes y temporales largas",
+                        "Las corrientes fluyen paralelas a las isobaras (líneas de igual presión)",
+                        "En el hemisferio norte, el flujo es con altas presiones a la derecha",
+                        "La velocidad geostrófica puede calcularse a partir de perfiles de temperatura y salinidad",
+                        "La altimetría satelital permite estimar corrientes geostróficas superficiales"
+                    ],
+                    applications: [
+                        "Mapeo de patrones de circulación oceánica global",
+                        "Cálculo de transportes de volumen, calor y sal",
+                        "Identificación de frentes oceánicos y corrientes intensas",
+                        "Análisis de variabilidad de corrientes a escala estacional e interanual",
+                        "Validación de modelos de circulación oceánica"
+                    ]
+                },
+                thermohaline: {
+                    title: "Circulación Termohalina",
+                    description: "La circulación termohalina es el sistema global de corrientes oceánicas profundas impulsadas por diferencias de densidad causadas por variaciones de temperatura y salinidad. Este 'cinturón transportador oceánico' conecta todos los océanos y juega un papel crucial en la regulación del clima terrestre.",
+                    keyPoints: [
+                        "Ciclo completo de recirculación que puede durar ~1000 años",
+                        "Formación de agua profunda en regiones polares (Atlántico Norte, Antártida)",
+                        "Transporte de agua profunda fría a lo largo del fondo oceánico",
+                        "Afloramiento gradual en el Océano Índico y Pacífico",
+                        "Retorno superficial hacia las regiones de formación de agua profunda"
+                    ],
+                    applications: [
+                        "Entendimiento del papel oceánico en el sistema climático global",
+                        "Estudio de mecanismos de almacenamiento y transporte de calor",
+                        "Análisis de captura y secuestro de carbono atmosférico",
+                        "Evaluación de impactos del cambio climático en circulación oceánica",
+                        "Investigación de eventos paleoclimáticos y cambios abruptos"
+                    ]
+                },
+                ekman: {
+                    title: "Transporte de Ekman",
+                    description: "El transporte de Ekman describe el movimiento de las capas superficiales del océano inducido por el viento, incorporando el efecto de la rotación terrestre. Debido a la fuerza de Coriolis, el agua se mueve a un ángulo respecto a la dirección del viento, resultando en un transporte neto perpendicular al viento.",
+                    keyPoints: [
+                        "El agua superficial se mueve a 45° de la dirección del viento en la superficie",
+                        "La dirección del movimiento cambia con la profundidad (espiral de Ekman)",
+                        "El transporte neto integrado es a 90° a la derecha del viento (en hemisferio norte)",
+                        "La profundidad de la capa de Ekman varía típicamente entre 10-200m",
+                        "El bombeo de Ekman crea zonas de convergencia/divergencia que inducen movimientos verticales"
+                    ],
+                    applications: [
+                        "Predicción de afloramientos costeros importantes para pesquerías",
+                        "Análisis de transporte y acumulación de contaminantes superficiales",
+                        "Estudio de formación de frentes oceánicos y zonas productivas",
+                        "Cálculo de balances de calor en capa mixta superficial",
+                        "Comprensión de respuesta oceánica a cambios en patrones de viento"
+                    ]
+                },
+                coastal: {
+                    title: "Circulación Costera",
+                    description: "La circulación costera comprende los patrones de flujo en regiones costeras y de plataforma continental, donde la batimetría, los vientos costeros, los aportes fluviales y las mareas interactúan para crear sistemas dinámicos complejos con importantes implicaciones ecológicas y socioeconómicas.",
+                    keyPoints: [
+                        "Afloramientos costeros generados por vientos paralelos a la costa",
+                        "Corrientes impulsadas por gradientes de densidad de origen fluvial",
+                        "Corrientes de marea amplificadas por confinamiento en plataformas someras",
+                        "Ondas atrapadas a la costa que se propagan con la costa a la derecha (HN)",
+                        "Frentes de densidad que separan aguas costeras de oceánicas"
+                    ],
+                    applications: [
+                        "Gestión de recursos pesqueros y acuicultura",
+                        "Planificación costera y evaluación de erosión",
+                        "Predicción de dispersión de contaminantes y derrames",
+                        "Optimización de operaciones portuarias y navegación",
+                        "Diseño de infraestructuras costeras y energías renovables marinas"
+                    ]
+                },
+                boundary: {
+                    title: "Corrientes de Borde",
+                    description: "Las corrientes de borde son flujos intensos y angostos que se forman a lo largo de los márgenes continentales, siendo elementos cruciales de la circulación oceánica global. Incluyen corrientes de borde occidental intensificadas (como la Corriente del Golfo) y corrientes de borde oriental más amplias y difusas.",
+                    keyPoints: [
+                        "Corrientes de borde occidental: estrechas, profundas e intensas (Golfo, Kuroshio)",
+                        "Corrientes de borde oriental: más anchas, someras y lentas (Canarias, California)",
+                        "Intensificación occidental debido a la variación del parámetro de Coriolis con latitud",
+                        "Transporte de calor significativo hacia los polos en corrientes occidentales",
+                        "Alta variabilidad y formación de meandros y remolinos"
+                    ],
+                    applications: [
+                        "Navegación marítima y optimización de rutas comerciales",
+                        "Estudios de transporte meridional de calor para balance climático",
+                        "Análisis de ecosistemas marinos asociados a corrientes productivas",
+                        "Evaluación de potencial energético para turbinas de corrientes marinas",
+                        "Seguimiento de objetos flotantes y dispersión de contaminantes"
+                    ]
+                }
+            },
+            waves: {
+                surface: {
+                    title: "Olas Superficiales",
+                    description: "Las olas superficiales son ondulaciones de la interfaz aire-agua generadas principalmente por el viento. Su estudio comprende la generación, propagación, transformación y disipación de la energía de las olas. Estas ondas gravitatorias se caracterizan por parámetros como altura, longitud de onda, periodo y energía.",
+                    keyPoints: [
+                        "Generación por transferencia de energía del viento a la superficie del agua",
+                        "Clasificación por periodo: capilares, gravitatorias, infragravitatorias",
+                        "Propagación dispersiva: diferentes longitudes de onda viajan a velocidades distintas",
+                        "Transformación en aguas someras: refracción, difracción, asomeramiento",
+                        "El espectro de oleaje describe la distribución de energía por frecuencias y direcciones"
+                    ],
+                    applications: [
+                        "Diseño de estructuras costeras y marinas resistentes al oleaje",
+                        "Predicción de estados de mar para navegación segura",
+                        "Estimación de riesgos de erosión costera y planificación litoral",
+                        "Evaluación de potencial energético para generación undimotriz",
+                        "Estudios de transporte de sedimentos en zonas costeras"
+                    ]
+                },
+                internal: {
+                    title: "Ondas Internas",
+                    description: "Las ondas internas son oscilaciones que ocurren en el interior del océano estratificado, propagándose a lo largo de interfaces de densidad. Pueden alcanzar amplitudes mucho mayores que las olas superficiales y son fundamentales para la mezcla oceánica y el transporte vertical de nutrientes.",
+                    keyPoints: [
+                        "Se propagan en interfaces de densidad o picnoclinas del océano estratificado",
+                        "Generadas por interacción de corrientes con topografía o ajustes baroclínicos",
+                        "Amplitudes típicas de 10-50m, mucho mayores que las olas superficiales",
+                        "Períodos desde minutos hasta horas, cerca de la frecuencia de Brunt-Väisälä",
+                        "Pueden romperse y causar mezcla vertical intensa en el océano"
+                    ],
+                    applications: [
+                        "Comprensión de mezcla oceánica y balance energético global",
+                        "Estimación de disponibilidad de nutrientes para ecosistemas marinos",
+                        "Interpretación de imágenes satelitales de rugosidad superficial",
+                        "Evaluación de impactos en operaciones submarinas y ROVs",
+                        "Análisis de interacciones con infraestructuras submarinas"
+                    ]
+                },
+                kelvin: {
+                    title: "Ondas de Kelvin y Rossby",
+                    description: "Las ondas de Kelvin y Rossby son fenómenos de gran escala fundamentales para la dinámica oceánica planetaria. Moduladas por la rotación terrestre y la estratificación, son cruciales para entender teleconexiones oceánicas y fenómenos como ENSO.",
+                    keyPoints: [
+                        "Ondas de Kelvin: atrapadas a límites (costa, ecuador), no dispersivas",
+                        "Ondas de Rossby: planetarias, se propagan hacia el oeste por efecto beta",
+                        "Velocidades: Kelvin (~2-3 m/s), Rossby (cm/s a pocos m/s)",
+                        "Kelvin ecuatoriales fundamentales en el ciclo El Niño-La Niña",
+                        "Rossby pueden tardar años en cruzar cuencas oceánicas completas"
+                    ],
+                    applications: [
+                        "Predicción de eventos El Niño/La Niña y sus impactos globales",
+                        "Estudio de ajustes oceánicos a gran escala tras perturbaciones",
+                        "Análisis de propagación de señales climáticas entre cuencas",
+                        "Interpretación de patrones de variabilidad en altimetría satelital",
+                        "Comprensión de oscilaciones interanuales en sistemas de corrientes"
+                    ]
+                },
+                tides: {
+                    title: "Mareas y Fenómenos Asociados",
+                    description: "Las mareas son oscilaciones periódicas del nivel del mar causadas por la atracción gravitatoria lunar y solar. Este fenómeno global se manifiesta de forma compleja debido a la rotación terrestre, distribución de continentes y batimetría, generando patrones únicos localmente.",
+                    keyPoints: [
+                        "Fuerzas generadoras: gravitacional directa y centrífuga indirecta",
+                        "Componentes principales: semidiurnas (M2, S2) y diurnas (K1, O1)",
+                        "Sistemas de anfidromía: puntos nodales donde la amplitud es cero",
+                        "Resonancia en cuencas y plataformas amplifica la señal mareal",
+                        "Mareas internas generadas por flujo mareal sobre topografía submarina"
+                    ],
+                    applications: [
+                        "Navegación marítima y planificación de operaciones portuarias",
+                        "Generación de energía mareomotriz renovable",
+                        "Estudios de inundación costera y zonificación de riesgos",
+                        "Análisis de transporte sedimentario y cambios morfológicos",
+                        "Planificación temporal de muestreos oceanográficos"
+                    ]
+                },
+                spectral: {
+                    title: "Análisis Espectral",
+                    description: "El análisis espectral es una herramienta matemática fundamental para estudiar señales periódicas y cuasi-periódicas en oceanografía. Permite descomponer series temporales complejas en componentes de frecuencia, revelando ciclos dominantes y energía asociada a diferentes procesos.",
+                    keyPoints: [
+                        "Transformada de Fourier convierte señales del dominio temporal al frecuencial",
+                        "Espectro de potencia muestra distribución de energía por frecuencias",
+                        "Análisis de coherencia relaciona señales en diferentes ubicaciones",
+                        "Métodos avanzados: wavelets para señales no estacionarias",
+                        "Análisis rotatorio distingue movimientos ciclónicos y anticiclónicos"
+                    ],
+                    applications: [
+                        "Identificación de componentes mareales en registros de nivel del mar",
+                        "Caracterización de oleaje y estados de mar para ingeniería",
+                        "Detección de oscilaciones climáticas (ENSO, NAO, PDO)",
+                        "Análisis de turbulencia y cascadas energéticas oceánicas",
+                        "Evaluación de tendencias a largo plazo en series oceánicas"
+                    ]
+                }
+            },
+            scales: {
+                submesoscale: {
+                    title: "Procesos de Submesoescala",
+                    description: "Los procesos de submesoescala (0.1-10 km, horas-días) ocupan el régimen intermedio entre mesoescala y turbulencia. Son fundamentales para la transferencia de energía entre escalas y para los intercambios verticales, con números de Rossby cercanos a 1.",
+                    keyPoints: [
+                        "Frontogénesis intensificada: formación de frentes de densidad pronunciados",
+                        "Números de Rossby O(1): equilibrio entre advección y rotación",
+                        "Filamentos y estructuras con fuertes gradientes de densidad horizontal",
+                        "Inestabilidades simétricas generan circulación secundaria intensa",
+                        "Contribución significativa a flujos verticales y mezcla oceánica"
+                    ],
+                    applications: [
+                        "Comprensión de mecanismos de bomba biológica de carbono",
+                        "Evaluación de transporte vertical de trazadores y nutrientes",
+                        "Interpretación de imágenes satelitales de alta resolución",
+                        "Diseño de estrategias de muestreo para procesos rápidos",
+                        "Mejora de parametrizaciones en modelos numéricos"
+                    ]
+                },
+                mesoscale: {
+                    title: "Fenómenos de Mesoescala",
+                    description: "Los fenómenos de mesoescala (10-100 km, semanas-meses) contienen la mayor parte de la energía cinética oceánica. Dominados por el balance geostrófico, incluyen remolinos, frentes y meandros fundamentales para el transporte de propiedades oceánicas.",
+                    keyPoints: [
+                        "Escala espacial del radio de deformación de Rossby (~10-100 km)",
+                        "Balance principalmente geostrófico, efectos no lineales secundarios",
+                        "Remolinos coherentes que pueden viajar miles de kilómetros",
+                        "Sistemas frontales separan masas de agua con propiedades distintas",
+                        "Meandros en corrientes intensas pueden desprenderse formando anillos"
+                    ],
+                    applications: [
+                        "Predicción de trayectorias de remolinos para navegación",
+                        "Análisis de transporte de calor, sal y propiedades biogeoquímicas",
+                        "Estudios de agregación biológica en estructuras de mesoescala",
+                        "Seguimiento de dispersión de contaminantes y organismos marinos",
+                        "Desarrollo de parametrizaciones para modelos de baja resolución"
+                    ]
+                },
+                gyres: {
+                    title: "Giros Oceánicos",
+                    description: "Los giros son sistemas de circulación a escala de cuenca oceánica, formados por la interacción del viento, rotación terrestre y configuración de continentes. Dominan la estructura horizontal y redistribuyen globalmente calor, sal y otras propiedades.",
+                    keyPoints: [
+                        "Giros subtropicales: anticiclónicos, cálidos, asociados a altas presiones",
+                        "Giros subpolares: ciclónicos, fríos, asociados a bajas presiones atmosféricas",
+                        "Intensificación occidental: corrientes intensas (Golfo, Kuroshio, Agulhas)",
+                        "Corrientes orientales más débiles y difusas de retorno",
+                        "Dinámica explicada por teoría de Sverdrup y conservación de vorticidad"
+                    ],
+                    applications: [
+                        "Estudios de circulación global y transportes de calor meridional",
+                        "Análisis de acumulación de detritos plásticos en centros de giros",
+                        "Evaluación de tiempos de residencia de masas de agua",
+                        "Interpretación de distribuciones de especies marinas y migraciones",
+                        "Comprensión de ciclos biogeoquímicos a escala de cuenca"
+                    ]
+                },
+                fronts: {
+                    title: "Frentes y Filamentos",
+                    description: "Los frentes oceánicos son interfaces que separan masas de agua con propiedades diferentes. Los filamentos son estructuras alargadas que se extienden desde frentes o remolinos. Ambos están asociados a intensos gradientes horizontales y movimientos verticales.",
+                    keyPoints: [
+                        "Frentes térmicos, halinos o de densidad según propiedad dominante",
+                        "Filamentos como extensiones de agua que penetran otras masas",
+                        "Formación: convergencia, afloramiento, intrusión de corrientes",
+                        "Circulación secundaria asociada con células transversales",
+                        "Alta productividad biológica típicamente asociada a estas estructuras"
+                    ],
+                    applications: [
+                        "Identificación de zonas pesqueras productivas para la industria",
+                        "Detección y seguimiento mediante imágenes satelitales térmicas",
+                        "Estudios de mezcla lateral y tasas de intercambio entre masas",
+                        "Análisis de agregación de contaminantes flotantes en frentes",
+                        "Evaluación de impacto en ecosistemas marinos y cadenas tróficas"
+                    ]
+                },
+                eddies: {
+                    title: "Remolinos",
+                    description: "Los remolinos oceánicos son estructuras rotacionales coherentes de mesoescala (100-300 km de diámetro) que persisten semanas-años. Transportan propiedades y organismos a través de largas distancias, siendo cruciales para la mezcla lateral oceánica.",
+                    keyPoints: [
+                        "Ciclónicos (rotación terrestre, centro frío) y anticiclónicos (opuestos)",
+                        "Formación: inestabilidad de corrientes, desprendimiento de meandros",
+                        "Estructura vertical extendiéndose hasta miles de metros de profundidad",
+                        "Aislamiento relativo del núcleo preserva propiedades originales",
+                        "Tiempo de vida superando un año en grandes remolinos oceánicos"
+                    ],
+                    applications: [
+                        "Transporte de calor, sal y propiedades biogeoquímicas entre regiones",
+                        "Aislamiento y transporte de comunidades biológicas específicas",
+                        "Interpretación de anomalías en altimetría satelital para seguimiento",
+                        "Estudios de mezcla lateral y difusión turbulenta en océanos",
+                        "Evaluación de impacto en operaciones offshore y acústica submarina"
+                    ]
+                }
+            },
+            interaction: {
+                heatflux: {
+                    title: "Flujos de Calor",
+                    description: "Los flujos de calor océano-atmósfera son componentes críticos del balance energético terrestre. Incluyen radiación solar, infrarroja, calor latente por evaporación y sensible por conducción. Determinan la temperatura superficial del mar y alimentan la circulación atmosférica.",
+                    keyPoints: [
+                        "Radiación solar: principal aporte energético, variable con latitud y estación",
+                        "Radiación infrarroja: emisión del océano hacia la atmósfera",
+                        "Calor latente: liberado durante evaporación, principal pérdida oceánica",
+                        "Calor sensible: transferencia directa por diferencia de temperatura",
+                        "Balance neto positivo en trópicos, negativo en altas latitudes"
+                    ],
+                    applications: [
+                        "Modelado climático y predicciones estacionales de temperatura",
+                        "Estudios de formación y evolución de la capa mixta superficial",
+                        "Análisis de balances energéticos regionales y globales",
+                        "Evaluación de impactos de eventos extremos (huracanes, olas de calor)",
+                        "Interpretación de patrones de temperatura superficial del mar"
+                    ]
+                },
+                momentum: {
+                    title: "Transferencia de Momentum",
+                    description: "La transferencia de momentum atmósfera-océano ocurre principalmente por esfuerzo del viento superficial. Fundamental para generar corrientes superficiales, desarrollar oleaje y impulsar fenómenos como afloramientos costeros y transporte de Ekman.",
+                    keyPoints: [
+                        "Esfuerzo del viento proporcional al cuadrado de la velocidad",
+                        "Coeficiente de arrastre variable según estabilidad y estado del mar",
+                        "Rugosidad superficial determinada por el campo de oleaje presente",
+                        "Transferencia bidireccional: oleaje también afecta capa límite atmosférica",
+                        "Principal motor de la circulación superficial oceánica global"
+                    ],
+                    applications: [
+                        "Predicción de corrientes superficiales y deriva de objetos flotantes",
+                        "Modelado de afloramientos costeros y su variabilidad estacional",
+                        "Estudios de generación y evolución de campos de oleaje",
+                        "Análisis de interacción océano-atmósfera en ciclones tropicales",
+                        "Evaluación de potencial energético eólico marino offshore"
+                    ]
+                },
+                elnino: {
+                    title: "El Niño y Teleconexiones",
+                    description: "ENSO es un patrón de variabilidad acoplada océano-atmósfera en el Pacífico tropical con impactos globales. Alterna entre fases cálidas (El Niño), frías (La Niña) y neutras, afectando patrones climáticos mundial a través de teleconexiones atmosféricas.",
+                    keyPoints: [
+                        "El Niño: debilitamiento alisios, aguas cálidas en Pacífico oriental",
+                        "La Niña: intensificación alisios, aguas frías en Pacífico oriental",
+                        "Ciclo irregular con periodicidad de 2-7 años, altamente variable",
+                        "Mecanismo de retroalimentación positiva de Bjerknes en desarrollo",
+                        "Propagación vía ondas Kelvin ecuatoriales y Rossby planetarias"
+                    ],
+                    applications: [
+                        "Predicción climática estacional a escala global y regional",
+                        "Gestión de recursos hídricos y agrícolas sensibles a precipitación",
+                        "Análisis de impactos en pesquerías y ecosistemas marinos",
+                        "Evaluación de riesgos de eventos extremos (sequías, inundaciones)",
+                        "Estudios de variabilidad interanual en registros oceanográficos"
+                    ]
+                },
+                climate: {
+                    title: "Rol Oceánico en el Clima",
+                    description: "Los océanos son reguladores térmicos, almacenes de carbono y transportadores de calor cruciales para el sistema climático. Su alta capacidad calorífica, inercia térmica y circulación global moderan extremos climáticos y determinan variabilidad a múltiples escalas.",
+                    keyPoints: [
+                        "Absorben >90% del exceso de calor del sistema climático antropogénico",
+                        "Transportan ~5 petavatios de calor desde trópicos hacia polos",
+                        "Capturan ~25% de las emisiones antropogénicas de CO2 atmosférico",
+                        "Fuente principal de vapor de agua para precipitación terrestre",
+                        "Variabilidad influye en patrones desde estacionales hasta milenarios"
+                    ],
+                    applications: [
+                        "Predicciones climáticas estacionales a decadales de alta resolución",
+                        "Proyecciones de cambio climático a largo plazo (2100+)",
+                        "Estudios de acidificación oceánica y sus impactos ecosistémicos",
+                        "Análisis de retroalimentaciones en el sistema climático terrestre",
+                        "Reconstrucciones paleoclimáticas basadas en registros oceánicos"
+                    ]
+                }
+            },
+            observation: {
+                remote: {
+                    title: "Sensores Remotos",
+                    description: "Los sensores remotos permiten observar océanos desde satélites, aeronaves y plataformas costeras, proporcionando cobertura global y continua. Estas tecnologías han revolucionado la oceanografía física permitiendo observaciones sinópticas de múltiples variables oceánicas.",
+                    keyPoints: [
+                        "Altimetría satelital para topografía superficial y corrientes geostróficas",
+                        "Radiometría infrarroja y microondas para temperatura superficial del mar",
+                        "Dispersómetros para medición de campos de viento superficial",
+                        "Sensores de color oceánico para clorofila y propiedades ópticas",
+                        "Sistemas radar SAR para oleaje, corrientes y hielo marino"
+                    ],
+                    applications: [
+                        "Monitoreo global de temperatura superficial y nivel del mar",
+                        "Detección y seguimiento de remolinos, frentes y anomalías",
+                        "Alertas de floraciones algales y eventos de contaminación marina",
+                        "Análisis de tendencias climáticas a largo plazo (décadas)",
+                        "Asimilación de datos en modelos predictivos oceánicos operacionales"
+                    ]
+                },
+                insitu: {
+                    title: "Mediciones In-Situ",
+                    description: "Las mediciones in-situ proporcionan observaciones directas desde superficie hasta profundidades abisales. Esenciales para calibrar sensores remotos, caracterizar estructura vertical y estudiar procesos no observables desde el espacio.",
+                    keyPoints: [
+                        "Perfiladores CTD para temperatura, salinidad y presión con precisión",
+                        "Flotadores Argo para perfiles autónomos de la capa superior (0-2000m)",
+                        "Anclajes y boyas para series temporales en puntos fijos",
+                        "Gliders y AUVs para muestreos autónomos tridimensionales",
+                        "Instrumentación acústica (ADCPs) para perfiles de corrientes"
+                    ],
+                    applications: [
+                        "Caracterización de masas de agua y su variabilidad temporal",
+                        "Monitoreo de corrientes profundas y transporte de volumen",
+                        "Estudios de procesos de mezcla y turbulencia oceánica",
+                        "Validación de productos satelitales y modelos numéricos",
+                        "Investigación en regiones remotas (polares, profundas, extremas)"
+                    ]
+                },
+                timeseries: {
+                    title: "Series Temporales",
+                    description: "Las series temporales oceanográficas son registros continuos o periódicos en ubicaciones fijas, proporcionando información crucial sobre variabilidad desde minutos hasta décadas. Fundamentales para caracterizar ciclos, tendencias y eventos extremos.",
+                    keyPoints: [
+                        "Observatorios oceánicos permanentes con múltiples sensores integrados",
+                        "Registros mareográficos históricos, algunos con más de un siglo",
+                        "Secciones hidrográficas repetidas en transectos clave globales",
+                        "Series de temperatura, salinidad, corrientes y biogeoquímica marina",
+                        "Redes de boyas fijas (TAO/TRITON, PIRATA, RAMA) para trópicos"
+                    ],
+                    applications: [
+                        "Detección de tendencias a largo plazo (calentamiento, acidificación)",
+                        "Caracterización de ciclos estacionales e interanuales dominantes",
+                        "Estudio de eventos extremos y su recurrencia estadística",
+                        "Validación de modelos y reconstrucciones históricas climáticas",
+                        "Análisis de teleconexiones y patrones de oscilación climática"
+                    ]
+                },
+                dataanalysis: {
+                    title: "Técnicas de Análisis de Datos",
+                    description: "Las técnicas modernas de análisis extraen información significativa de conjuntos complejos y multidimensionales. Desde métodos estadísticos clásicos hasta algoritmos de machine learning, son esenciales para interpretar la creciente cantidad de datos disponibles.",
+                    keyPoints: [
+                        "Análisis espectral para identificación de periodicidades dominantes",
+                        "Funciones empíricas ortogonales (EOF) para patrones espaciales",
+                        "Filtrado y descomposición para separar procesos físicos",
+                        "Análisis de correlación y coherencia entre variables múltiples",
+                        "Técnicas avanzadas: wavelets, redes neuronales, clustering inteligente"
+                    ],
+                    applications: [
+                        "Reconstrucción de campos oceánicos a partir de datos dispersos",
+                        "Identificación de patrones espaciotemporales de variabilidad climática",
+                        "Detección automática de eventos extremos y anomalías",
+                        "Predicción estadística de variables oceanográficas futuras",
+                        "Interpretación de relaciones entre variables físicas y biogeoquímicas"
+                    ]
+                }
+            },
+            modeling: {
+                numerical: {
+                    title: "Modelos Numéricos",
+                    description: "Los modelos numéricos oceánicos son representaciones matemáticas implementadas computacionalmente para simular el estado y evolución oceánica. Basados en ecuaciones fundamentales de dinámica de fluidos, son herramientas esenciales para comprender procesos pasados, presentes y futuros.",
+                    keyPoints: [
+                        "Discretización espacial: diferencias finitas, elementos finitos, volúmenes finitos",
+                        "Esquemas temporales: explícitos, implícitos y semi-implícitos adaptativos",
+                        "Coordenadas verticales: z-level, sigma, isopícnicas o híbridas",
+                        "Parametrización de procesos no resueltos: turbulencia, mezcla vertical",
+                        "Jerarquía desde modelos idealizados hasta realistas de alta resolución"
+                    ],
+                    applications: [
+                        "Predicciones operacionales de corrientes, temperatura y nivel del mar",
+                        "Estudios de procesos específicos con modelos idealizados controlados",
+                        "Reconstrucciones históricas (reanalysis) del estado oceánico pasado",
+                        "Proyecciones de cambios futuros en escenarios climáticos",
+                        "Simulación de dispersión de contaminantes y organismos marinos"
+                    ]
+                },
+                coastal: {
+                    title: "Modelos Costeros",
+                    description: "Los modelos costeros se especializan en simular dinámica oceánica en regiones litorales, donde interacciones con topografía, aportes fluviales y procesos de pequeña escala son cruciales. Requieren alta resolución espacial y forzamientos específicos.",
+                    keyPoints: [
+                        "Alta resolución espacial (decenas a cientos de metros)",
+                        "Inclusión de mareas astronómicas y procesos baroclínicos",
+                        "Representación de aportes fluviales y plumas estuarinas complejas",
+                        "Interacción con morfología costera y batimetría detallada",
+                        "Acoplamiento con modelos de oleaje y transporte sedimentario"
+                    ],
+                    applications: [
+                        "Predicción de inundaciones costeras y marejadas ciclónicas",
+                        "Gestión de calidad de agua y dispersión de contaminantes urbanos",
+                        "Planificación costera y evaluación de impactos ambientales",
+                        "Apoyo a operaciones portuarias y navegación de precisión",
+                        "Estudios de conectividad ecológica y dispersión larvaria marina"
+                    ]
+                },
+                global: {
+                    title: "Modelos Globales",
+                    description: "Los modelos globales simulan circulación oceánica a escala planetaria, capturando sistemas de corrientes principales, formación de masas de agua e intercambios entre cuencas. Fundamentales para estudios climáticos y condiciones de contorno regionales.",
+                    keyPoints: [
+                        "Resolución desde 1° hasta 0.1° en modelos de alta resolución",
+                        "Representación de circulación termohalina y transporte interoceánico",
+                        "Capacidad de simular variabilidad interanual a multidecadal",
+                        "Interacciones con hielo marino y plataformas glaciares antárticas",
+                        "Inclusión de ciclos biogeoquímicos en modelos de sistema terrestre"
+                    ],
+                    applications: [
+                        "Estudios de variabilidad climática y cambio global antropogénico",
+                        "Análisis de balances energéticos y ciclos globales de carbono",
+                        "Predicciones estacionales a decadales para planificación climática",
+                        "Identificación de teleconexiones oceánicas entre regiones distantes",
+                        "Condiciones de contorno para modelos regionales anidados"
+                    ]
+                },
+                ai: {
+                    title: "Aplicaciones de IA",
+                    description: "Las aplicaciones de inteligencia artificial aprovechan machine learning y técnicas analíticas avanzadas para extraer patrones de grandes conjuntos de datos, mejorar predicciones y optimizar productos. Están transformando la observación, análisis y predicción oceánica.",
+                    keyPoints: [
+                        "Redes neuronales para predicción de variables oceánicas complejas",
+                        "Algoritmos de clasificación para identificación de fenómenos y anomalías",
+                        "Técnicas de super-resolución para mejorar datos satelitales",
+                        "Deep learning para corrección de sesgos en sensores remotos",
+                        "Modelos híbridos combinando física con aprendizaje automático"
+                    ],
+                    applications: [
+                        "Predicción de temperatura superficial del mar y corrientes",
+                        "Identificación automática y seguimiento de remolinos y frentes",
+                        "Reconstrucción de campos 3D a partir de datos limitados",
+                        "Detección de eventos extremos y anomalías en tiempo real",
+                        "Mejora de productos satelitales (eliminación de nubes, ruido)"
+                    ]
+                },
+                dataassimilation: {
+                    title: "Asimilación de Datos",
+                    description: "La asimilación de datos incorpora observaciones en modelos numéricos para mejorar predicciones. Combina óptimamente información de diferentes fuentes considerando incertidumbres respectivas, produciendo estimaciones coherentes del estado oceánico.",
+                    keyPoints: [
+                        "Métodos secuenciales: filtro de Kalman y variantes (EnKF, SEEK)",
+                        "Métodos variacionales: 3D-VAR, 4D-VAR para ventanas temporales",
+                        "Asimilación de múltiples tipos de datos: in-situ, satélite, etc.",
+                        "Balance entre fidelidad a observaciones y consistencia física",
+                        "Estimación de incertidumbres en predicciones y análisis"
+                    ],
+                    applications: [
+                        "Predicción operacional oceánica en tiempo real global",
+                        "Reanálisis oceanográficos para estudios históricos climáticos",
+                        "Inicialización de modelos de predicción estacional y climática",
+                        "Estimación de parámetros no observables directamente",
+                        "Diseño óptimo de redes observacionales futuras"
+                    ]
+                }
+            }
         };
 
         // Estado de la aplicación
