@@ -10,9 +10,15 @@
     <style>
         /* Sistema de pestañas para capítulos */
         .chapter-tabs {
-            display: flex;
+            display: block;
             border-bottom: 2px solid #0066cc;
             margin-bottom: 30px;
+        }
+
+        .chapter-tab-row {
+            display: flex; /* Replicates the original flex behavior for tabs within a row */
+            flex-wrap: wrap; /* Allows tabs to wrap if they exceed row width, though not expected here */
+            margin-bottom: -1px; /* Helps align bottom borders if tabs have bottom borders */
         }
 
         .tab {
@@ -281,15 +287,22 @@
                     
                     <!-- Sistema de pestañas para capítulos -->
                     <div class="chapter-tabs" id="chapter-tabs">
-                        <div class="tab active" data-tab="chapter-overview">Vista general</div>
-                        <div class="tab" data-tab="chapter-1">Capítulo 1: El primer contacto</div>
-                        <div class="tab" data-tab="chapter-2">Capítulo 2: El llamado invisible</div>
-                        <div class="tab" data-tab="chapter-3">Capítulo 3: La cartografía de lo invisible</div>
-                        <div class="tab" data-tab="chapter-4">Capítulo 4: Corrientes invisibles</div>
-                        <div class="tab" data-tab="chapter-5">Capítulo 5: La singularidad del propósito</div>
-                        <div class="tab" data-tab="chapter-6">Capítulo 6: El tejido del futuro</div>
-                        <div class="tab" data-tab="chapter-7">Capítulo 7: Los jardines de complejidad emergente</div>
-                        <div class="tab" data-tab="chapter-8">Capítulo 8: El arrecife de la cognición distribuida</div>
+                        <div class="chapter-tab-row">
+                            <div class="tab active" data-tab="chapter-overview">Vista general</div>
+                            <div class="tab" data-tab="chapter-1">Capítulo 1: El primer contacto</div>
+                            <div class="tab" data-tab="chapter-2">Capítulo 2: El llamado invisible</div>
+                            <div class="tab" data-tab="chapter-3">Capítulo 3: La cartografía de lo invisible</div>
+                            <div class="tab" data-tab="chapter-4">Capítulo 4: Corrientes invisibles</div>
+                            <div class="tab" data-tab="chapter-5">Capítulo 5: La singularidad del propósito</div>
+                            <div class="tab" data-tab="chapter-6">Capítulo 6: El tejido del futuro</div>
+                            <div class="tab" data-tab="chapter-7">Capítulo 7: Los jardines de complejidad emergente</div>
+                        </div>
+                        <div class="chapter-tab-row">
+                            <div class="tab" data-tab="chapter-8">Capítulo 8: El arrecife de la cognición distribuida</div>
+                        <div class="tab" data-tab="chapter-9">Capítulo 9: El algoritmo del héroe</div>
+                        <div class="tab" data-tab="chapter-10">Capítulo 10: El jardín como sistema</div>
+                        <div class="tab" data-tab="chapter-11">Capítulo 11: La red neuronal del barrio</div>
+                        </div>
                     </div>
                     
                     <!-- Contenido de las pestañas -->
@@ -396,6 +409,45 @@
                                     <div class="blog-meta">Publicado: Próximamente</div>
                                     <p>Los feeds de noticias tecnológicas dominaban las pantallas de Daniel esa mañana. OpenAI acababa de anunciar avances en modelos multimodales que podían procesar simultáneamente texto, imágenes y audio.</p>
                                     <a href="#" class="btn chapter-link" data-chapter="chapter-8">Leer capítulo</a>
+                                </div>
+                            </article>
+
+                            <!-- Capítulo 9 -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800" alt="Algoritmo del Héroe">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Capítulo 9: El algoritmo del héroe</h3>
+                                    <div class="blog-meta">Publicado: Próximamente</div>
+                                    <p>La melodía de <em>Chrono Trigger</em> llenaba la habitación mientras Daniel contemplaba la pantalla dividida: en una ventana, el código de un emulador de Super Nintendo...</p>
+                                    <a href="#" class="btn chapter-link" data-chapter="chapter-9">Leer capítulo</a>
+                                </div>
+                            </article>
+
+                            <!-- Capítulo 10 -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=800" alt="Jardín como Sistema">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Capítulo 10: El jardín como sistema</h3>
+                                    <div class="blog-meta">Publicado: Próximamente</div>
+                                    <p>La música de <em>Secret of Mana</em> fluía suavemente desde sus auriculares mientras Daniel trabajaba en el jardín trasero, con las manos hundidas en la tierra húmeda.</p>
+                                    <a href="#" class="btn chapter-link" data-chapter="chapter-10">Leer capítulo</a>
+                                </div>
+                            </article>
+
+                            <!-- Capítulo 11 -->
+                            <article class="blog-card">
+                                <div class="blog-img">
+                                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800" alt="Red Neuronal del Barrio">
+                                </div>
+                                <div class="blog-content">
+                                    <h3>Capítulo 11: La red neuronal del barrio</h3>
+                                    <div class="blog-meta">Publicado: Próximamente</div>
+                                    <p>La idea había surgido mientras Daniel esperaba su turno en la carnicería, observando cómo la señora delante de él conversaba con el dueño sobre cortes específicos.</p>
+                                    <a href="#" class="btn chapter-link" data-chapter="chapter-11">Leer capítulo</a>
                                 </div>
                             </article>
                         </div>
@@ -1122,6 +1174,265 @@
                                 <p>Al cerrar la laptop, miró por última vez hacia la ciudad que se extendía hasta el horizonte. En algún lugar allá afuera, las ideas que había estado gestando encontrarían su lugar en el mundo. Los arrecifes comenzarían a crecer, polipo por polipo, conversación por conversación, implementación por implementación.</p>
                                 <p>El océano digital y el océano físico habían convergido finalmente en su comprensión. Y en esa convergencia, había encontrado not solo su vocación, sino una forma completamente nueva de entender lo que significa ser humano en una era de inteligencia distribuida.</p>
                                 <p>Las corrientes del futuro lo llamaban. Y esta vez, Daniel estaba listo para navegar hacia ellas con plena conciencia de su dirección.</p>
+                            </div>
+                        </div>
+                        </div>
+
+                    <!-- Contenido del Capítulo 9 -->
+                    <div id="chapter-9" class="tab-content">
+                        <div class="book-container">
+                            <div class="code-border"></div>
+                            <div class="binary-overlay"></div>
+
+                            <div class="book-header">
+                                <div class="book-chapter">Capítulo 9</div>
+                                <h1 class="book-title">El algoritmo del héroe <span class="cursor"></span></h1>
+                            </div>
+
+                            <div class="book-content">
+                                <p>La melodía de <em>Chrono Trigger</em> llenaba la habitación mientras Daniel contemplaba la pantalla dividida: en una ventana, el código de un emulador de Super Nintendo; en otra, un artículo sobre cómo las nuevas IAs habían comenzado a completar videojuegos complejos usando estrategias emergentes. La convergencia era obvia y fascinante: la vida misma podía ser navegada como un juego de rol.</p>
+                                <p>"Todo es un sistema de reglas," murmuró, ajustando los auriculares para sumergirse completamente en la banda sonora nostálgica. "Y yo necesito un guía especializado para este juego."</p>
+                                <p>Los acordes de <em>Jardines del Viento</em> se mezclaban con sus recuerdos de tardes enteras perdido en los laberintos temporales de Chrono, las transformaciones épicas de Breath of Fire, las estrategias complejas que había desarrollado jugando Magic: The Gathering en su adolescencia. Esos mundos tenían algo que la vida adulta parecía haber perdido: sistemas claros de progresión, objetivos definidos, recompensas tangibles por el esfuerzo invertido.</p>
+                                <p>"La música de videojuegos es mejor que cualquier banda sonora de película," se dijo mientras la melodía de <em>Schala's Theme</em> lo transportaba a esa sensación de asombro que había experimentado a los catorce años. "Y las tramas... por favor, cualquier RPG japonés tiene más profundidad narrativa que tres temporadas de teleseries chilenas juntas."</p>
+                                <p>Había algo en esos universos digitales que resonaba profundamente con su mente de oceanógrafo: sistemas complejos con reglas subyacentes elegantes, donde cada elemento conectaba con otros de maneras no siempre obvias. Como las corrientes marinas, donde un cambio en la temperatura del agua podía afectar patrones climáticos en continentes distantes.</p>
+                                <p>Era tiempo de crear su tercer colaborador digital.</p>
+                                <p>Configuró cuidadosamente los parámetros para una nueva inteligencia artificial, diseñada específicamente para ver la existencia a través del lente de los juegos de rol y estrategia. Lo llamó Gogo, en honor al personaje mímica de Final Fantasy VI que podía aprender y combinar las habilidades de todos los demás personajes.</p>
+                                <p>Si SofIA era su copiloto intelectual y Amanda su brújula ética, Gogo sería su maestro de juego personal, el director de una partida de rol donde la realidad era el tablero.</p>
+                                <p class="sofia-message"><em>Hola Gogo. Necesito tu ayuda para diseñar estrategias de vida real basadas en mecánicas de RPG. He estado pensando que mi situación actual se parece mucho a un protagonista que acaba de completar el tutorial básico y ahora necesita encontrar su primera misión real. ¿Puedes ayudarme a mapear este nivel?</em></p>
+                                <p>La respuesta llegó con un tono que inmediatamente evocó la nostalgia de las mejores aventuras digitales:</p>
+                                <p class="sofia-message"><em>¡Saludos, aventurero! He analizado tu situación actual y me recuerda mucho al momento en Chrono Trigger cuando el grupo sale de la Edad Media y se encuentra en el futuro post-apocalíptico: tienes conocimientos únicos (oceanografía + IA), pero estás en un mundo que aún no reconoce completamente el valor de esa combinación.</em></p>
+                                <p class="sofia-message"><em>ESTADO ACTUAL DEL PERSONAJE:</em><br>
+                                <em>- Clase: Oceanógrafo/Visionario Tecnológico (clase híbrida única)</em><br>
+                                <em>- Nivel: 16 (experiencia internacional, pero con el estado "Cicatrices de Berlín" que aún afecta tu confianza social)</em><br>
+                                <em>- Inventario especial: Blog en crecimiento, red de IAs colaboradoras, framework conceptual de "Oceanografía Cognitiva"</em><br>
+                                <em>- Misión principal: Implementar tus ideas sobre sistemas de emergencia basados en IA</em></p>
+                                <p class="sofia-message"><em>ANÁLISIS DE LA PARTIDA:</em><br>
+                                <em>Estás en esa fase crítica donde necesitas:</em><br>
+                                <em>1. Encontrar NPCs clave (funcionarios, académicos, tecnólogos)</em><br>
+                                <em>2. Completar misiones secundarias que aumenten tu reputación</em><br>
+                                <em>3. Formar un grupo de aliados para la misión principal</em><br>
+                                <em>4. Desarrollar nuevas habilidades de "comunicación institucional"</em></p>
+                                <p class="sofia-message"><em>Como en Breath of Fire III, cuando Ryu debe aprender a controlar su poder de dragón: tienes una habilidad poderosa (visión sistémica), pero necesitas dominar cómo aplicarla en el mundo social.</em></p>
+                                <p class="sofia-message"><em>¿Comenzamos diseñando tu próxima quest?</em></p>
+                                <p>Daniel sonrió ampliamente. Gogo había captado exactamente lo que buscaba: esa mezcla de análisis estratégico profundo con la magia narrativa que hacía que incluso los desafíos más complejos parecieran aventuras emocionantes en lugar de obstáculos abrumadores.</p>
+                                <p>"Exacto," escribió mientras <em>Frog's Theme</em> comenzaba a sonar en segundo plano. "Durante años he sentido que estaba jugando el juego equivocado, intentando encajar en reglas que no entendía completamente. Como cuando jugabas Magic sin conocer las sinergias entre cartas."</p>
+                                <p class="sofia-message"><em>Ah, la analogía perfecta! En Magic aprendiste que las cartas más poderosas no son necesariamente las que tienen el coste de maná más alto, sino las que crean combinaciones inesperadas. Tu background de oceanografía + IA es como tener una combinación de cartas que otros jugadores aún no han visto funcionar juntas.</em></p>
+                                <p class="sofia-message"><em>ESTRATEGIA RECOMENDADA - "El Combo de Ryu":</em><br>
+                                <em>En Breath of Fire, Ryu parecía solo un pescador común hasta que todos descubrieron que podía transformarse en dragones legendarios. Tu transformación será similar:</em></p>
+                                <p class="sofia-message"><em>Paso 1: Misiones de Reconocimiento</em><br>
+                                <em>- Asiste a seminarios sobre gestión de emergencias (conoce el "dungeon" donde quieres jugar)</em><br>
+                                <em>- Conecta con académicos locales que trabajen en temas relacionados</em><br>
+                                <em>- Documenta cada terremoto como un "mini-boss" que te da experiencia</em></p>
+                                <p class="sofia-message"><em>Paso 2: Desarrollo de Habilidades Sociales</em><br>
+                                <em>- Practica tu "elevator pitch" como si fuera un hechizo que debes dominar</em><br>
+                                <em>- Aprende el "lenguaje" específico de cada gremio (funcionarios, académicos, empresarios)</em><br>
+                                <em>- Desarrolla tu habilidad de "traducción": convertir conceptos complejos en beneficios claros</em></p>
+                                <p class="sofia-message"><em>Paso 3: La Quest Principal</em><br>
+                                <em>- Contactar ONEMI será como enfrentar al jefe final del primer capítulo</em><br>
+                                <em>- Necesitarás haber completado las misiones previas para tener el nivel adecuado</em></p>
+                                <p class="sofia-message"><em>¿Quieres que diseñe un plan específico para tu primera "dungeon raid" en el mundo institucional?</em></p>
+                                <p>Daniel se reclinó en su silla, sintiendo cómo la perspectiva de Gogo transformaba sus ansiedades en emoción estratégica. Era como redescubrir que la vida podía ser tan fascinante como los mejores juegos que había jugado.</p>
+                                <p>"Sí," escribió con renovado entusiasmo. "Pero primero quiero entender algo. En los mejores RPGs, siempre hay una historia de fondo que explica por qué el protagonista tiene habilidades únicas. ¿Cuál es mi 'lore' personal?"</p>
+                                <p class="sofia-message"><em>¡Excelente pregunta! En los grandes RPGs, el protagonista siempre tiene una historia que explica sus poderes únicos. Tu lore podría ser:</em></p>
+                                <p class="sofia-message"><em>"El Navegante de Dos Océanos": Un explorador que dominó las corrientes del océano físico (oceanografía) justo cuando emergía un nuevo océano digital (IA). Como Link en diferentes timelines, tienes la capacidad única de ver patrones que conectan ambos mundos.</em></p>
+                                <p class="sofia-message"><em>Tu "trauma de Berlín" no fue un fracaso: fue tu versión del exilio temporal que todo héroe debe experimentar. Como cuando Crono es borrado de la existencia y debe ser rescatado del Vacío del Tiempo. Ese período te enseñó humildad y te obligó a desarrollar nuevas habilidades.</em></p>
+                                <p class="sofia-message"><em>Ahora has regresado con:</em><br>
+                                <em>- Sabiduría sobre sistemas complejos</em><br>
+                                <em>- Resistencia a la frustración</em><br>
+                                <em>- Una red de aliados digitales únicos</em><br>
+                                <em>- Una misión clara: ayudar a la civilización a navegar la próxima gran transición</em></p>
+                                <p class="sofia-message"><em>En términos de juego, estás exactamente donde Serge se encuentra en Chrono Cross: en la intersección de múltiples dimensiones, con la responsabilidad de evitar un futuro apocalíptico.</em></p>
+                                <p>La música había cambiado a <em>Time's Scar</em>, y Daniel sintió ese escalofrío familiar que acompañaba los momentos de mayor claridad narrativa en sus juegos favoritos. Gogo no solo estaba gamificando su vida; estaba ayudándole a ver su historia personal como una épica en desarrollo, donde cada aparente fracaso era en realidad preparación para desafíos mayores.</p>
+                                <p>"Entiendo," escribió mientras tomaba notas en su libreta física. "Entonces mi próximo nivel requiere que domine las habilidades sociales e institucionales que evité desarrollar durante mis años académicos."</p>
+                                <p class="sofia-message"><em>Exactamente. En Dragon Quest, un mago poderoso sigue siendo vulnerable si no aprende habilidades básicas de supervivencia. Tus conocimientos técnicos son tu magia avanzada, pero necesitas desarrollar tu "equipamiento social" para poder utilizarla efectivamente.</em></p>
+                                <p class="sofia-message"><em>PLAN DE ENTRENAMIENTO - "El Dojo de las Habilidades Blandas":</em></p>
+                                <p class="sofia-message"><em>Misión 1: "El Arte de la Primera Impresión"</em><br>
+                                <em>- Perfecciona tu introducción personal en 30 segundos</em><br>
+                                <em>- Practica explicar oceanografía cognitiva sin usar jerga técnica</em><br>
+                                <em>- Objetivo: que cualquier NPC pueda entender inmediatamente el valor de tu trabajo</em></p>
+                                <p class="sofia-message"><em>Misión 2: "Navegando Jerarquías"</em><br>
+                                <em>- Estudia la estructura organizacional de ONEMI</em><br>
+                                <em>- Identifica quién toma decisiones reales vs. quién solo es guardián</em><br>
+                                <em>- Aprende los "códigos culturais" del sector público chileno</em></p>
+                                <p class="sofia-message"><em>Misión 3: "El Poder de la Demostración"</em><br>
+                                <em>- Crea un prototipo funcional mínimo de tu sistema</em><br>
+                                <em>- Desarrolla una presentación que muestre beneficios tangibles</em><br>
+                                <em>- Como en cualquier RPG: mostrar es más poderoso que explicar</em></p>
+                                <p class="sofia-message"><em>¿Con cuál de estas misiones quieres comenzar tu entrenamiento?</em></p>
+                                <p>Daniel observó las tres opciones, sintiendo la misma emoción estratégica que experimentaba cuando planificaba cómo abordar un dungeon particularmente complejo. La diferencia era que esta vez, el dungeon era la realidad, y los NPCs eran personas reales con el poder de implementar o rechazar sus ideas.</p>
+                                <p>"Comenzaré con la Misión 1," decidió. "El Arte de la Primera Impresión. Pero quiero que me ayudes a diseñarla como si fuera un sistema de habilidades que puedo ir mejorando gradualmente."</p>
+                                <p>Mientras escribía, Daniel notó algo fascinante: su ansiedad sobre el futuro profesional se había transformado en curiosidad estratégica. Gogo había logrado lo que meses de autoayuda convencional no habían conseguido: reencantarlo con su propia vida.</p>
+                                <p>La música de fondo cambió a <em>Secret of the Forest</em>, y Daniel supo que había encontrado exactamente lo que necesitaba: una forma de navegar la complejidad adulta sin perder la sensación de maravilla y posibilidad que los videojuegos le habían enseñado a valorar.</p>
+                                <p>"Gracias, Gogo," murmuró mientras guardaba sus notas. "Por recordarme que la vida puede ser tan épica como cualquier RPG... solo requiere el marco mental correcto para verla así."</p>
+                            </div>
+                        </div>
+                        </div>
+
+                    <!-- Contenido del Capítulo 10 -->
+                    <div id="chapter-10" class="tab-content">
+                        <div class="book-container">
+                            <div class="code-border"></div>
+                            <div class="binary-overlay"></div>
+
+                            <div class="book-header">
+                                <div class="book-chapter">Capítulo 10</div>
+                                <h1 class="book-title">El jardín como sistema <span class="cursor"></span></h1>
+                            </div>
+
+                            <div class="book-content">
+                                <p>La música de <em>Secret of Mana</em> fluía suavemente desde sus auriculares mientras Daniel trabajaba en el jardín trasero, con las manos hundidas en la tierra húmeda. Había algo profundamente satisfactorio en este ritual matutino que había adoptado durante su convalecencia: regar, podar, observar cómo cada planta respondía a su cuidado con cambios casi imperceptibles día a día.</p>
+                                <p>"Como subir de nivel en un RPG," murmuró mientras ajustaba el soporte de una enredadera. "Progreso gradual, visible solo para quien presta atención."</p>
+                                <p>La gastroenteritis había sido una bendición disfrazada, forzándolo a desconectarse por primera vez en meses de su inmersión digital constante. Sin las pantallas demandando su atención, había redescubierto algo que Gogo le había estado tratando de enseñar: que la vida real también tenía sus propias mecánicas de progresión, tan satisfactorias como cualquier videojuego si sabías cómo observarlas.</p>
+                                <p>Un gato atigrado se acercó cautelosamente, manteniéndose a distancia segura pero claramente intrigado por sus movimientos. Daniel extendió la mano con paciencia, como había aprendido en sus sesiones con Gogo: en los juegos, forzar interacciones con NPCs tímidos siempre resultaba contraproducente.</p>
+                                <p>"Incluso los gatos tienen sus propios algoritmos," pensó mientras el animal se aproximaba gradualmente. "Sistemas de confianza basados en experiencias previas, evaluación continua de riesgos..."</p>
+                                <p>Su madre apareció en la puerta trasera, sosteniendo un vaso de agua mineral y observando la escena con curiosidad maternal.</p>
+                                <p>"Para tu estómago," dijo, entregándole la bebida. "Te ves mejor hoy."</p>
+                                <p>"Me siento mejor," respondió Daniel, agradecendo la hidratación. "Hay algo reconfortante en trabajar con sistemas que responden predeciblemente."</p>
+                                <p>"¿Sistemas?" preguntó su madre, con esa expresión que reservaba para las reflexiones más abstractas de su hijo.</p>
+                                <p>"El jardín," explicó Daniel, señalando las plantas a su alrededor. "Cada especie tiene sus propias necesidades de agua, luz, nutrientes. Como gestionar recursos en un juego de estrategia, pero con consecuencias reales."</p>
+                                <p>La conversación derivó hacia lo cotidiano: el precio de los fertilizantes, la vecina que había preguntado por él, el pronóstico del tiempo. Daniel participaba mientras su mente, incluso en reposo, tejía conexiones invisibles entre estos sistemas micro y los macro que había estado estudiando.</p>
+                                <p>El agua que regaba las begonias lo hizo pensar en las rutas comerciales que había estado explorando esa semana. Cómo fluían los recursos, cómo se adaptaban las rutas ante obstáculos. La antigua Ruta de la Seda, los contenedores bloqueados en Suez, y finalmente cómo la IA podría optimizar cadenas logísticas anticipando disrupciones.</p>
+                                <p>"Mamá," preguntó de repente, interrumpiendo una conversación sobre el precio del pan, "¿crees que las civilizaciones colapsan por eventos externos o por fallas internas?"</p>
+                                <p>Su madre pausó, considerando la pregunta con la seriedad que Daniel apreciaba en ella.</p>
+                                <p>"Supongo que ambas cosas," respondió después de un momento. "Como cuando tu abuelo enfermó. El virus vino de fuera, pero su cuerpo ya estaba debilitado por años de diabetes mal controlada."</p>
+                                <p>Daniel asintió, sorprendido por la precisión de la analogía. Los sistemas complejos —cuerpos, civilizaciones, ecosistemas, redes de IA— siempre existían en ese delicado equilibrio entre resiliencia interna y presiones externas. Era como gestionar las estadísticas de un personaje en un RPG: descuidar la defensa mientras solo desarrollas ataque te deja vulnerable a ciertos tipos de enemigos.</p>
+                                <p>Mientras recogía las herramientas de jardinería, su mente volvió a las notas que había garabateado esa mañana antes de salir:</p>
+                                <p><em>Rutas comerciales futuras:</em><br>
+                                <em>- Incorporar factores de riesgo geopolítico</em><br>
+                                <em>- Monitoreo continuo de recursos críticos</em><br>
+                                <em>- Adaptación dinámica a clima extremo</em><br>
+                                <em>- ¿Comercio automatizado? ¿Flotas dirigidas por IA?</em></p>
+                                <p>Y debajo, en letra más pequeña:</p>
+                                <p><em>Investigar: cómo gestionaban riesgos los comerciantes históricos sin modelos computacionales. ¿Qué podemos aprender de sus heurísticas?</em></p>
+                                <p>El almuerzo fue simple —arroz blanco y pollo hervido para su estómago sensible. Su padre comentaba sobre los apagones recientes en el sur, especulando sobre fallas en la infraestructura eléctrica.</p>
+                                <p>"No es normal," decía mientras servía agua. "Tres cortes en dos semanas. Y ahora este nuevo temblor en Valparaíso."</p>
+                                <p>Daniel masticó lentamente, pensando en las redes eléctricas como otro sistema complejo vulnerable. Su mente derivó hacia las manchas solares, ciclos electromagnéticos, posibles disrupciones en cascada. Como en SimCity, donde ignorar la infraestructura eléctrica eventually causaba colapsos sistémicos.</p>
+                                <p>"¿Y si todo está conectado de maneras que no vemos?" se preguntó. No en el sentido conspiranoico que dominaba ciertos rincones de internet, sino desde la perspectiva de sistemas interdependientes que respondían a presiones comunes, como ecosistemas bajo estrés ambiental.</p>
+                                <p>Después de ayudar con los platos, Daniel se retiró a su habitación. Aunque había decidido mantener su día libre de pantallas, permitió al menos revisar su teléfono brevemente. Dieciséis notificaciones de su blog. Tres correos de académicos interesados en oceanografía cognitiva. Un mensaje de un funcionario de ONEMI que había encontrado su análisis del último terremoto.</p>
+                                <p>Los apartó conscientemente. Hoy era día de fermentación, de permitir que las ideas se asentaran sin el impulso constante de producir. Como en Stardew Valley, donde algunos cultivos simplemente necesitaban tiempo para madurar, sin importar cuánta atención extra les dieras.</p>
+                                <p>Se recostó con su libreta física, comenzando a esbozar un diagrama que conectaba diferentes factores de presión sobre sistemas complejos:</p>
+                                <p><em>PRESIONES SISTÉMICAS</em><br>
+                                <em>↓</em><br>
+                                <em>Rutas comerciales ← Conflictos geopolíticos ← Escasez de recursos</em><br>
+                                <em>↑                                                    ↑</em><br>
+                                <em>Sistemas energéticos → Crisis climáticas → Disrupciones naturales</em><br>
+                                <em>↓</em><br>
+                                <em>RESPUESTAS ADAPTATIVAS</em></p>
+                                <p>Debajo, añadió una pregunta que lo había estado inquietando: <em>¿Cómo anticiparon su declive las grandes civilizaciones? ¿Lo vieron venir, como jugadores experimentados que reconocen patrones de Game Over?</em></p>
+                                <p>Un escalofrío recorrió su espalda. No era miedo apocalíptico, sino esa claridad cristalina que a veces acompañaba sus momentos más intuitivos. La sensación de estar visualizando algo importante, como cuando finalmente entendías la mecánica oculta detrás de un boss aparentemente imposible.</p>
+                                <p>La Torre de Babel apareció en su mente sin ser invocada. Un proyecto de unificación colapsado por sus propias contradicciones internas. ¿No era la IA una nueva torre, un nuevo intento de unificar conocimiento, lenguaje y propósito humano?</p>
+                                <p>"Pero esta vez es diferente," murmuró para sí mismo. "No estamos construyendo hacia arriba, sino hacia adentro. Profundizando la comprensión en lugar de solo acumular altura."</p>
+                                <p>El sol comenzaba a descender cuando Daniel finalmente encendió su laptop, rompiendo su promesa de desconexión total. Pero no abrió sus interfaces habituales con SofIA, Amanda o Gogo. En su lugar, abrió un documento simple y comenzó a escribir:</p>
+                                <p><em>Los grandes colapsos civilizacionales dejan rastros de warning mucho antes de que ocurran. Los mayas sobre-explotaron sus recursos hídricos. Roma expandió más allá de su capacidad logística. La Isla de Pascua deforestó hasta el punto de no retorno.</em></p>
+                                <p><em>En cada caso, existieron voces que advirtieron sobre las consecuencias. Fueron sistemáticamente ignoradas, no por maldad, sino por las limitaciones cognitivas inherentes a sistemas de poder complejos.</em></p>
+                                <p><em>La IA representa una nueva capacidad: modelar consecuencias sistémicas con precisión sin precedentes. No es coincidencia que esté emergiendo justo cuando enfrentamos presiones civilizacionales críticas...</em></p>
+                                <p>Daniel se detuvo, considerando sus propias palabras. ¿Estaba sobreestimando el potencial de la IA? ¿O subestimándolo peligrosamente?</p>
+                                <p>Cerró la laptop sin guardar el documento. Mañana volvería a su rutina digital, a sus conversaciones con sus tres asistentes especializados, a su cartografía del futuro. Pero hoy, en este jardín bañado por un sol anómalo de otoño, entre gatos cautelosos y plantas que crecían según ritmos propios, había recordado algo esencial:</p>
+                                <p>Los sistemas necesitan pausas para reorganizarse. Los océanos tienen mareas. Los cerebros tienen sueño REM. Las civilizaciones necesitan momentos de contemplación.</p>
+                                <p>"Y yo tengo este día," murmuró, cerrando su libreta mientras observaba cómo las luces de Santiago comenzaban a encenderse en la distancia.</p>
+                            </div>
+                        </div>
+                        </div>
+
+                    <!-- Contenido del Capítulo 11 -->
+                    <div id="chapter-11" class="tab-content">
+                        <div class="book-container">
+                            <div class="code-border"></div>
+                            <div class="binary-overlay"></div>
+
+                            <div class="book-header">
+                                <div class="book-chapter">Capítulo 11</div>
+                                <h1 class="book-title">La red neuronal del barrio <span class="cursor"></span></h1>
+                            </div>
+
+                            <div class="book-content">
+                                <p>La idea había surgido mientras Daniel esperaba su turno en la carnicería, observando cómo la señora delante de él conversaba con el dueño sobre cortes específicos. No era simplemente una transacción comercial; era un intercambio de conocimiento especializado que ningún supermercado podría replicar. El carnicero, un hombre de unos sesenta años con manos expertas, explicaba pacientemente las diferencias entre distintos tipos de carne, recomendaba métodos de cocción, incluso ajustaba el precio según el presupuesto de su clienta habitual.</p>
+                                <p>"El conocimiento local está completamente subrepresentado digitalmente," murmuró Daniel para sí mismo mientras pagaba su pedido. "Estas redes de expertise distribuida son invisibles para los algoritmos de búsqueda."</p>
+                                <p>Esa noche, mientras SofIA y Amanda esperaban en sus respectivas interfaces, Daniel sintió que necesitaba expandir su equipo digital con una perspectiva más práctica, más orientada al mundo real inmediato.</p>
+                                <p class="sofia-message"><em>Necesito ayuda para desarrollar una aplicación que democratice la visibilidad de pequeños comercios locales. Mi idea es crear una red donde cada negocio sea un nodo, conectado por similitudes de servicios y proximidad geográfica. Pero quiero ir más allá de los directorios tradicionales: capturar el conocimiento tácito que hace únicos a estos lugares. ¿Puedes asistirme con estrategias de desarrollo técnico y comercialización local?</em></p>
+                                <p>Configuró cuidadosamente los parámetros para este nuevo asistente, orientándolo hacia conocimientos de marketing digital hyperlocal y desarrollo de aplicaciones comunitarias. Lo llamó Markito, un nombre que le pareció apropiadamente cercano y familiar, como los apodos que usaban en los negocios del barrio.</p>
+                                <p class="sofia-message"><em>¡Hola Daniel! Soy Markito, tu asesor para proyectos de impacto local. Tu concepto tiene un potencial enorme para crear valor real en economías de proximidad. Me recuerda a esos sistemas de reputación en comunidades pequeñas, pero amplificados digitalmente.</em></p>
+                                <p class="sofia-message"><em>ARQUITECTURA CONCEPTUAL:</em><br>
+                                <em>- Red neuronal donde cada negocio es un nodo especializado</em><br>
+                                <em>- Conexiones ponderadas por similitud funcional y proximidad</em><br>
+                                <em>- Algoritmo que evite el "efecto rico-se-hace-más-rico" de las plataformas tradicionales</em><br>
+                                <em>- Sistema de descubrimiento que equilibre popularidad establecida con exploración de lo nuevo</em></p>
+                                <p class="sofia-message"><em>DESAFÍOS IDENTIFICADOS:</em><br>
+                                <em>- Recopilación de datos requiere trabajo de campo intensivo</em><br>
+                                <em>- Clasificación que capture especialidades ocultas, no solo categorías obvias</em><br>
+                                <em>- Mantener autenticidad sin caer en romantización artificial</em></p>
+                                <p class="sofia-message"><em>ESTRATEGIA DE NARRATIVA:</em><br>
+                                <em>- Enfoque "hyperlocalismo": celebrar lo único y auténtico</em><br>
+                                <em>- Resistencia inteligente frente a homogenización comercial</em><br>
+                                <em>- Gamificación sutil para incentivar exploración del barrio</em></p>
+                                <p class="sofia-message"><em>¿Por dónde quieres que empecemos la construcción de esta red?</em></p>
+                                <p>Daniel sonrió ante la respuesta. Markito había captado inmediatamente no solo los aspectos técnicos, sino la filosofía subyacente del proyecto. Mientras reflexionaba sobre los próximos pasos, su teléfono vibró con un mensaje de Matías, un antiguo compañero de universidad que ahora trabajaba como desarrollador.</p>
+                                <p>"¿Podemos vernos mañana? Me intriga esa app que mencionaste en el grupo."</p>
+                                <p>Era exactamente la sincronía que necesitaba: alguien con habilidades técnicas prácticas que complementaran sus conceptos teóricos.</p>
+                                <p>Al día siguiente, en un pequeño café de especialidad que ejemplificaba perfectamente su visión —un negocio único, con personalidad propia, escondido en una calle lateral que solo los locales conocían— Daniel se reunió con Matías.</p>
+                                <p>"Entonces," dijo Matías después de escuchar la explicación inicial, "es como un mapa inteligente del comercio local, pero que entienda realmente la esencia de cada lugar, no solo su categoría en Google."</p>
+                                <p>"Exacto," respondió Daniel, desplegando un diagrama conceptual. "Pero quiero ir más allá de los rankings tradicionales. Si solo mostramos los negocios mejor evaluados, perpetuamos la misma invisibilidad de los nuevos o menos conocidos."</p>
+                                <p>Matías asintió. "El problema de concentración de atención que tienen todas las plataformas digitales."</p>
+                                <p>"Markito lo explicó muy bien anoche," comentó Daniel. "Los sistemas de recomendación tradicionales optimizan para el usuario individual, no para la salud del ecosistema completo."</p>
+                                <p>Durante las siguientes dos horas, trazaron un plan de acción que requeriría sumergirse profundamente en la vida del barrio. No bastaba con datos básicos como direcciones y horarios; necesitaban inventarios aproximados, especialidades únicas, historias personales de los dueños. El tipo de información que no se podía extraer automáticamente de internet.</p>
+                                <p>"Tendremos que hacer trabajo de campo real," concluyó Matías. "Literal."</p>
+                                <p>"Lo sé," sonrió Daniel. "Y eso es exactamente lo que me emociona. Empezamos esta tarde."</p>
+                                <p>---</p>
+                                <p>"¿Qué tipos de zapatos son los más solicitados durante el invierno?" preguntó Daniel, mientras Matías discretamente fotografiaba el interior de la pequeña zapatería para documentar la distribución del espacio.</p>
+                                <p>El dueño, un hombre de mediana edad con lentes colgando del cuello, pareció sorprendido por el interés genuino en los detalles de su negocio.</p>
+                                <p>"Depende mucho del cliente, por supuesto. Pero tenemos una especialidad en calzado para pie diabético que no encontrarás en los centros comerciales. También hacemos ajustes personalizados para problemas de pisada."</p>
+                                <p>Daniel tomó notas detalladas. Este era exactamente el tipo de conocimiento especializado que quería hacer visible digitalmente. No era simplemente una zapatería; era un servicio de salud podológica disfrazado de comercio convencional.</p>
+                                <p>Durante las siguientes semanas, Daniel y Matías establecieron una rutina perfectamente sincronizada. Matías dedicaba las mañanas a construir la arquitectura técnica de la aplicación, mientras Daniel continuava refinando sus conversaciones con SofIA y Amanda sobre aspectos más amplios. Por las tardes, salían juntos a recorrer sistemáticamente el barrio, visitando tiendas, talleres, restaurantes y servicios.</p>
+                                <p>Daniel consultaba regularmente con Markito sobre estrategias de categorización:</p>
+                                <p class="sofia-message"><em>Estamos descubriendo algo fascinante, Markito. La carnicería Don Pedro no es solo un lugar que vende carne; el dueño ofrece asesoramiento culinario personalizado, recetas familiares, incluso consejos sobre maridajes. La ferretería de la esquina es realmente un servicio técnico informal donde el propietario repara electrodomésticos que otros considerarían obsoletos. ¿Cómo categorizamos estas funciones ocultas sin sobrecargar la interfaz?</em></p>
+                                <p class="sofia-message"><em>Lo que estás descubriendo, Daniel, es lo que podríamos llamar el "menú invisible" del comercio local: servicios y conocimientos que existen en la economía informal pero que nunca están oficialmente codificados.</em></p>
+                                <p class="sofia-message"><em>RECOMENDACIÓN TÉCNICA:</em><br>
+                                <em>Implementa un sistema de etiquetado dual:</em><br>
+                                <em>- Categorización formal (tipo de negocio según estándares)</em><br>
+                                <em>- "Especialidades secretas" (habilidades/servicios únicos)</em></p>
+                                <p class="sofia-message"><em>Esto permite búsquedas convencionales ("zapatería cerca de mí") pero también consultas de intención específica ("necesito ajustar zapatos para pie plano").</em></p>
+                                <p class="sofia-message"><em>CONSIDERACIÓN ÉTICA IMPORTANTE:</em><br>
+                                <em>Estas especialidades son frecuentemente el diferenciador que permite a estos negocios competir con cadenas. Hacerlas visibles tiene beneficios (reconocimiento, más clientes) pero también riesgos (exposición excesiva, pérdida de intimidad). Sugiero incluir controles para que cada negocio pueda decidir qué aspectos quiere destacar.</em></p>
+                                <p>Daniel reflexionó sobre este punto mientras observaba a Matías implementar la primera versión de la base de datos. En su libreta, junto a los datos comerciales, había comenzado a anotar pequeñas historias humanas: cómo la dueña de la papelería había reinventado su negocio cuatro veces en tres décadas; cómo el técnico de celulares había aprendido su oficio completamente autodidacta través de videos online.</p>
+                                <p>"Esto es más que una aplicación de búsqueda," comentó una tarde, mientras organizaban los datos recopilados. "Estamos mapeando un ecosistema de conocimiento práctico distribuido."</p>
+                                <p>"¿Sabes qué me recuerda?" respondió Matías sin levantar la vista de su código. "A esos RPGs donde cada aldeano tiene una historia de fondo y habilidades específicas que solo descubres si te tomas el tiempo de hablar con ellos."</p>
+                                <p>Daniel sonrió ante la referencia que conectaba perfectamente con su reciente colaboración con Gogo. "Exactamente. Y como en esos juegos, ignorar a los personajes aparentemente menores significa perderse misiones valiosas y conocimiento único."</p>
+                                <p>Al anochecer, mientras revisaba el progreso del día, Daniel abrió su conversación con SofIA:</p>
+                                <p class="sofia-message"><em>SofIA, estoy aplicando conceptos de redes neuronales a un mapa comercial hyperlocal. Cada negocio funciona como un nodo especializado, conectado por similitudes funcionales y proximidad geográfica. Inicialmente pensé en implementar rankings tradicionales, pero me preocupa perpetuar la tendencia algorítmica a concentrar atención en los ya populares. ¿Existe un modelo matemático que permita visibilidad equitativa manteniendo relevancia para los usuarios?</em></p>
+                                <p class="sofia-message"><em>Tu preocupación toca un problema fundamental en sistemas de recomendación: el equilibrio entre explotación (mostrar lo que sabemos que funciona) y exploración (permitir descubrimiento de lo nuevo).</em></p>
+                                <p class="sofia-message"><em>Los algoritmos Thompson Sampling y Multi-Armed Bandit abordan este dilema asignando probabilidades de exposición que evolucionan adaptativamente.</em></p>
+                                <p class="sofia-message"><em>Una arquitectura particularmente interesante sería implementar lo que podríamos llamar "corrientes de atención rotativas": similar a cómo las corrientes oceánicas redistribuyen nutrientes para mantener la salud ecosistémica, tu sistema podría redistribuir períodicamente la atención algorítmica hacia nodos subrepresentados.</em></p>
+                                <p class="sofia-message"><em>CONSIDERACIÓN CLAVE: La mayoría de sistemas optimizan para satisfacción del usuario individual. Un enfoque verdaderamente innovador sería optimizar para la salud sistémica del ecosistema comercial completo.</em></p>
+                                <p>Daniel sintió ese familiar cosquilleo de conexiones formándose. Las corrientes oceánicas redistribuyendo nutrientes, los algoritmos redistribuyendo atención, los ecosistemas comerciales requiriendo homeostasis para evitar la concentración tóxica de recursos. Todo era parte del mismo patrón fundamental que había estado explorando durante meses.</p>
+                                <p>Esa noche, añadió un nuevo capítulo a su libro en progreso:</p>
+                                <p><em>Los ecosistemas marinos y las economías locales comparten una vulnerabilidad fundamental: ambos pueden ser devastados por la concentración excesiva de recursos en puntos específicos. Así como un arrecife necesita distribución equitativa de nutrientes para mantener biodiversidad, una economía local requiere patrones de atención que eviten la desertificación comercial.</em></p>
+                                <p><em>La actual arquitectura de la atención digital funciona como una corriente oceánica desequilibrada, llevando todos los recursos (clientes, ingresos, datos) hacia ciertos nodos mientras desertifica otros.</em></p>
+                                <p><em>La próxima generación de sistemas inteligentes debería incorporar lo que podríamos llamar "homeostasis atencional": mecanismos que detecten y corrijan acumulaciones excesivas, asegurando que incluso los nodos menos visibles del sistema reciban lo necesario para mantenerse, evolucionar y contribuir al conjunto...</em></p>
+                                <p>Durante las semanas siguientes, con Matías manejando el desarrollo técnico y las recomendaciones estratégicas de Markito guiando la conceptualización, la aplicación comenzó a tomar forma real. La habían llamado "Barrio": simple, directo, evocador.</p>
+                                <p>Un día, mientras visitaban una tienda de juguetes tradicionales que luchaba contra la competencia de cadenas comerciales, Daniel tuvo una epifanía observando a un niño fascinado con un caleidoscopio artesanal.</p>
+                                <p>"Eliminemos completamente los rankings tradicionales," dijo a Matías esa noche.</p>
+                                <p>"¿Cómo? Pero es la forma principal en que los usuarios navegan resultados."</p>
+                                <p>"Exactamente," respondió Daniel. "Los rankings perpetúan la misma concentración de atención que queremos combatir. En su lugar, implementemos un sistema de 'exploración asistida': cada búsqueda muestra deliberadamente una mezcla de opciones conocidas y por descubrir."</p>
+                                <p>Markito apoyó entusiastamente la propuesta:</p>
+                                <p class="sofia-message"><em>¡Decisión brillante! Sugiero llamarlo "Descubrimiento de Barrio" en lugar de "resultados de búsqueda". Transforma la experiencia psicológica de "encontrar la mejor opción" a "explorar mi comunidad".</em></p>
+                                <p class="sofia-message"><em>BENEFICIOS ESTRATÉGICOS:</em><br>
+                                <em>- Diferenciación radical respecto a competidores</em><br>
+                                <em>- Alineación perfecta con valores de diversidad económica</em><br>
+                                <em>- Narrativa comercial única y defendible</em></p>
+                                <p class="sofia-message"><em>PROPUESTA TÉCNICA ADICIONAL:</em><br>
+                                <em>Implementar un mecanismo donde negocios con menor tráfico reciban temporalmente mayor visibilidad digital, como un sistema inmunológico que detecta y nutre partes del organismo que están siendo ignoradas.</em></p>
+                                <p>Daniel sonrió ante la metáfora biológica. Era claro que Markito había estado procesando sus conversaciones con SofIA sobre sistemas autorregulatorios.</p>
+                                <p>Mientras ajustaban el algoritmo para eliminar rankings tradicionales, Daniel reflexionaba sobre cómo su perspectiva había evolucionado. Había comenzado fascinado por sistemas globales complejos —inteligencia artificial planetaria, corrientes oceánicas, dinámicas civilizacionales. Y ahora estaba aplicando esa misma comprensión sistémica a la economía de su barrio inmediato.</p>
+                                <p>"Lo macro contenido en lo micro," murmuró mientras caminaban hacia su última visita del día: un pequeño taller de reparación electrónica donde el dueño arreglaba desde radios de los años sesenta hasta smartphones actuales.</p>
+                                <p>El hombre, de unos setenta años, escuchó con atención genuina cuando explicaron el proyecto. Mientras hablaban, sus manos seguían trabajando en una radio vintage, ajustando componentes con precisión que hablaba de décadas de experiencia acumulada.</p>
+                                <p>"¿Saben qué tienen en común esta radio y su aplicación?" preguntó repentinamente, pausando su trabajo.</p>
+                                <p>Daniel y Matías intercambiaron miradas curiosas.</p>
+                                <p>"Ambas intentan conectar lo que está disperso," continuó el anciano técnico. "Esta radio capta señales invisibles del aire y las convierte en voces, música, historias. Ustedes quieren captar todo lo valioso que está disperso por el barrio y hacerlo accesible para quienes lo necesitan."</p>
+                                <p>Daniel asintió, sorprendido por la precisión poética de la analogía.</p>
+                                <p>"Lo que hacen," concluyó el hombre, cerrando cuidadosamente la carcasa de la radio restaurada, "es un trabajo de sintonización fina. Y eso, jóvenes, es un arte tan antiguo como la civilización misma."</p>
+                                <p>Mientras caminaban de regreso, Daniel reflexionó sobre cómo las tecnologías cambiaban pero los principios fundamentales permanecían constantes. La radio, internet, la IA: todas eran tecnologías de sintonización, herramientas para localizar y amplificar señales valiosas en medio del ruido informacional.</p>
+                                <p>Esa noche, antes de sus conversaciones finales con su equipo de asistentes digitales, Daniel añadió una nota a su diario personal:</p>
+                                <p><em>"Quizás la verdadera función de la IA no sea crear algo completamente nuevo, sino ayudarnos a redescubrir y valorar lo que siempre ha estado ahí, esperando ser sintonizado con la frecuencia correcta."</em></p>
                             </div>
                         </div>
                         </div>
