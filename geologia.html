@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geología Marina - OlitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #2b1d0e; /* Earthy: Dark brown */
+            color: #f5f5f5; /* Earthy: Off-white/Light beige */
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Fondo oceánico similar al index */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/kI72GlX.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.5) saturate(0.8); /* Earthy: Adjusted brightness and saturation */
+            z-index: -2;
+        }
+
+        .darken-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(43, 29, 14, 0.4) 0%, /* Earthy: Dark brown gradient */
+                rgba(43, 29, 14, 0.7) 100%
+            );
+            z-index: -1;
+        }
+
+        /* Header navigation */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(43, 29, 14, 0.95); /* Earthy: Dark brown */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(161, 136, 127, 0.2); /* Earthy: Light tan border */
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #c79170; /* Earthy: Warm tan/copper */
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #f5f5f5; /* Earthy: Off-white/Light beige */
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            color: #c79170; /* Earthy: Warm tan/copper */
+        }
+
+        .menu-toggle {
+            display: none;
+            color: #f5f5f5; /* Earthy: Off-white/Light beige */
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Card principal con estilo oceánico */
+        .main-card {
+            background: rgba(245, 245, 220, 0.95); /* Earthy: Beige/Off-white */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(121, 85, 72, 0.3); /* Earthy: Brown border */
+            color: #4e342e; /* Earthy: Dark brown text */
+        }
+
+        /* Título de la página */
+        .page-title {
+            background: linear-gradient(135deg, #795548, #a1887f); /* Earthy: Brown to Tan gradient */
+            color: #fff8e1; /* Earthy: Very light beige */
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Pestañas de categorías */
+        .category-tabs {
+            overflow-x: auto;
+            background: rgba(239, 235, 220, 0.8); /* Earthy: Lighter beige */
+        }
+
+        .category-tabs-container {
+            display: flex;
+            border-bottom: 1px solid #d7ccc8; /* Earthy: Light brown border */
+            min-width: max-content;
+        }
+
+        .category-tab {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #5d4037; /* Earthy: Medium brown */
+            border-bottom: 3px solid transparent;
+        }
+
+        .category-tab:hover {
+            color: #795548; /* Earthy: Darker brown */
+            background-color: rgba(121, 85, 72, 0.1); /* Earthy: Light brown tint */
+        }
+
+        .category-tab.active {
+            color: #795548; /* Earthy: Darker brown */
+            border-bottom-color: #795548; /* Earthy: Darker brown */
+            background-color: rgba(121, 85, 72, 0.1); /* Earthy: Light brown tint */
+        }
+
+        /* Selector de tópicos */
+        .topics-selector {
+            background: rgba(239, 235, 220, 0.6); /* Earthy: Lighter beige */
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(215, 204, 200, 0.5); /* Earthy: Light brown border */
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .topic-button {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: rgba(253, 250, 242, 0.9); /* Earthy: Very light beige */
+            border: 2px solid rgba(161, 136, 127, 0.3); /* Earthy: Tan border */
+            color: #4e342e; /* Earthy: Dark brown text */
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .topic-button:hover {
+            background-color: rgba(220, 210, 190, 0.8); /* Earthy: Darker beige for hover */
+            border-color: #a1887f; /* Earthy: Tan border */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-button.active {
+            background: linear-gradient(135deg, #8d6e63, #a1887f); /* Earthy: Medium brown to Tan gradient */
+            color: #fff8e1; /* Earthy: Very light beige */
+            border-color: #8d6e63; /* Earthy: Medium brown */
+            box-shadow: 0 4px 12px rgba(141, 110, 99, 0.3); /* Shadow based on active background */
+        }
+
+        /* Contenido del tópico */
+        .topic-content {
+            padding: 2rem;
+            background: rgba(253, 250, 242, 0.95); /* Earthy: Very light beige */
+        }
+
+        .topic-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #795548; /* Earthy: Dark brown */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .description {
+            color: #4e342e; /* Earthy: Dark brown text */
+            margin-bottom: 2rem;
+            text-align: justify;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            padding: 1.5rem;
+            background: rgba(239, 235, 220, 0.5); /* Earthy: Lighter beige */
+            border-radius: 12px;
+            border-left: 4px solid #a1887f; /* Earthy: Tan left border */
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #795548; /* Earthy: Dark brown */
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: #8d6e63; /* Earthy: Medium brown */
+        }
+
+        .key-points, .applications {
+            margin-bottom: 2rem;
+        }
+
+        .points-list {
+            list-style: none;
+            background: rgba(239, 235, 220, 0.3); /* Earthy: Lighter beige tint */
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .points-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .points-list li:hover {
+            background: rgba(220, 210, 190, 0.3); /* Earthy: Darker beige tint for hover */
+            transform: translateX(5px);
+        }
+
+        .bullet-blue { /* Consider renaming to .bullet-primary or similar */
+            color: #8d6e63; /* Earthy: Medium brown */
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .bullet-green { /* Consider renaming to .bullet-secondary or similar */
+            color: #859977; /* Earthy: Muted olive green */
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(135deg, rgba(121, 85, 72, 0.1), rgba(161, 136, 127, 0.1)); /* Earthy: Light brown tints */
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(121, 85, 72, 0.2); /* Earthy: Brown border */
+        }
+
+        .image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #a1887f 0%, #795548 100%); /* Earthy: Tan to Brown gradient */
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff8e1; /* Earthy: Very light beige */
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background: rgba(43, 29, 14, 0.95); /* Earthy: Dark brown */
+            color: #f5f5f5; /* Earthy: Off-white/Light beige */
+            text-align: center;
+            border-top: 1px solid rgba(161, 136, 127, 0.2); /* Earthy: Light tan border */
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .category-tab {
+                font-size: 0.8rem;
+                padding: 0.8rem 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-content {
+                padding: 1rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ef4444; /* Standard error red, can be adjusted if needed */
+            font-weight: 500;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(254, 226, 226, 0.8); /* Lighter red background */
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Animaciones suaves */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Botón de volver al inicio */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #795548, #a1887f); /* Earthy: Brown to Tan gradient */
+            color: #fff8e1; /* Earthy: Very light beige */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(121, 85, 72, 0.3); /* Shadow based on new background */
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(121, 85, 72, 0.4); /* Shadow based on new background */
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="darken-overlay"></div>
+
+    <header>
+        <div class="nav-container">
+            <a href="./index.html" class="logo">OlitAI</a>
+            <nav>
+                <ul>
+                    <li><a href="./index.html">Inicio</a></li>
+                    <li><a href="./blog.html">Blog</a></li>
+                    <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
+                    <li><a href="./about.html">Acerca de</a></li>
+                    <li><a href="./biologia_marina_pagina.html">Biología Marina</a></li>
+                    <li><a href="./fisica_integrated.html">Oceanografía Física</a></li>
+                    <li><a href="./geologia.html" class="active">Geología Marina</a></li>
+                    <li><a href="./quimica.html">Química Marina</a></li>
+                </ul>
+            </nav>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-card">
+            <!-- Título de la página -->
+            <div class="page-title">
+                <h1><i class="fas fa-mountain"></i> Geología Marina</h1>
+                <p>Explorando la estructura, procesos y evolución de los fondos oceánicos</p>
+            </div>
+
+            <!-- Pestañas de categorías -->
+            <div class="category-tabs">
+                <div class="category-tabs-container" id="categoryTabs">
+                    <!-- Las pestañas se generarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Selector de tópicos -->
+            <div class="topics-selector">
+                <div class="topics-grid" id="topicsGrid">
+                    <!-- Los tópicos se generarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Contenido del tópico -->
+            <div class="topic-content">
+                <div id="topicContent">
+                    <!-- El contenido se generará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Diego Hernández-Cerón. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Datos de la aplicación (mantienes el mismo contenido)
+        const categories = [
+            { id: "fase1", name: "FASE I: FUNDAMENTOS DE GEOLOGÍA PARA OCEANOGRAFÍA" },
+            { id: "fase2", name: "FASE II: OCEANOGRAFÍA GEOLÓGICA INTERMEDIA" },
+            { id: "fase3", name: "FASE III: OCEANOGRAFÍA GEOLÓGICA AVANZADA" },
+            { id: "fase4", name: "FASE IV: TÉCNICAS AVANZADAS Y APLICACIONES" },
+            { id: "fase5", name: "FASE V: APLICACIONES INTEGRADAS Y PROYECTOS" }
+        ];
+
+        const topicsByCategory = {
+            fase1: [
+                { id: "f1_topic1", name: "1. Principios Básicos de Geología y Mineralogía" },
+                { id: "f1_topic2", name: "2. Procesos Geológicos Fundamentales" },
+                { id: "f1_topic3", name: "3. Tectónica y Estructura Oceánica" },
+                { id: "f1_topic4", name: "4. Geomorfología Básica Marina y Costera" }
+            ],
+            fase2: [
+                { id: "f2_topic5", name: "5. Estructura y Dinámica del Fondo Oceánico" },
+                { id: "f2_topic6", name: "6. Sedimentología Marina Avanzada" },
+                { id: "f2_topic7", name: "7. Geoquímica Marina Fundamental" },
+                { id: "f2_topic8", name: "8. Métodos Básicos de Investigación Geológica Marina" }
+            ],
+            fase3: [
+                { id: "f3_topic9", name: "9. Procesos Geológicos Submarinos Complejos" },
+                { id: "f3_topic10", name: "10. Paleoceanografía y Registro Geológico Marino" },
+                { id: "f3_topic11", name: "11. Recursos Geológicos Oceánicos" },
+                { id: "f3_topic12", name: "12. Riesgos Geológicos Submarinos" }
+            ],
+            fase4: [
+                { id: "f4_topic13", name: "13. Métodos Geofísicos Avanzados" },
+                { id: "f4_topic14", name: "14. Técnicas Analíticas Especializadas" },
+                { id: "f4_topic15", name: "15. Métodos Computacionales y Modelado" },
+                { id: "f4_topic16", name: "16. Machine Learning y Big Data en Geología Marina" }
+            ],
+            fase5: [
+                { id: "f5_topic17", name: "17. Gestión Costera y Marina basada en Geología" },
+                { id: "f5_topic18", name: "18. Aplicaciones a Ingeniería y Estructuras Submarinas" },
+                { id: "f5_topic19", name: "19. Patrimonio Geológico Submarino" },
+                { id: "f5_topic20", name: "20. Proyectos Integradores Multidisciplinarios" }
+            ]
+        };
+
+        const content = {
+            fase1: {
+                f1_topic1: {
+                    title: "1. Principios Básicos de Geología y Mineralogía",
+                    description: "Esta sección introduce los conceptos esenciales de la geología y mineralogía que son fundamentales para comprender la oceanografía geológica, incluyendo la identificación de minerales y rocas comunes en ambientes marinos y los principios de cristalografía.",
+                    keyPoints: [
+                        "**Fundamentos mineralógicos**",
+                        "  - Definición y propiedades de los minerales",
+                        "  - Silicatos y grupos minerales principales",
+                        "  - Minerales comunes en ambientes marinos",
+                        "  - Identificación básica de minerales",
+                        "**Fundamentos petrológicos**",
+                        "  - Rocas ígneas, sedimentarias y metamórficas",
+                        "  - Ciclo de las rocas",
+                        "  - Texturas y estructuras básicas",
+                        "  - Rocas características en ambientes oceánicos",
+                        "**Cristalografía elemental**",
+                        "  - Sistemas cristalinos",
+                        "  - Propiedades físicas derivadas de la estructura",
+                        "  - Técnicas básicas de identificación mineralógica",
+                        "  - Mineralogía de sedimentos marinos"
+                    ],
+                    applications: [
+                        "Identificación de componentes de sedimentos marinos.",
+                        "Comprensión de la formación de la corteza oceánica.",
+                        "Interpretación de la historia geológica de los fondos marinos."
+                    ]
+                },
+                f1_topic2: {
+                    title: "2. Procesos Geológicos Fundamentales",
+                    description: "Explora los procesos geológicos básicos como el intemperismo, la erosión, el transporte y la sedimentación, y la diagénesis temprana, con un enfoque en cómo estos procesos operan en los ambientes marinos.",
+                    keyPoints: [
+                        "**Intemperismo y erosión**",
+                        "  - Mecanismos de meteorización física y química",
+                        "  - Erosión en ambientes costeros",
+                        "  - Procesos bioerosivos en medios marinos",
+                        "  - Tasas y factores de control",
+                        "**Transporte y sedimentación**",
+                        "  - Mecanismos básicos de transporte",
+                        "  - Clasificación de sedimentos",
+                        "  - Ambientes deposicionales marinos",
+                        "  - Estructuras sedimentarias diagnósticas",
+                        "**Diagénesis marina temprana**",
+                        "  - Procesos post-deposicionales",
+                        "  - Cementación y compactación",
+                        "  - Disolución y reemplazamiento",
+                        "  - Transformaciones mineralógicas"
+                    ],
+                    applications: [
+                        "Interpretación de secuencias sedimentarias.",
+                        "Modelado de la evolución costera.",
+                        "Comprensión de la formación de recursos minerales sedimentarios."
+                    ]
+                },
+                f1_topic3: {
+                    title: "3. Tectónica y Estructura Oceánica",
+                    description: "Introduce los principios de la tectónica de placas, la estructura de la corteza oceánica y los procesos de deformación que modelan los fondos marinos, estableciendo el marco para entender la arquitectura global de los océanos.",
+                    keyPoints: [
+                        "**Fundamentos de tectónica de placas**",
+                        "  - Tipos de límites de placas",
+                        "  - Expansión del fondo oceánico",
+                        "  - Subducción y zonas de colisión",
+                        "  - Evidencias del movimiento de placas",
+                        "**Estructura de la corteza oceánica**",
+                        "  - Comparación con corteza continental",
+                        "  - Capas sísmicas de la litosfera oceánica",
+                        "  - Perfiles característicos",
+                        "  - Anomalías geofísicas asociadas",
+                        "**Deformación y estructuras básicas**",
+                        "  - Fallas, pliegues y diaclasas en medios marinos",
+                        "  - Expresión morfológica de estructuras",
+                        "  - Deformación activa vs. inactiva",
+                        "  - Relación con sismicidad submarina"
+                    ],
+                    applications: [
+                        "Evaluación de riesgos sísmicos y tsunamis.",
+                        "Exploración de recursos asociados a límites de placas.",
+                        "Reconstrucción de la historia tectónica de las cuencas oceánicas."
+                    ]
+                },
+                f1_topic4: {
+                    title: "4. Geomorfología Básica Marina y Costera",
+                    description: "Presenta los principios de la geomorfología aplicados a los ambientes marinos y costeros, describiendo las principales formas del relieve submarino y costero y los procesos que las originan.",
+                    keyPoints: [
+                        "**Principios de geomorfología**",
+                        "  - Factores de control morfológico",
+                        "  - Procesos modeladores",
+                        "  - Escalas espaciales y temporales",
+                        "  - Clasificación morfogenética",
+                        "**Morfología costera elemental**",
+                        "  - Tipos de costas",
+                        "  - Elementos morfológicos principales",
+                        "  - Acantilados, playas y estuarios",
+                        "  - Respuesta a factores externos",
+                        "**Morfología submarina básica**",
+                        "  - Plataforma, talud y llanura abisal",
+                        "  - Cañones submarinos",
+                        "  - Montes submarinos",
+                        "  - Representación e interpretación morfológica"
+                    ],
+                    applications: [
+                        "Planificación del uso del suelo costero.",
+                        "Identificación de hábitats bentónicos.",
+                        "Exploración de recursos en diferentes provincias geomorfológicas."
+                    ]
+                }
+            },
+            fase2: {
+                f2_topic5: {
+                    title: "5. Estructura y Dinámica del Fondo Oceánico",
+                    description: "Profundiza en las unidades morfoestructurales de los océanos, la estructura profunda y la evolución tectónica de las cuencas oceánicas, integrando conceptos de geofísica y tectónica.",
+                    keyPoints: [
+                        "**Unidades morfoestructurales oceánicas**",
+                        "  - Márgenes continentales activos y pasivos",
+                        "  - Cuencas oceánicas y sus subdivisiones",
+                        "  - Dorsales medioceánicas",
+                        "  - Fosas y arcos insulares",
+                        "**Estructura profunda oceánica**",
+                        "  - Variaciones en espesor cortical",
+                        "  - Geofísica del manto superior oceánico",
+                        "  - Discontinuidades principales",
+                        "  - Flujo térmico y gradientes",
+                        "**Evolución tectónica de cuencas oceánicas**",
+                        "  - Fases de rifting y expansión",
+                        "  - Ciclo de Wilson",
+                        "  - Reorganizaciones de placas",
+                        "  - Magnetoestratigrafía oceánica"
+                    ],
+                    applications: [
+                        "Exploración de hidrocarburos en márgenes continentales.",
+                        "Estudio de la sismicidad y vulcanismo en dorsales.",
+                        "Comprensión de la evolución a largo plazo del planeta."
+                    ]
+                },
+                f2_topic6: {
+                    title: "6. Sedimentología Marina Avanzada",
+                    description: "Desarrolla una comprensión avanzada de la clasificación de sedimentos marinos, los procesos sedimentarios complejos y la interpretación de facies sedimentarias para reconstruir paleoambientes.",
+                    keyPoints: [
+                        "**Clasificación avanzada de sedimentos marinos**",
+                        "  - Sedimentos terrígenos vs. biogénicos",
+                        "  - Sedimentos autigénicos y cosmogénicos",
+                        "  - Clasificación textural y genética",
+                        "  - Análisis integrado de procedencia",
+                        "**Procesos sedimentarios marinos**",
+                        "  - Decantación pelágica y hemipelágica",
+                        "  - Corrientes de turbidez y flujos de masas",
+                        "  - Corrientes de contorno y contornitas",
+                        "  - Ciclicidad sedimentaria",
+                        "**Facies sedimentarias características**",
+                        "  - Facies de plataforma, talud y cuenca",
+                        "  - Secuencias turbidíticas",
+                        "  - Depósitos contorníticos",
+                        "  - Interpretación paleoambiental"
+                    ],
+                    applications: [
+                        "Paleoceanografía y reconstrucción de climas pasados.",
+                        "Exploración de recursos minerales en depósitos sedimentarios.",
+                        "Evaluación de la estabilidad de taludes continentales."
+                    ]
+                },
+                f2_topic7: {
+                    title: "7. Geoquímica Marina Fundamental",
+                    description: "Introduce los principios de la geoquímica de las aguas oceánicas y los sedimentos, y el uso de indicadores geoquímicos para entender procesos actuales y pasados en los océanos.",
+                    keyPoints: [
+                        "**Geoquímica de aguas oceánicas**",
+                        "  - Composición y variabilidad",
+                        "  - Ciclos geoquímicos principales",
+                        "  - Tiempo de residencia de elementos",
+                        "  - Interacción agua-roca-biota",
+                        "**Geoquímica sedimentaria**",
+                        "  - Composición elemental e isotópica",
+                        "  - Trazadores geoquímicos",
+                        "  - Ciclos redox en sedimentos",
+                        "  - Diagénesis geoquímica",
+                        "**Indicadores geoquímicos**",
+                        "  - Paleosalinidad y paleotemperatura",
+                        "  - Paleoproductividad y paleooxigenación",
+                        "  - Señales de eventos anóxicos",
+                        "  - Biomarcadores y su significado"
+                    ],
+                    applications: [
+                        "Estudios de cambio climático y ciclos biogeoquímicos.",
+                        "Monitoreo de contaminación marina.",
+                        "Exploración de depósitos minerales hidrotermales."
+                    ]
+                },
+                f2_topic8: {
+                    title: "8. Métodos Básicos de Investigación Geológica Marina",
+                    description: "Presenta las técnicas fundamentales utilizadas en la investigación geológica marina, incluyendo métodos de muestreo de sedimentos, técnicas geofísicas básicas y análisis de laboratorio estándar.",
+                    keyPoints: [
+                        "**Métodos de muestreo sedimentario**",
+                        "  - Dragas, box-corers y testigos",
+                        "  - Recuperación y procesamiento de muestras",
+                        "  - Análisis sedimentológicos estándar",
+                        "  - Documentación y bases de datos",
+                        "**Métodos geofísicos básicos**",
+                        "  - Batimetría y sonar de barrido lateral",
+                        "  - Perfiladores sísmicos de alta resolución",
+                        "  - Métodos magnéticos y gravimétricos",
+                        "  - Integración de datos multiparamétricos",
+                        "**Técnicas de laboratorio fundamentales**",
+                        "  - Análisis granulométrico y textural",
+                        "  - Análisis de composición",
+                        "  - Técnicas microscópicas básicas",
+                        "  - Preparación y análisis de muestras"
+                    ],
+                    applications: [
+                        "Planificación y ejecución de campañas oceanográficas.",
+                        "Caracterización de sitios para ingeniería submarina.",
+                        "Investigación científica de los fondos oceánicos."
+                    ]
+                }
+            },
+            fase3: {
+                f3_topic9: {
+                    title: "9. Procesos Geológicos Submarinos Complejos",
+                    description: "Examina procesos geológicos submarinos de mayor complejidad, como el volcanismo avanzado, los sistemas hidrotermales y los movimientos en masa, y su impacto en la morfología y composición del fondo oceánico.",
+                    keyPoints: [
+                        "**Volcanismo submarino avanzado**",
+                        "  - Petrogénesis de magmas oceánicos",
+                        "  - Estilos eruptivos y productos",
+                        "  - Morfologías volcánicas complejas",
+                        "  - Evolución de edificios volcánicos",
+                        "**Procesos hidrotermales**",
+                        "  - Circulación hidrotermal oceánica",
+                        "  - Sistemas hidrotermales de alta y baja temperatura",
+                        "  - Precipitación mineral asociada",
+                        "  - Interacción con sistemas biológicos",
+                        "**Movimientos en masa submarinos**",
+                        "  - Mecánica de deslizamientos submarinos",
+                        "  - Factores desencadenantes",
+                        "  - Morfología y arquitectura interna",
+                        "  - Modelado y predicción"
+                    ],
+                    applications: [
+                        "Exploración de depósitos minerales asociados a volcanismo e hidrotermalismo.",
+                        "Evaluación de riesgos geológicos como deslizamientos y erupciones.",
+                        "Estudio de ecosistemas únicos en fuentes hidrotermales."
+                    ]
+                },
+                f3_topic10: {
+                    title: "10. Paleoceanografía y Registro Geológico Marino",
+                    description: "Se enfoca en cómo el registro geológico marino se utiliza para reconstruir las condiciones oceánicas del pasado, utilizando indicadores paleoceanográficos avanzados y técnicas de integración multiproxy.",
+                    keyPoints: [
+                        "**Principios de paleoceanografía**",
+                        "  - Concepto de proxy y calibración",
+                        "  - Archivo sedimentario oceánico",
+                        "  - Resolución temporal y limitaciones",
+                        "  - Integración multiproxy",
+                        "**Indicadores paleoceanográficos avanzados**",
+                        "  - Proxies isotópicos (δ18O, δ13C, δD, etc.)",
+                        "  - Indicadores microfosilíferos",
+                        "  - Biomarcadores moleculares",
+                        "  - Elementos traza en biominerales",
+                        "**Reconstrucciones paleoceanográficas**",
+                        "  - Paleotemperaturas y paleosalinidades",
+                        "  - Paleocirculación oceánica",
+                        "  - Paleoproductividad",
+                        "  - Eventos globales en el registro marino"
+                    ],
+                    applications: [
+                        "Comprensión de la variabilidad climática natural.",
+                        "Validación de modelos climáticos.",
+                        "Estudio de la respuesta de los océanos a cambios ambientales pasados."
+                    ]
+                },
+                f3_topic11: {
+                    title: "11. Recursos Geológicos Oceánicos",
+                    description: "Detalla los principales tipos de recursos geológicos que se encuentran en los océanos, incluyendo hidrocarburos offshore, minerales submarinos y otros recursos no energéticos, así como las consideraciones para su exploración y explotación sostenible.",
+                    keyPoints: [
+                        "**Hidrocarburos offshore**",
+                        "  - Sistemas petrolíferos marinos",
+                        "  - Exploración y evaluación",
+                        "  - Técnicas de extracción",
+                        "  - Impacto ambiental y mitigación",
+                        "**Recursos minerales submarinos**",
+                        "  - Nódulos polimetálicos",
+                        "  - Sulfuros masivos",
+                        "  - Costras de ferromanganeso",
+                        "  - Consideraciones para exploración sostenible",
+                        "**Otros recursos no energéticos**",
+                        "  - Áridos y materiales de construcción",
+                        "  - Minerales de evaporitas",
+                        "  - Placeres submarinos",
+                        "  - Evaluación y gestión de recursos"
+                    ],
+                    applications: [
+                        "Suministro energético y de materias primas.",
+                        "Desarrollo de tecnologías de minería submarina.",
+                        "Gestión ambiental de la extracción de recursos."
+                    ]
+                },
+                f3_topic12: {
+                    title: "12. Riesgos Geológicos Submarinos",
+                    description: "Cubre la evaluación y mitigación de riesgos geológicos submarinos, incluyendo peligros sísmicos, tsunamis e inestabilidades de taludes, y su impacto en las zonas costeras e infraestructuras marinas.",
+                    keyPoints: [
+                        "**Evaluación de peligros sísmicos**",
+                        "  - Sismicidad en márgenes activos",
+                        "  - Caracterización de fallas submarinas",
+                        "  - Paleosismicidad en sedimentos marinos",
+                        "  - Modelado de propagación",
+                        "**Tsunamis: génesis y propagación**",
+                        "  - Mecanismos de generación",
+                        "  - Modelado numérico",
+                        "  - Impacto en costas",
+                        "  - Paleotsunamis en el registro geológico",
+                        "**Inestabilidades de taludes submarinos**",
+                        "  - Factores de estabilidad",
+                        "  - Evaluación geotécnica",
+                        "  - Monitoreo y sistemas de alerta",
+                        "  - Impacto en infraestructuras submarinas"
+                    ],
+                    applications: [
+                        "Sistemas de alerta temprana para tsunamis.",
+                        "Diseño seguro de infraestructuras costeras y offshore.",
+                        "Planificación territorial en zonas de riesgo."
+                    ]
+                }
+            },
+            fase4: {
+                f4_topic13: {
+                    title: "13. Métodos Geofísicos Avanzados",
+                    description: "Introduce técnicas geofísicas avanzadas como la sísmica multidimensional, métodos electromagnéticos marinos y tomografía sísmica, que permiten obtener imágenes detalladas del subsuelo marino.",
+                    keyPoints: [
+                        "**Sísmica de reflexión multidimensional**",
+                        "  - Adquisición 2D vs. 3D",
+                        "  - Procesamiento avanzado",
+                        "  - Atributos sísmicos",
+                        "  - Interpretación estructural y estratigráfica",
+                        "**Métodos electromagnéticos marinos**",
+                        "  - CSEM (Controlled Source Electromagnetics)",
+                        "  - Magnetotelúrica marina",
+                        "  - Aplicaciones a recursos e hidrogeología",
+                        "  - Limitaciones y nuevos desarrollos",
+                        "**Tomografía sísmica oceánica**",
+                        "  - Principios y adquisición",
+                        "  - Inversión tomográfica",
+                        "  - Modelos de velocidad 3D",
+                        "  - Aplicaciones a estudios corticales"
+                    ],
+                    applications: [
+                        "Exploración detallada de yacimientos de hidrocarburos.",
+                        "Caracterización de la estructura de la litosfera oceánica.",
+                        "Mapeo de fluidos y sistemas magmáticos en el subsuelo."
+                    ]
+                },
+                f4_topic14: {
+                    title: "14. Técnicas Analíticas Especializadas",
+                    description: "Presenta técnicas analíticas de laboratorio especializadas para el estudio de materiales geológicos marinos, incluyendo mineralogía y petrología avanzada, geoquímica isotópica y geocronología.",
+                    keyPoints: [
+                        "**Mineralogía y petrología avanzada**",
+                        "  - Microsonda electrónica",
+                        "  - Difracción y fluorescencia de rayos X",
+                        "  - Espectrometría Raman",
+                        "  - Técnicas de imagen mineral",
+                        "**Geoquímica isotópica**",
+                        "  - Sistemas isotópicos radiogénicos",
+                        "  - Isótopos estables no tradicionales",
+                        "  - Técnicas de microanálisis isotópico",
+                        "  - Aplicaciones a estudios oceanográficos",
+                        "**Geocronología**",
+                        "  - Datación radiocarbónica",
+                        "  - Series de uranio",
+                        "  - Isótopos cosmogénicos",
+                        "  - Magnetoestratigrafía y cicloestratigrafía"
+                    ],
+                    applications: [
+                        "Datación precisa de eventos geológicos marinos.",
+                        "Determinación de la procedencia de sedimentos y magmas.",
+                        "Reconstrucción detallada de condiciones paleoambientales."
+                    ]
+                },
+                f4_topic15: {
+                    title: "15. Métodos Computacionales y Modelado",
+                    description: "Explora el uso de sistemas de información geográfica (SIG) submarinos, modelado geológico 3D y modelado numérico de procesos para analizar y predecir fenómenos geológicos marinos.",
+                    keyPoints: [
+                        "**Sistemas de información geográfica submarinos**",
+                        "  - Bases de datos geoespaciales marinas",
+                        "  - Análisis espacial de datos geológicos",
+                        "  - Generación de modelos digitales submarinos",
+                        "  - Cartografía geológica submarina",
+                        "**Modelado geológico 3D**",
+                        "  - Modelado estructural",
+                        "  - Modelado estratigráfico",
+                        "  - Integración de datos heterogéneos",
+                        "  - Visualización avanzada",
+                        "**Modelado numérico de procesos**",
+                        "  - Modelos hidro-sedimentarios",
+                        "  - Simulación de procesos tectónicos",
+                        "  - Modelado de cuencas",
+                        "  - Predicción de riesgos geológicos"
+                    ],
+                    applications: [
+                        "Creación de mapas geológicos submarinos interactivos.",
+                        "Simulación de la evolución de cuencas sedimentarias.",
+                        "Modelado de la dispersión de contaminantes en el fondo marino."
+                    ]
+                },
+                f4_topic16: {
+                    title: "16. Machine Learning y Big Data en Geología Marina",
+                    description: "Introduce la aplicación de técnicas de inteligencia artificial, machine learning y manejo de big data para el análisis de grandes volúmenes de datos geológicos marinos y la extracción de conocimiento.",
+                    keyPoints: [
+                        "**Inteligencia artificial aplicada**",
+                        "  - Reconocimiento automatizado de patrones",
+                        "  - Clasificación de hábitats y fondos",
+                        "  - Detección de anomalías geológicas",
+                        "  - Extracción de características geológicas",
+                        "**Big Data en estudios oceánicos**",
+                        "  - Gestión de grandes volúmenes de datos",
+                        "  - Procesamiento paralelo",
+                        "  - Fusión de datos heterogéneos",
+                        "  - Visualización de datos complejos",
+                        "**Aplicaciones específicas**",
+                        "  - Predicción de zonas mineralizadas",
+                        "  - Clasificación automatizada de sedimentos",
+                        "  - Detección de peligros geológicos",
+                        "  - Mapeo predictivo de fondos marinos"
+                    ],
+                    applications: [
+                        "Optimización de la exploración de recursos.",
+                        "Mejora de la eficiencia en la cartografía submarina.",
+                        "Desarrollo de sistemas de alerta temprana más precisos."
+                    ]
+                }
+            },
+            fase5: {
+                f5_topic17: {
+                    title: "17. Gestión Costera y Marina basada en Geología",
+                    description: "Se centra en cómo los conocimientos geológicos se aplican a la gestión sostenible de zonas costeras y marinas, incluyendo la planificación espacial y la evaluación de impacto ambiental.",
+                    keyPoints: [
+                        "**Geología aplicada a la gestión costera**",
+                        "  - Cartografía geológica para planificación",
+                        "  - Evaluación de dinámica sedimentaria",
+                        "  - Geodiversidad costera y submarina",
+                        "  - Estrategias basadas en procesos naturales",
+                        "**Evaluación de impacto en fondos marinos**",
+                        "  - Líneas base geológicas",
+                        "  - Seguimiento de alteraciones",
+                        "  - Sedimentos como archivo de impactos",
+                        "  - Restauración y remediación",
+                        "**Planificación espacial marina geológica**",
+                        "  - Zonificación basada en tipos de fondo",
+                        "  - Compatibilidad de usos y sustrato",
+                        "  - Áreas geológicamente sensibles",
+                        "  - Servicios ecosistémicos asociados a geología"
+                    ],
+                    applications: [
+                        "Diseño de estrategias de protección costera.",
+                        "Establecimiento de áreas marinas protegidas.",
+                        "Regulación de actividades industriales en el mar."
+                    ]
+                },
+                f5_topic18: {
+                    title: "18. Aplicaciones a Ingeniería y Estructuras Submarinas",
+                    description: "Detalla la aplicación de la geología marina a la ingeniería geotécnica, el diseño y construcción de infraestructuras submarinas, y la gestión de dragados y sedimentos.",
+                    keyPoints: [
+                        "**Geotecnia marina**",
+                        "  - Caracterización de suelos submarinos",
+                        "  - Pruebas in situ y laboratorio",
+                        "  - Comportamiento de sedimentos bajo carga",
+                        "  - Diseño de cimentaciones",
+                        "**Infraestructuras submarinas**",
+                        "  - Evaluación de rutas para cables y tuberías",
+                        "  - Estructuras offshore",
+                        "  - Interacción estructura-sedimento",
+                        "  - Monitoreo de estabilidad",
+                        "**Dragados y gestión de sedimentos**",
+                        "  - Caracterización pre-dragado",
+                        "  - Tecnologías de dragado",
+                        "  - Disposición de materiales",
+                        "  - Impactos y mitigación"
+                    ],
+                    applications: [
+                        "Construcción de plataformas petrolíferas y parques eólicos offshore.",
+                        "Instalación de cables y tuberías submarinas.",
+                        "Mantenimiento de canales de navegación."
+                    ]
+                },
+                f5_topic19: {
+                    title: "19. Patrimonio Geológico Submarino",
+                    description: "Aborda la identificación, valoración, conservación y divulgación del patrimonio geológico submarino, promoviendo su uso sostenible y la concienciación sobre su importancia.",
+                    keyPoints: [
+                        "**Identificación y valoración**",
+                        "  - Inventario de geositios submarinos",
+                        "  - Criterios de evaluación",
+                        "  - Vulnerabilidad y amenazas",
+                        "  - Documentación científica",
+                        "**Conservación y gestión**",
+                        "  - Instrumentos legales de protección",
+                        "  - Monitoreo de conservación",
+                        "  - Restauración de elementos dañados",
+                        "  - Gestión integrada con biodiversidad",
+                        "**Divulgación y uso sostenible**",
+                        "  - Técnicas de interpretación del patrimonio submarino",
+                        "  - Buceo geológico",
+                        "  - Museos virtuales submarinos",
+                        "  - Ciencia ciudadana en geología marina"
+                    ],
+                    applications: [
+                        "Creación de geoparques marinos.",
+                        "Desarrollo de turismo geológico sostenible.",
+                        "Educación ambiental y científica."
+                    ]
+                },
+                f5_topic20: {
+                    title: "20. Proyectos Integradores Multidisciplinarios",
+                    description: "Enfatiza la importancia de la integración multidisciplinaria a través de estudios de caso regionales, proyectos de cartografía integral y proyectos de investigación aplicada, fomentando la colaboración y la comunicación científica.",
+                    keyPoints: [
+                        "**Estudios de caso regionales**",
+                        "  - Caracterización integral de márgenes continentales",
+                        "  - Evolución de sistemas insulares",
+                        "  - Dinámicas sedimentarias en mares cerrados",
+                        "  - Impacto del cambio climático en sistemas geológicos",
+                        "**Proyectos de cartografía integral**",
+                        "  - Mapas geológicos submarinos",
+                        "  - Atlas de hábitats con base geológica",
+                        "  - Cartografía de recursos y riesgos",
+                        "  - Herramientas digitales para diseminación",
+                        "**Proyectos de investigación aplicada**",
+                        "  - Diseño experimental y metodológico",
+                        "  - Trabajo en equipo multidisciplinar",
+                        "  - Obtención y análisis de datos",
+                        "  - Comunicación científica de resultados"
+                    ],
+                    applications: [
+                        "Resolución de problemas complejos en oceanografía geológica.",
+                        "Generación de conocimiento para la toma de decisiones.",
+                        "Formación de investigadores con visión integral."
+                    ]
+                }
+            }
+        };
+
+        // Estado de la aplicación
+        let selectedCategory = "fase1";
+        let selectedTopic = "f1_topic1";
+
+        // Función para renderizar las pestañas de categorías
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = `category-tab ${selectedCategory === category.id ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(category.id);
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // Función para renderizar los tópicos
+        function renderTopics() {
+            const topicsGrid = document.getElementById('topicsGrid');
+            topicsGrid.innerHTML = '';
+
+            const topics = topicsByCategory[selectedCategory] || [];
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.className = `topic-button ${selectedTopic === topic.id ? 'active' : ''}`;
+                button.textContent = topic.name;
+                button.onclick = () => selectTopic(topic.id);
+                topicsGrid.appendChild(button);
+            });
+        }
+
+        // Función para renderizar el contenido del tópico
+        function renderTopicContent() {
+            const contentDiv = document.getElementById('topicContent');
+            const categoryData = content[selectedCategory];
+
+            if (!categoryData) {
+                contentDiv.innerHTML = '<div class="error-message">Categoría no encontrada</div>';
+                return;
+            }
+
+            const topicData = categoryData[selectedTopic];
+            if (!topicData) {
+                contentDiv.innerHTML = '<div class="error-message">Tópico no encontrado</div>';
+                return;
+            }
+
+            contentDiv.innerHTML = `
+                <h3 class="topic-title">${topicData.title}</h3>
+                <div class="content-grid">
+                    <div class="main-content">
+                        <p class="description">${topicData.description}</p>
+
+                        <div class="key-points">
+                            <h4 class="section-title">
+                                <i class="fas fa-lightbulb"></i>
+                                Puntos Clave
+                            </h4>
+                            <ul class="points-list">
+                                ${topicData.keyPoints.map(point => `
+                                    <li>
+                                        <span class="bullet-blue">•</span>
+                                        <span>${point}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="applications">
+                            <h4 class="section-title">
+                                <i class="fas fa-cogs"></i>
+                                Aplicaciones
+                            </h4>
+                            <ul class="points-list">
+                                ${topicData.applications.map(app => `
+                                    <li>
+                                        <span class="bullet-green">→</span>
+                                        <span>${app}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sidebar">
+                        <div class="image-placeholder">
+                            <i class="fas fa-water" style="font-size: 2rem; margin-bottom: 1rem;"></i><br>
+                            ${topicData.title}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para seleccionar categoría
+        function selectCategory(categoryId) {
+            selectedCategory = categoryId;
+            const topics = topicsByCategory[categoryId];
+            if (topics && topics.length > 0) {
+                selectedTopic = topics[0].id;
+            }
+            render();
+        }
+
+        // Función para seleccionar tópico
+        function selectTopic(topicId) {
+            selectedTopic = topicId;
+            renderTopicContent();
+            renderTopics();
+        }
+
+        // Función principal de renderizado
+        function render() {
+            renderCategoryTabs();
+            renderTopics();
+            renderTopicContent();
+        }
+
+        // Botón volver arriba
+        function initBackToTop() {
+            const backToTop = document.getElementById('backToTop');
+
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            render();
+            initBackToTop();
+        });
+    </script>
+</body>
+</html>
