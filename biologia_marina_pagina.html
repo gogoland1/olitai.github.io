@@ -3,382 +3,946 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biología Marina</title>
+    <title>Biología Marina - OlitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #1a5276;
-            --secondary: #2980b9;
-            --accent: #3498db;
-            --light: #ebf5fb;
-            --dark: #1c2833;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #1D2A21; /* Green: Dark Green */
+            color: #E8F5E9; /* Green: Lightest Green */
             line-height: 1.6;
-            color: var(--dark);
-            background-color: white;
+            min-height: 100vh;
         }
-        
-        .container {
+
+        /* Fondo oceánico similar al index */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/kI72GlX.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.5) saturate(1.0) hue-rotate(40deg); /* Green: Adjusted for greener tint */
+            z-index: -2;
+        }
+
+        .darken-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(29, 42, 33, 0.4) 0%, /* Green: Dark Green gradient */
+                rgba(29, 42, 33, 0.7) 100%
+            );
+            z-index: -1;
+        }
+
+        /* Header navigation */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(29, 42, 33, 0.95); /* Green: Dark Green */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(106, 168, 79, 0.3); /* Green: Muted green border */
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
         }
-        
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 40px 0;
-            margin-bottom: 30px;
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #81c784; /* Green: Light vibrant green */
+            text-decoration: none;
         }
-        
-        .header-content {
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #E8F5E9; /* Green: Lightest Green */
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            color: #81c784; /* Green: Light vibrant green */
+        }
+
+        .menu-toggle {
+            display: none;
+            color: #E8F5E9; /* Green: Lightest Green */
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Card principal con estilo oceánico */
+        .main-card {
+            background: rgba(232, 245, 233, 0.95); /* Green: Very light green/mint white */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(60, 100, 70, 0.3); /* Green: Dark green border */
+            color: #1B5E20; /* Green: Dark forest green text */
+        }
+
+        /* Título de la página */
+        .page-title {
+            background: linear-gradient(135deg, #38761D, #6AA84F); /* Green: Dark to medium green gradient */
+            color: #FFFFFF; /* Green: White */
+            padding: 2rem;
             text-align: center;
+            margin-bottom: 0;
         }
-        
-        h1 {
+
+        .page-title h1 {
             font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 10px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            font-weight: 300;
+
+        .page-title p {
+            font-size: 1.1rem;
             opacity: 0.9;
         }
-        
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--light);
+
+        /* Pestañas de categorías */
+        .category-tabs {
+            overflow-x: auto;
+            background: rgba(200, 230, 201, 0.8); /* Green: Light mint green */
         }
-        
-        .tab-link {
-            padding: 12px 20px;
-            cursor: pointer;
-            border: none;
+
+        .category-tabs-container {
+            display: flex;
+            border-bottom: 1px solid #A5D6A7; /* Green: Light green border */
+            min-width: max-content;
+        }
+
+        .category-tab {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
             background: none;
-            color: var(--dark);
-            font-size: 1rem;
-            font-weight: 500;
+            border: none;
+            cursor: pointer;
             transition: all 0.3s;
+            color: #2E7D32; /* Green: Medium-dark green */
             border-bottom: 3px solid transparent;
         }
-        
-        .tab-link:hover {
-            background-color: var(--light);
-            border-bottom: 3px solid var(--light);
+
+        .category-tab:hover {
+            color: #1B5E20; /* Green: Dark forest green */
+            background-color: rgba(106, 168, 79, 0.1); /* Green: Light green tint */
         }
-        
-        .tab-link.active {
-            border-bottom: 3px solid var(--accent);
-            color: var(--primary);
+
+        .category-tab.active {
+            color: #1B5E20; /* Green: Dark forest green */
+            border-bottom-color: #38761D; /* Green: Darker active border */
+            background-color: rgba(106, 168, 79, 0.15); /* Green: Light green tint */
         }
-        
-        .tab-content {
-            display: none;
-            padding: 20px 0;
+
+        /* Selector de tópicos */
+        .topics-selector {
+            background: rgba(200, 230, 201, 0.6); /* Green: Light mint green */
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(165, 214, 167, 0.5); /* Green: Light green border */
         }
-        
-        .tab-content.active {
-            display: block;
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
         }
-        
-        .topic {
-            margin-bottom: 40px;
+
+        .topic-button {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: rgba(240, 247, 240, 0.9); /* Green: Very light mint */
+            border: 2px solid rgba(129, 199, 132, 0.4); /* Green: Light green border */
+            color: #1B5E20; /* Green: Dark forest green */
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        
-        h2 {
-            font-size: 1.8rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-weight: 400;
+
+        .topic-button:hover {
+            background-color: rgba(165, 214, 167, 0.8); /* Green: Light green for hover */
+            border-color: #6AA84F; /* Green: Medium green */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
-        h3 {
-            font-size: 1.3rem;
-            color: var(--secondary);
-            margin: 20px 0 15px 0;
-            font-weight: 400;
+
+        .topic-button.active {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50); /* Green: Medium to vibrant green gradient */
+            color: #FFFFFF; /* Green: White */
+            border-color: #2E7D32; /* Green: Medium green */
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); /* Shadow based on active background */
         }
-        
-        ul {
-            list-style-type: none;
-            margin-left: 10px;
+
+        /* Contenido del tópico */
+        .topic-content {
+            padding: 2rem;
+            background: rgba(240, 247, 240, 0.95); /* Green: Very light mint */
         }
-        
-        li {
-            margin-bottom: 8px;
-            position: relative;
-            padding-left: 20px;
-        }
-        
-        li:before {
-            content: "•";
-            color: var(--accent);
-            position: absolute;
-            left: 0;
-            top: 0;
-            font-size: 1.2em;
-        }
-        
-        .card {
-            background-color: var(--light);
-            border-radius: 5px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .card h4 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-        
-        footer {
-            background-color: var(--primary);
-            color: white;
+
+        .topic-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #38761D; /* Green: Dark green */
+            margin-bottom: 1.5rem;
             text-align: center;
-            padding: 30px 0;
-            margin-top: 50px;
         }
-        
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .description {
+            color: #1B5E20; /* Green: Dark forest green */
+            margin-bottom: 2rem;
+            text-align: justify;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            padding: 1.5rem;
+            background: rgba(200, 230, 201, 0.5); /* Green: Light mint green */
+            border-radius: 12px;
+            border-left: 4px solid #6AA84F; /* Green: Medium green */
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #38761D; /* Green: Dark green */
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: #4CAF50; /* Green: Vibrant green */
+        }
+
+        .key-points, .applications {
+            margin-bottom: 2rem;
+        }
+
+        .points-list {
+            list-style: none;
+            background: rgba(200, 230, 201, 0.3); /* Green: Light mint green tint */
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .points-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .points-list li:hover {
+            background: rgba(165, 214, 167, 0.3); /* Green: Light green tint for hover */
+            transform: translateX(5px);
+        }
+
+        .bullet-blue { /* Consider renaming to .bullet-primary or similar */
+            color: #4CAF50; /* Green: Vibrant green */
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .bullet-green { /* Consider renaming to .bullet-secondary or similar */
+            color: #8BC34A; /* Green: Lime green */
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(135deg, rgba(106, 168, 79, 0.1), rgba(129, 199, 132, 0.1)); /* Green: Light green tints */
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(106, 168, 79, 0.2); /* Green: Muted green border */
+        }
+
+        .image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #6AA84F 0%, #38761D 100%); /* Green: Medium to Dark green */
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF; /* Green: White */
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background: rgba(29, 42, 33, 0.95); /* Green: Dark Green */
+            color: #E8F5E9; /* Green: Lightest Green */
+            text-align: center;
+            border-top: 1px solid rgba(106, 168, 79, 0.3); /* Green: Muted green border */
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
+            .nav-container {
+                padding: 0 1rem;
             }
-            
-            .tab-link {
-                text-align: left;
-                border-left: 3px solid transparent;
-                border-bottom: none;
-                padding: 15px;
+
+            nav ul {
+                display: none;
             }
-            
-            .tab-link.active, .tab-link:hover {
-                border-left: 3px solid var(--accent);
-                border-bottom: none;
+
+            .menu-toggle {
+                display: block;
             }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .category-tab {
+                font-size: 0.8rem;
+                padding: 0.8rem 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-content {
+                padding: 1rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ef4444; /* Standard error red, can be adjusted if needed */
+            font-weight: 500;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(254, 226, 226, 0.8); /* Lighter red background */
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Animaciones suaves */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Botón de volver al inicio */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #38761D, #6AA84F); /* Green: Dark to medium green gradient */
+            color: #FFFFFF; /* Green: White */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(121, 85, 72, 0.3); /* Shadow based on new background */
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(121, 85, 72, 0.4); /* Shadow based on new background */
         }
     </style>
 </head>
 <body>
+    <div class="bg-overlay"></div>
+    <div class="darken-overlay"></div>
+
     <header>
-        <div class="container">
-            <div class="header-content">
-                <h1>Biología Marina</h1>
-                <p class="subtitle">Explorando la vida en los océanos</p>
+        <div class="nav-container">
+            <a href="./index.html" class="logo">OlitAI</a>
+            <nav>
+                <ul>
+                    <li><a href="./index.html">Inicio</a></li>
+                    <li><a href="./blog.html">Blog</a></li>
+                    <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
+                    <li><a href="./about.html">Acerca de</a></li>
+                    <li><a href="./biologia_marina_pagina.html" class="active">Biología Marina</a></li>
+                    <li><a href="./fisica_integrated.html">Oceanografía Física</a></li>
+                    <li><a href="./geologia.html">Geología Marina</a></li>
+                    <li><a href="./quimica.html">Química Marina</a></li>
+                </ul>
+            </nav>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
             </div>
         </div>
     </header>
-    
+
     <div class="container">
-        <div class="tabs">
-            <button class="tab-link active" onclick="openTab(event, 'taxonomia')">Taxonomía y Biodiversidad</button>
-            <button class="tab-link" onclick="openTab(event, 'metodos')">Métodos Analíticos</button>
-            <button class="tab-link" onclick="openTab(event, 'ecologia')">Ecología Marina</button>
-            <button class="tab-link" onclick="openTab(event, 'aplicaciones')">Aplicaciones y Gestión</button>
-        </div>
-        
-        <div id="taxonomia" class="tab-content active">
-            <div class="topic">
-                <h2>Taxonomía y Biodiversidad Marina</h2>
-                
-                <div class="card">
-                    <h4>Productores Primarios</h4>
-                    <ul>
-                        <li>Fitoplancton (diatomeas, dinoflagelados, cocolitofóridos, cianobacterias)</li>
-                        <li>Algas (pardas, rojas, verdes)</li>
-                    </ul>
-                </div>
-                
-                <div class="card">
-                    <h4>Consumidores Primarios</h4>
-                    <ul>
-                        <li>Zooplancton (copépodos, krill, larvas planctónicas, medusas)</li>
-                        <li>Comunidades bentónicas (poliquetos, bivalvos, equinodermos, corales)</li>
-                    </ul>
-                </div>
-                
-                <div class="card">
-                    <h4>Consumidores Secundarios</h4>
-                    <ul>
-                        <li>Necton (peces diversos)</li>
-                        <li>Cefalópodos (calamares, pulpos, sepias)</li>
-                        <li>Crustáceos (cangrejos, langostas, camarones)</li>
-                    </ul>
-                </div>
-                
-                <div class="card">
-                    <h4>Consumidores Tope</h4>
-                    <ul>
-                        <li>Aves marinas (albatros, petreles, pingüinos, gaviotas)</li>
-                        <li>Mamíferos marinos (cetáceos, pinnípedos, sirenios)</li>
-                    </ul>
-                </div>
-                
-                <h3>Métodos de Identificación y Muestreo</h3>
-                <ul>
-                    <li>Microscopía óptica y electrónica</li>
-                    <li>Análisis de ADN y códigos de barras genéticos</li>
-                    <li>Metabarcoding para comunidades completas</li>
-                    <li>Técnicas de muestreo específicas por grupo taxonómico</li>
-                </ul>
+        <div class="main-card">
+            <!-- Título de la página -->
+            <div class="page-title">
+                <h1><i class="fas fa-leaf"></i> Biología Marina</h1>
+                <p>Explorando la diversidad, ecología y procesos de la vida en los océanos</p>
             </div>
-        </div>
-        
-        <div id="metodos" class="tab-content">
-            <div class="topic">
-                <h2>Métodos Analíticos y Estadísticos</h2>
-                
-                <h3>Estadística para Ecología Marina</h3>
-                <ul>
-                    <li>Análisis univariados y multivariados</li>
-                    <li>Pruebas paramétricas y no paramétricas</li>
-                    <li>Modelos Lineales Generalizados (GLM)</li>
-                    <li>Análisis de series temporales</li>
-                    <li>Estadística espacial y SIG</li>
-                </ul>
-                
-                <h3>Machine Learning en Ecología Marina</h3>
-                <div class="card">
-                    <h4>Aplicaciones de IA</h4>
-                    <ul>
-                        <li>Clasificación de hábitats y ecosistemas</li>
-                        <li>Predicción de distribución de especies</li>
-                        <li>Detección de patrones espaciales complejos</li>
-                        <li>Reconocimiento automatizado de organismos</li>
-                        <li>Análisis de imágenes submarinas</li>
-                    </ul>
+
+            <!-- Pestañas de categorías -->
+            <div class="category-tabs">
+                <div class="category-tabs-container" id="categoryTabs">
+                    <!-- Las pestañas se generarán dinámicamente -->
                 </div>
-                
-                <h3>Diseño Experimental y Muestreo</h3>
-                <ul>
-                    <li>Potencia estadística y tamaño muestral</li>
-                    <li>Diseños BACI, anidados y jerárquicos</li>
-                    <li>Métodos de muestreo estadístico</li>
-                </ul>
             </div>
-        </div>
-        
-        <div id="ecologia" class="tab-content">
-            <div class="topic">
-                <h2>Ecología Marina Avanzada</h2>
-                
-                <h3>Fundamentos de Ecología Marina</h3>
-                <ul>
-                    <li>Isótopos estables en ecología marina</li>
-                    <li>Caracterización estructural de ecosistemas</li>
-                    <li>Dinámica y procesos comunitarios</li>
-                    <li>Interacciones predador-presa</li>
-                    <li>Dinámica de poblaciones marinas</li>
-                </ul>
-                
-                <div class="card">
-                    <h4>Ecología Bentónica</h4>
-                    <ul>
-                        <li>Estructura de hábitats bentónicos</li>
-                        <li>Zonación vertical y horizontal</li>
-                        <li>Ecosistemas de aguas someras</li>
-                        <li>Comunidades de fondos blandos y duros</li>
-                        <li>Ecosistemas quimiosintéticos</li>
-                    </ul>
+
+            <!-- Selector de tópicos -->
+            <div class="topics-selector">
+                <div class="topics-grid" id="topicsGrid">
+                    <!-- Los tópicos se generarán dinámicamente -->
                 </div>
-                
-                <div class="card">
-                    <h4>Conexiones Tierra-Mar y Hielo-Tierra-Océano</h4>
-                    <ul>
-                        <li>Estuarios y zonas costeras como interfaces</li>
-                        <li>Ecosistemas costeros de transición</li>
-                        <li>Comunidades asociadas al hielo marino</li>
-                        <li>Impacto del deshielo en ecosistemas polares</li>
-                    </ul>
-                </div>
-                
-                <h3>Conceptos Ecológicos Avanzados</h3>
-                <ul>
-                    <li>Hipótesis de estados estables alternativos</li>
-                    <li>Dispersión larval y reclutamiento</li>
-                    <li>Teoría de biogeografía de islas</li>
-                    <li>Enfoques multiomics en ecología marina</li>
-                </ul>
             </div>
-        </div>
-        
-        <div id="aplicaciones" class="tab-content">
-            <div class="topic">
-                <h2>Aplicaciones y Gestión</h2>
-                
-                <h3>IA Aplicada a Pesquerías</h3>
-                <ul>
-                    <li>Predicción de zonas de pesca y biomasa</li>
-                    <li>Gemelos digitales para ecosistemas pesqueros</li>
-                    <li>Técnicas de upscaling y downscaling</li>
-                </ul>
-                
-                <div class="card">
-                    <h4>IA para Bioacústica y Comunicación Marina</h4>
-                    <ul>
-                        <li>Detección y clasificación de sonidos marinos</li>
-                        <li>Análisis de comunicación en mamíferos marinos</li>
-                        <li>Interfaces humano-cetáceo asistidas por IA</li>
-                    </ul>
-                </div>
-                
-                <h3>IA para Gobernanza Oceánica</h3>
-                <ul>
-                    <li>Minería de textos jurídicos oceánicos</li>
-                    <li>Diseño asistido de normativas ecosistémicas</li>
-                    <li>Vigilancia inteligente de actividades marítimas</li>
-                    <li>Observatorio de gobernanza oceánica global</li>
-                </ul>
-                
-                <div class="card">
-                    <h4>Monitoreo de Fenómenos Oceanográficos</h4>
-                    <ul>
-                        <li>Detección y predicción de floraciones algales nocivas</li>
-                        <li>Seguimiento de derrames de petróleo</li>
-                        <li>Monitoreo de eventos extremos marinos</li>
-                    </ul>
+
+            <!-- Contenido del tópico -->
+            <div class="topic-content">
+                <div id="topicContent">
+                    <!-- El contenido se generará dinámicamente -->
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <footer>
         <div class="container">
-            <p>© 2025 Biología Marina | Departamento de Ciencias Oceánicas</p>
+            <p>&copy; 2025 Diego Hernández-Cerón. Todos los derechos reservados.</p>
         </div>
     </footer>
-    
+
     <script>
-        function openTab(evt, tabName) {
-            // Ocultar todos los contenidos de pestañas
-            const tabContents = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove("active");
+        // Estado de la aplicación
+        const categories = [
+            { id: "fase1_bio", name: "FASE I: FUNDAMENTOS DE BIODIVERSIDAD MARINA" },
+            { id: "fase2_bio", name: "FASE II: MÉTODOS Y ANÁLISIS EN ECOLOGÍA MARINA" },
+            { id: "fase3_bio", name: "FASE III: ECOLOGÍA MARINA AVANZADA" },
+            { id: "fase4_bio", name: "FASE IV: BIOLOGÍA MARINA APLICADA Y GESTIÓN CON IA" }
+        ];
+
+        const topicsByCategory = {
+            fase1_bio: [
+                { id: "f1_bio_topic1", name: "1. Productores Primarios Marinos" },
+                { id: "f1_bio_topic2", name: "2. Consumidores Primarios Marinos" },
+                { id: "f1_bio_topic3", name: "3. Consumidores Secundarios y Terciarios" },
+                { id: "f1_bio_topic4", name: "4. Consumidores Tope Marinos" },
+                { id: "f1_bio_topic5", name: "5. Métodos de Identificación y Muestreo de Biodiversidad" }
+            ],
+            fase2_bio: [
+                { id: "f2_bio_topic1", name: "1. Estadística Aplicada a la Ecología Marina" },
+                { id: "f2_bio_topic2", name: "2. Machine Learning en Estudios de Ecología Marina" },
+                { id: "f2_bio_topic3", name: "3. Diseño Experimental y Estrategias de Muestreo" }
+            ],
+            fase3_bio: [
+                { id: "f3_bio_topic1", name: "1. Fundamentos de Procesos Ecológicos Marinos" },
+                { id: "f3_bio_topic2", name: "2. Ecología de Comunidades Bentónicas" },
+                { id: "f3_bio_topic3", name: "3. Conexiones Ecosistémicas Clave" },
+                { id: "f3_bio_topic4", name: "4. Conceptos Teóricos Avanzados en Ecología Marina" }
+            ],
+            fase4_bio: [
+                { id: "f4_bio_topic1", name: "1. IA Aplicada a la Gestión de Pesquerías Sostenibles" },
+                { id: "f4_bio_topic2", name: "2. IA en Bioacústica y Comunicación Animal Marina" },
+                { id: "f4_bio_topic3", name: "3. IA para la Gobernanza y Legislación Oceánica" },
+                { id: "f4_bio_topic4", name: "4. Monitoreo y Predicción de Fenómenos Oceanográficos con IA" }
+            ]
+        };
+
+        const content = {
+            fase1_bio: {
+                f1_bio_topic1: {
+                    title: "1. Productores Primarios Marinos",
+                    description: "Organismos en la base de la cadena trófica marina, capaces de fotosíntesis, cruciales para la producción de oxígeno y como alimento para otros seres vivos.",
+                    keyPoints: [
+                        "Fitoplancton (diatomeas, dinoflagelados, cocolitofóridos, cianobacterias): Diversos microorganismos fotosintéticos que flotan en la columna de agua.",
+                        "Algas (pardas, rojas, verdes): Macroorganismos fotosintéticos que habitan principalmente en zonas costeras."
+                    ],
+                    applications: [
+                        "Monitoreo de la salud del ecosistema y calidad del agua.",
+                        "Estudios de cambio climático (captura de CO2 y acidificación oceánica).",
+                        "Base para la acuicultura de diversas especies marinas.",
+                        "Fuente de compuestos bioactivos con potencial farmacológico."
+                    ]
+                },
+                f1_bio_topic2: {
+                    title: "2. Consumidores Primarios Marinos",
+                    description: "Organismos herbívoros que se alimentan directamente de los productores primarios, transfiriendo energía al siguiente nivel trófico.",
+                    keyPoints: [
+                        "Zooplancton (copépodos, krill, larvas planctónicas, medusas): Pequeños animales que derivan en el agua, alimentándose de fitoplancton.",
+                        "Comunidades bentónicas (poliquetos, bivalvos, equinodermos, corales): Organismos que viven en el fondo marino, muchos de los cuales se alimentan de material orgánico particulado o algas."
+                    ],
+                    applications: [
+                        "Indicadores de la calidad del agua y de la productividad primaria.",
+                        "Eslabón crucial en las redes tróficas marinas, sosteniendo pesquerías.",
+                        "Estudios de impacto de la pesca y la contaminación en comunidades bentónicas.",
+                        "Investigación en bioprospección de corales y otros invertebrados."
+                    ]
+                },
+                f1_bio_topic3: {
+                    title: "3. Consumidores Secundarios y Terciarios",
+                    description: "Carnívoros que se alimentan de otros consumidores, ocupando niveles tróficos intermedios y jugando roles importantes en la estructura de las comunidades marinas.",
+                    keyPoints: [
+                        "Necton (peces diversos): Organismos que nadan activamente, desde pequeños peces forrajeros hasta grandes depredadores.",
+                        "Cefalópodos (calamares, pulpos, sepias): Invertebrados marinos inteligentes con adaptaciones únicas para la caza.",
+                        "Crustáceos (cangrejos, langostas, camarones): Diversos artrópodos con exoesqueleto, muchos de importancia comercial."
+                    ],
+                    applications: [
+                        "Gestión de pesquerías comerciales y recreativas.",
+                        "Estudios de biodiversidad y conservación de especies clave.",
+                        "Modelado de redes tróficas y dinámica de poblaciones.",
+                        "Evaluación de la salud de los ecosistemas a través de la condición de los depredadores."
+                    ]
+                },
+                f1_bio_topic4: {
+                    title: "4. Consumidores Tope Marinos",
+                    description: "Depredadores en la cima de la cadena alimentaria marina, cruciales para el equilibrio del ecosistema y a menudo carismáticos, atrayendo interés público.",
+                    keyPoints: [
+                        "Aves marinas (albatros, petreles, pingüinos, gaviotas): Adaptadas a la vida en el mar, alimentándose de peces y otros organismos.",
+                        "Mamíferos marinos (cetáceos: ballenas, delfines; pinnípedos: focas, lobos marinos; sirenios: manatíes): Diversos grupos con adaptaciones especializadas al medio acuático."
+                    ],
+                    applications: [
+                        "Indicadores de la salud general del océano y de la contaminación (bioacumulación).",
+                        "Planes de conservación de especies carismáticas y en peligro.",
+                        "Estudios de acumulación de contaminantes y toxinas en la cadena trófica.",
+                        "Ecoturismo y educación ambiental."
+                    ]
+                },
+                f1_bio_topic5: {
+                    title: "5. Métodos de Identificación y Muestreo de Biodiversidad",
+                    description: "Técnicas y herramientas utilizadas por los biólogos marinos para identificar especies, estudiar su distribución y muestrear comunidades para evaluar la biodiversidad.",
+                    keyPoints: [
+                        "Microscopía óptica y electrónica: Para la identificación de microorganismos y detalles estructurales.",
+                        "Análisis de ADN y códigos de barras genéticos (DNA barcoding): Para la identificación precisa de especies y estudios filogenéticos.",
+                        "Metabarcoding ambiental (eDNA): Para la detección de comunidades completas a partir de muestras de agua o sedimento.",
+                        "Técnicas de muestreo específicas por grupo taxonómico (redes, dragas, trampas, censos visuales)."
+                    ],
+                    applications: [
+                        "Descubrimiento y catalogación de nuevas especies marinas.",
+                        "Evaluación de la riqueza de especies y diversidad genética en diferentes hábitats.",
+                        "Monitoreo de especies invasoras y su impacto.",
+                        "Estudios de conectividad poblacional y biogeografía."
+                    ]
+                }
+            },
+            fase2_bio: {
+                f2_bio_topic1: {
+                    title: "1. Estadística Aplicada a la Ecología Marina",
+                    description: "Herramientas estadísticas y métodos cuantitativos esenciales para el diseño de estudios, análisis de datos y la interpretación de resultados en investigaciones de ecología marina.",
+                    keyPoints: [
+                        "Análisis univariados (pruebas t, ANOVA) y multivariados (PCA, MDS, análisis de clusters): Para explorar patrones y relaciones en datos complejos.",
+                        "Pruebas paramétricas y no paramétricas: Selección adecuada según la distribución de los datos.",
+                        "Modelos Lineales Generalizados (GLM) y Modelos Mixtos (GLMM): Para modelar respuestas ecológicas a múltiples factores.",
+                        "Análisis de series temporales: Para identificar tendencias y ciclos en datos recolectados a lo largo del tiempo.",
+                        "Estadística espacial y Sistemas de Información Geográfica (SIG): Para analizar patrones de distribución y relaciones espaciales."
+                    ],
+                    applications: [
+                        "Validación rigurosa de hipótesis ecológicas y teorías.",
+                        "Modelado predictivo de la distribución de especies y la abundancia.",
+                        "Análisis de tendencias poblacionales y evaluación del estado de conservación.",
+                        "Identificación de factores ambientales que influyen en las comunidades marinas."
+                    ]
+                },
+                f2_bio_topic2: {
+                    title: "2. Machine Learning en Estudios de Ecología Marina",
+                    description: "Aplicación de técnicas de inteligencia artificial y aprendizaje automático para abordar problemas complejos, analizar grandes conjuntos de datos y descubrir nuevos insights en ecología marina.",
+                    keyPoints: [
+                        "Clasificación de hábitats y ecosistemas: Utilizando datos de sensores remotos o imágenes submarinas.",
+                        "Predicción de distribución de especies (Species Distribution Models - SDMs): Basados en variables ambientales.",
+                        "Detección de patrones espaciales y temporales complejos en datos ecológicos.",
+                        "Reconocimiento automatizado de organismos: A partir de imágenes, videos o sonidos.",
+                        "Análisis de imágenes submarinas y videos para censos y estudios de comportamiento."
+                    ],
+                    applications: [
+                        "Procesamiento eficiente y automatizado de grandes volúmenes de datos oceanográficos y biológicos.",
+                        "Mejora de la precisión en modelos predictivos para la gestión de recursos.",
+                        "Descubrimiento de nuevas correlaciones ecológicas y factores de influencia.",
+                        "Desarrollo de herramientas para el monitoreo en tiempo real de ecosistemas."
+                    ]
+                },
+                f2_bio_topic3: {
+                    title: "3. Diseño Experimental y Estrategias de Muestreo",
+                    description: "Principios fundamentales para el diseño robusto de estudios experimentales y la planificación de programas de muestreo efectivos y eficientes en el diverso y desafiante medio marino.",
+                    keyPoints: [
+                        "Cálculo de potencia estadística y determinación del tamaño muestral adecuado.",
+                        "Diseños experimentales comunes: BACI (Before-After-Control-Impact), diseños factoriales, anidados y jerárquicos.",
+                        "Métodos de muestreo estadístico: Aleatorio simple, estratificado, sistemático y adaptativo.",
+                        "Consideraciones logísticas y desafíos del muestreo en ambientes marinos."
+                    ],
+                    applications: [
+                        "Evaluación rigurosa del impacto ambiental de actividades humanas.",
+                        "Estudios de la efectividad de medidas de conservación y restauración.",
+                        "Optimización de los esfuerzos de monitoreo para maximizar la información obtenida.",
+                        "Investigación de procesos ecológicos mediante manipulación experimental."
+                    ]
+                }
+            },
+            fase3_bio: {
+                f3_bio_topic1: {
+                    title: "1. Fundamentos de Procesos Ecológicos Marinos",
+                    description: "Exploración de los conceptos y procesos clave que rigen las interacciones entre organismos marinos y su ambiente, y la dinámica de los ecosistemas oceánicos.",
+                    keyPoints: [
+                        "Uso de isótopos estables (ej. δ13C, δ15N) como trazadores de redes tróficas y rutas migratorias.",
+                        "Caracterización estructural de ecosistemas: diversidad, complejidad, estabilidad.",
+                        "Dinámica y procesos comunitarios: sucesión ecológica, efectos de perturbaciones naturais y antropogénicas.",
+                        "Interacciones biológicas: predador-presa, competencia, mutualismo, parasitismo.",
+                        "Dinámica de poblaciones marinas: modelos de crecimiento, mortalidad, reclutamiento y dispersión."
+                    ],
+                    applications: [
+                        "Modelado de redes tróficas para entender el flujo de energía y materia.",
+                        "Comprensión de la resiliencia y resistencia de los ecosistemas a cambios.",
+                        "Desarrollo de estrategias de gestión basadas en el ecosistema (EBM).",
+                        "Predicción de la respuesta de las poblaciones a la explotación y al cambio climático."
+                    ]
+                },
+                f3_bio_topic2: {
+                    title: "2. Ecología de Comunidades Bentónicas",
+                    description: "Estudio de los organismos que viven en, sobre o asociados al fondo marino (bentos), sus interacciones, y la estructura y función de los ecosistemas bentónicos.",
+                    keyPoints: [
+                        "Estructura de hábitats bentónicos: influencia del tipo de sustrato (rocoso, arenoso, fangoso) y la complejidad física.",
+                        "Zonación vertical y horizontal de comunidades bentónicas en respuesta a gradientes ambientales.",
+                        "Ecosistemas de aguas someras: pastos marinos, arrecifes de coral, bosques de kelp y su importancia ecológica.",
+                        "Comunidades de fondos blandos (infauna) y fondos duros (epifauna).",
+                        "Ecosistemas quimiosintéticos de aguas profundas: fuentes hidrotermales, filtraciones frías y montañas submarinas."
+                    ],
+                    applications: [
+                        "Mapeo y caracterización de hábitats bentónicos sensibles para la conservación.",
+                        "Evaluación del impacto de actividades como la pesca de arrastre, dragado y acuicultura.",
+                        "Descubrimiento de nuevas especies y compuestos bioactivos en ecosistemas profundos.",
+                        "Restauración de hábitats bentónicos degradados."
+                    ]
+                },
+                f3_bio_topic3: {
+                    title: "3. Conexiones Ecosistémicas Clave",
+                    description: "Análisis de las interacciones y flujos de materia y energía entre diferentes dominios y ambientes que son cruciales para la estructura y función de los ecosistemas marinos.",
+                    keyPoints: [
+                        "Estuarios y zonas costeras como interfaces críticas Tierra-Mar, influenciadas por aportes fluviales y mareas.",
+                        "Ecosistemas costeros de transición: manglares, marismas salinas y su rol en la protección costera y como viveros.",
+                        "Comunidades asociadas al hielo marino en regiones polares y su vulnerabilidad al cambio climático.",
+                        "Impacto del deshielo glaciar y de icebergs en los ecosistemas marinos polares y subpolares (ej. aporte de nutrientes)."
+                    ],
+                    applications: [
+                        "Gestión integrada de zonas costeras y cuencas hidrográficas.",
+                        "Estudios de impacto del cambio climático en zonas de transición y ecosistemas polares.",
+                        "Conservación de corredores ecológicos y conectividad entre hábitats.",
+                        "Evaluación de los servicios ecosistémicos provistos por estos sistemas de conexión."
+                    ]
+                },
+                f3_bio_topic4: {
+                    title: "4. Conceptos Teóricos Avanzados en Ecología Marina",
+                    description: "Introducción a marcos conceptuales y teorías ecológicas avanzadas que ayudan a explicar patrones, procesos y la dinámica compleja de los ecosistemas marinos.",
+                    keyPoints: [
+                        "Hipótesis de estados estables alternativos y cambios de régimen (regime shifts) en ecosistemas marinos.",
+                        "Dispersión larval, conectividad poblacional y su importancia para la persistencia de metapoblaciones.",
+                        "Teoría de biogeografía de islas y su aplicación al diseño de redes de áreas marinas protegidas (AMPs).",
+                        "Enfoques 'multiomics' (genómica, transcriptómica, proteómica, metabolómica) en ecología marina para entender respuestas a nivel molecular."
+                    ],
+                    applications: [
+                        "Predicción y manejo de respuestas ecosistémicas a múltiples factores de estrés.",
+                        "Diseño efectivo de redes de AMPs para la conservación de la biodiversidad y los procesos ecológicos.",
+                        "Comprensión de la capacidad de adaptación de las especies marinas al cambio ambiental global.",
+                        "Desarrollo de nuevos biomarcadores para la evaluación de la salud de los ecosistemas."
+                    ]
+                }
+            },
+            fase4_bio: {
+                f4_bio_topic1: {
+                    title: "1. IA Aplicada a la Gestión de Pesquerías Sostenibles",
+                    description: "Utilización de la inteligencia artificial (IA) y el aprendizaje automático para mejorar la evaluación de stocks pesqueros, optimizar estrategias de manejo y promover la sostenibilidad de las pesquerías.",
+                    keyPoints: [
+                        "Predicción de zonas de pesca óptimas y estimación de biomasa de stocks utilizando modelos de IA.",
+                        "Desarrollo de gemelos digitales (digital twins) para simular ecosistemas pesqueros y evaluar el impacto de diferentes estrategias de manejo.",
+                        "Aplicación de técnicas de upscaling y downscaling para integrar datos de diferentes fuentes y resoluciones espaciales/temporales.",
+                        "Monitoreo electrónico y análisis de video para mejorar la selectividad de artes de pesca y reducir descartes."
+                    ],
+                    applications: [
+                        "Optimización de cuotas de pesca y esfuerzo pesquero para la sostenibilidad a largo plazo.",
+                        "Reducción de la pesca incidental de especies no objetivo y protegidas.",
+                        "Mejora del monitoreo, control y vigilancia (MCV) de la actividad pesquera para combatir la pesca ilegal, no declarada y no reglamentada (INDNR).",
+                        "Desarrollo de sistemas de alerta temprana para cambios en la distribución o abundancia de recursos pesqueros."
+                    ]
+                },
+                f4_bio_topic2: {
+                    title: "2. IA en Bioacústica y Comunicación Animal Marina",
+                    description: "Aplicación de la inteligencia artificial para el análisis de los sonidos producidos por organismos marinos, el estudio de su comunicación y el monitoreo no invasivo de la vida marina.",
+                    keyPoints: [
+                        "Detección y clasificación automatizada de vocalizaciones de mamíferos marinos, peces e invertebrados utilizando algoritmos de IA.",
+                        "Análisis de repertorios vocales, dialectos y patrones de comunicación en especies marinas.",
+                        "Desarrollo de interfaces humano-cetáceo asistidas por IA para la investigación de la cognición y comunicación de delfines y ballenas.",
+                        "Identificación de fuentes de ruido antropogénico y evaluación de su impacto en la fauna marina."
+                    ],
+                    applications: [
+                        "Monitoreo no invasivo de la presencia, distribución y comportamiento de poblaciones animales, incluyendo especies raras o crípticas.",
+                        "Estudio del impacto del ruido generado por actividades humanas (tráfico marítimo, sonares, construcción) en la vida marina.",
+                        "Mejora de la comprensión de la complejidad social y cognitiva de las especies marinas.",
+                        "Desarrollo de herramientas para la mitigación del ruido y la protección de hábitats acústicos sensibles."
+                    ]
+                },
+                f4_bio_topic3: {
+                    title: "3. IA para la Gobernanza y Legislación Oceánica",
+                    description: "Uso de herramientas de inteligencia artificial para apoyar la toma de decisiones informadas, el desarrollo de políticas efectivas y la mejora de la vigilancia y el cumplimiento en el ámbito de la gobernanza de los océanos.",
+                    keyPoints: [
+                        "Minería de textos y procesamiento de lenguaje natural (NLP) para analizar grandes volúmenes de documentos legales, tratados internacionales y políticas oceánicas.",
+                        "Diseño asistido por IA de normativas y regulaciones ecosistémicas que consideren la complejidad de las interacciones marinas.",
+                        "Vigilancia inteligente de actividades marítimas (pesca, transporte, minería) utilizando datos satelitales y de sensores, analizados con IA para detectar anomalías.",
+                        "Creación de un observatorio de gobernanza oceánica global basado en IA para monitorear el progreso hacia objetivos de sostenibilidad."
+                    ],
+                    applications: [
+                        "Mejora de la transparencia, la rendición de cuentas y el cumplimiento normativo en el sector marítimo.",
+                        "Desarrollo de políticas oceánicas más adaptativas y basadas en la mejor evidencia científica disponible.",
+                        "Fortalecimiento de la cooperación internacional para la gestión sostenible de los recursos marinos transzonales y de alta mar.",
+                        "Identificación temprana de vacíos legales o conflictos normativos en la gobernanza oceánica."
+                    ]
+                },
+                f4_bio_topic4: {
+                    title: "4. Monitoreo y Predicción de Fenómenos Oceanográficos con IA",
+                    description: "Aplicación de la inteligencia artificial para la detección temprana, el monitoreo continuo y la predicción de eventos y fenómenos oceanográficos críticos que pueden afectar los ecosistemas marinos y las comunidades costeras.",
+                    keyPoints: [
+                        "Detección y predicción de la ocurrencia, extensión e intensidad de floraciones algales nocivas (FANs) utilizando datos satelitales y modelos de IA.",
+                        "Seguimiento y modelado de la dispersión de derrames de petróleo y otros contaminantes marinos para optimizar la respuesta a emergencias.",
+                        "Monitoreo y alerta temprana de eventos extremos marinos como olas de calor marinas, eventos de hipoxia y acidificación.",
+                        "Integración de datos de múltiples fuentes (sensores remotos, in-situ, modelos) mediante IA para mejorar la comprensión y predicción de procesos complejos."
+                    ],
+                    applications: [
+                        "Protección de la salud pública, los recursos pesqueros y la acuicultura frente a FANs y contaminación.",
+                        "Optimización de la respuesta a emergencias ambientales marinas y minimización de daños.",
+                        "Desarrollo de estrategias de adaptación al cambio climático para ecosistemas marinos y comunidades costeras vulnerables.",
+                        "Mejora de la seguridad marítima y la planificación de actividades en el océano."
+                    ]
+                }
             }
-            
-            // Desactivar todos los botones de pestañas
-            const tabLinks = document.getElementsByClassName("tab-link");
-            for (let i = 0; i < tabLinks.length; i++) {
-                tabLinks[i].classList.remove("active");
-            }
-            
-            // Mostrar la pestaña actual y activar el botón correspondiente
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
+        };
+
+        let selectedCategory = "fase1_bio";
+        let selectedTopic = "f1_bio_topic1";
+
+        // Función para renderizar las pestañas de categorías
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = `category-tab ${selectedCategory === category.id ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(category.id);
+                tabsContainer.appendChild(tab);
+            });
         }
+
+        // Función para renderizar los tópicos
+        function renderTopics() {
+            const topicsGrid = document.getElementById('topicsGrid');
+            topicsGrid.innerHTML = '';
+
+            const topics = topicsByCategory[selectedCategory] || [];
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.className = `topic-button ${selectedTopic === topic.id ? 'active' : ''}`;
+                button.textContent = topic.name;
+                button.onclick = () => selectTopic(topic.id);
+                topicsGrid.appendChild(button);
+            });
+        }
+
+        // Función para renderizar el contenido del tópico
+        function renderTopicContent() {
+            const contentDiv = document.getElementById('topicContent');
+            const categoryData = content[selectedCategory];
+            
+            if (!categoryData) {
+                contentDiv.innerHTML = '<div class="error-message">Categoría no encontrada</div>';
+                return;
+            }
+
+            const topicData = categoryData[selectedTopic];
+            if (!topicData) {
+                contentDiv.innerHTML = '<div class="error-message">Tópico no encontrado</div>';
+                return;
+            }
+
+            contentDiv.innerHTML = `
+                <h3 class="topic-title">${topicData.title}</h3>
+                <div class="content-grid">
+                    <div class="main-content">
+                        <p class="description">${topicData.description}</p>
+
+                        <div class="key-points">
+                            <h4 class="section-title">
+                                <i class="fas fa-lightbulb"></i>
+                                Puntos Clave
+                            </h4>
+                            <ul class="points-list">
+                                ${topicData.keyPoints.map(point => `
+                                    <li>
+                                        <span class="bullet-blue">•</span>
+                                        <span>${point}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="applications">
+                            <h4 class="section-title">
+                                <i class="fas fa-cogs"></i>
+                                Aplicaciones
+                            </h4>
+                            <ul class="points-list">
+                                ${topicData.applications.map(app => `
+                                    <li>
+                                        <span class="bullet-green">→</span>
+                                        <span>${app}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sidebar">
+                        <div class="image-placeholder">
+                            <i class="fas fa-water" style="font-size: 2rem; margin-bottom: 1rem;"></i><br>
+                            ${topicData.title}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para seleccionar categoría
+        function selectCategory(categoryId) {
+            selectedCategory = categoryId;
+            const topics = topicsByCategory[categoryId];
+            if (topics && topics.length > 0) {
+                selectedTopic = topics[0].id;
+            }
+            render();
+        }
+
+        // Función para seleccionar tópico
+        function selectTopic(topicId) {
+            selectedTopic = topicId;
+            renderTopicContent();
+            renderTopics();
+        }
+
+        // Función principal de renderizado
+        function render() {
+            renderCategoryTabs();
+            renderTopics();
+            renderTopicContent();
+        }
+
+        // Botón volver arriba
+        function initBackToTop() {
+            const backToTop = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            render();
+            initBackToTop();
+        });
     </script>
 </body>
 </html>
