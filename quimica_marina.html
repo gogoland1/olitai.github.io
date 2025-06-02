@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oceanografía Química - OlitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0D1B2A; /* Celeste: Very dark blue */
+            color: #EAEAEA; /* Celeste: Light grey */
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Fondo oceánico similar al index */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/kI72GlX.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.45) saturate(0.9) hue-rotate(170deg); /* Celeste: Adjusted for bluer tint */
+            z-index: -2;
+        }
+
+        .darken-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(13, 27, 42, 0.4) 0%, /* Celeste: Dark blue gradient */
+                rgba(13, 27, 42, 0.7) 100%
+            );
+            z-index: -1;
+        }
+
+        /* Header navigation */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(13, 27, 42, 0.95); /* Celeste: Very Dark Blue */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(127, 219, 255, 0.2); /* Celeste: Light sky blue border */
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #7FDBFF; /* Celeste: Bright Sky Blue */
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #EAEAEA; /* Celeste: Light grey */
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            color: #7FDBFF; /* Celeste: Bright Sky Blue */
+        }
+
+        .menu-toggle {
+            display: none;
+            color: #EAEAEA; /* Celeste: Light grey */
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Card principal con estilo oceánico */
+        .main-card {
+            background: rgba(225, 245, 254, 0.95); /* Celeste: Very light blue/almost white */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(74, 144, 226, 0.3); /* Celeste: Medium blue border */
+            color: #2c3e50; /* Celeste: Dark slate blue text */
+        }
+
+        /* Título de la página */
+        .page-title {
+            background: linear-gradient(135deg, #4A90E2, #7FDBFF); /* Celeste: Medium to Light Sky Blue gradient */
+            color: white; /* Celeste: White */
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <a href="./oceano-ritmos.html#tabla-periodica" class="btn-tabla-periodica">
+                        <i class="fas fa-atom"></i> Ver Tabla Periódica de los Océanos
+                    </a>
+                </div>
+
+        /* Pestañas de categorías */
+        .category-tabs {
+            overflow-x: auto;
+            background: rgba(200, 230, 250, 0.8); /* Celeste: Light blue tint */
+        }
+
+        .category-tabs-container {
+            display: flex;
+            border-bottom: 1px solid #A8D8EA; /* Celeste: Light blue border */
+            min-width: max-content;
+        }
+
+        .category-tab {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #3478B3; /* Celeste: Medium sky blue */
+            border-bottom: 3px solid transparent;
+        }
+
+        .category-tab:hover {
+            color: #4A90E2; /* Celeste: Darker sky blue */
+            background-color: rgba(74, 144, 226, 0.1); /* Celeste: Light blue tint */
+        }
+
+        .category-tab.active {
+            color: #4A90E2; /* Celeste: Darker sky blue */
+            border-bottom-color: #4A90E2; /* Celeste: Darker active border */
+            background-color: rgba(74, 144, 226, 0.15); /* Celeste: Light blue tint */
+        }
+
+        /* Selector de tópicos */
+        .topics-selector {
+            background: rgba(200, 230, 250, 0.6); /* Celeste: Light blue tint */
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(168, 216, 234, 0.5); /* Celeste: Light blue border */
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .topic-button {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: rgba(240, 248, 255, 0.9); /* Celeste: Very light sky blue */
+            border: 2px solid rgba(127, 170, 220, 0.4); /* Celeste: Light blue border */
+            color: #2c3e50; /* Celeste: Dark slate blue text */
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .topic-button:hover {
+            background-color: rgba(176, 224, 255, 0.8); /* Celeste: Light sky blue for hover */
+            border-color: #5DADE2; /* Celeste: Medium sky blue */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-button.active {
+            background: linear-gradient(135deg, #3498DB, #5DADE2); /* Celeste: Medium to vibrant sky blue gradient */
+            color: white; /* Celeste: White */
+            border-color: #3498DB; /* Celeste: Medium sky blue */
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3); /* Shadow based on active background */
+        }
+
+        /* Contenido del tópico */
+        .topic-content {
+            padding: 2rem;
+            background: rgba(240, 248, 255, 0.95); /* Celeste: Very light sky blue */
+        }
+
+        .topic-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4A90E2; /* Celeste: Dark sky blue */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .description {
+            color: #2c3e50; /* Celeste: Dark slate blue text */
+            margin-bottom: 2rem;
+            text-align: justify;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            padding: 1.5rem;
+            background: rgba(200, 230, 250, 0.5); /* Celeste: Light blue tint */
+            border-radius: 12px;
+            border-left: 4px solid #5DADE2; /* Celeste: Medium sky blue */
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #4A90E2; /* Celeste: Dark sky blue */
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: #5DADE2; /* Celeste: Medium sky blue */
+        }
+
+        .key-points, .applications {
+            margin-bottom: 2rem;
+        }
+
+        .points-list {
+            list-style: none;
+            background: rgba(200, 230, 250, 0.3); /* Celeste: Light blue tint */
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .points-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .points-list li:hover {
+            background: rgba(176, 224, 255, 0.3); /* Celeste: Light sky blue tint for hover */
+            transform: translateX(5px);
+        }
+
+        .bullet-blue { /* Consider renaming to .bullet-primary or similar */
+            color: #5DADE2; /* Celeste: Vibrant sky blue */
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .bullet-green { /* Consider renaming to .bullet-secondary or similar */
+            color: #4FC3F7; /* Celeste: Lighter/different sky blue or teal */
+            margin-right: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.05), rgba(127, 219, 255, 0.1)); /* Celeste: Very light blue tints */
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(74, 144, 226, 0.2); /* Celeste: Medium blue border */
+        }
+
+        .image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #5DADE2 0%, #3498DB 100%); /* Celeste: Sky blue gradient */
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white; /* Celeste: White */
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background: rgba(13, 27, 42, 0.95); /* Celeste: Very Dark Blue */
+            color: #EAEAEA; /* Celeste: Light grey */
+            text-align: center;
+            border-top: 1px solid rgba(127, 219, 255, 0.2); /* Celeste: Light sky blue border */
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .category-tab {
+                font-size: 0.8rem;
+                padding: 0.8rem 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-content {
+                padding: 1rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ef4444; /* Standard error red, can be adjusted if needed */
+            font-weight: 500;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(254, 226, 226, 0.8); /* Lighter red background */
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Animaciones suaves */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Botón de volver al inicio */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #4A90E2, #7FDBFF); /* Celeste: Medium to Light Sky Blue gradient */
+            color: #FFFFFF; /* Celeste: White */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(121, 85, 72, 0.3); /* Shadow based on new background */
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(121, 85, 72, 0.4); /* Shadow based on new background */
+        }
+
+        .btn-tabla-periodica {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #FF7E5F, #FEB47B); /* A contrasting warm color - orange/coral gradient */
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-tabla-periodica:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #FEB47B, #FF7E5F); /* Reverse gradient on hover */
+        }
+
+        .btn-tabla-periodica i {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="darken-overlay"></div>
+
+    <header>
+        <div class="nav-container">
+            <a href="./index.html" class="logo">OlitAI</a>
+            <nav>
+                <ul>
+                    <li><a href="./index.html">Inicio</a></li>
+                    <li><a href="./blog.html">Blog</a></li>
+                    <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
+                    <li><a href="./about.html">Acerca de</a></li>
+                    <li><a href="./biologia_marina_pagina.html">Biología Marina</a></li>
+                    <li><a href="./fisica_integrated.html">Oceanografía Física</a></li>
+                    <li><a href="./geologia.html">Geología Marina</a></li>
+                    <li><a href="./quimica_marina.html" class="active">Química Marina</a></li>
+                </ul>
+            </nav>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-card">
+            <!-- Título de la página -->
+            <div class="page-title">
+                <h1><i class="fas fa-flask"></i> Oceanografía Química</h1>
+                <p>Comprendiendo la composición, procesos y ciclos de los elementos en el mar.</p>
+            </div>
+
+            <!-- Pestañas de categorías -->
+            <div class="category-tabs">
+                <div class="category-tabs-container" id="categoryTabs">
+                    <!-- Las pestañas se generarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Selector de tópicos -->
+            <div class="topics-selector">
+                <div class="topics-grid" id="topicsGrid">
+                    <!-- Los tópicos se generarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Contenido del tópico -->
+            <div class="topic-content">
+                <div id="topicContent">
+                    <!-- El contenido se generará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Diego Hernández-Cerón. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Estado de la aplicación
+        const categories = [
+            { id: "fase1_quim", name: "FASE I: FUNDAMENTOS DE QUÍMICA OCEÁNICA" },
+            { id: "fase2_quim", name: "FASE II: PROCESOS Y CICLOS BIOGEOQUÍMICOS" },
+            { id: "fase3_quim", name: "FASE III: ANÁLISIS QUÍMICO OCEÁNICO Y TÉCNICAS EXPERIMENTALES" },
+            { id: "fase4_quim", name: "FASE IV: QUÍMICA MARINA APLICADA Y ESPECIALIZADA" },
+            { id: "fase5_quim", name: "FASE V: TÉCNICAS AVANZADAS E INTEGRACIÓN MULTIDISCIPLINAR" }
+        ];
+
+        const topicsByCategory = {
+            fase1_quim: [
+                { id: "f1_quim_topic1", name: "1. La Fábrica Corteza-Océano-Atmósfera" },
+                { id: "f1_quim_topic2", name: "2. Propiedades Fisicoquímicas del Agua de Mar" },
+                { id: "f1_quim_topic3", name: "3. La Sal Marina más allá del NaCl" },
+                { id: "f1_quim_topic4", name: "4. Salinidad como Trazador Conservativo" },
+                { id: "f1_quim_topic5", name: "5. Gases Disueltos y Equilibrio Aire-Mar" }
+            ],
+            fase2_quim: [
+                { id: "f2_quim_topic6", name: "6. El Sistema del Carbono Marino" },
+                { id: "f2_quim_topic7", name: "7. Ciclos de Nutrientes Marinos" },
+                { id: "f2_quim_topic8", name: "8. Química Redox del Agua de Mar" },
+                { id: "f2_quim_topic9", name: "9. Elementos Traza y Micronutrientes" },
+                { id: "f2_quim_topic10", name: "10. Química de Interfaces Marinas" }
+            ],
+            fase3_quim: [
+                { id: "f3_quim_topic11", name: "11. Muestreo y Diseño Experimental" },
+                { id: "f3_quim_topic12", name: "12. Instrumentación y Mediciones in situ" },
+                { id: "f3_quim_topic13", name: "13. Técnicas Analíticas de Laboratorio I: Parámetros Principales" },
+                { id: "f3_quim_topic14", name: "14. Técnicas Analíticas de Laboratorio II: Métodos Avanzados" },
+                { id: "f3_quim_topic15", name: "15. Análisis de Compuestos Orgánicos" },
+                { id: "f3_quim_topic16", name: "16. Técnicas Isotópicas en Oceanografía Química" },
+                { id: "f3_quim_topic17", name: "17. Control de Calidad y Procesamiento de Datos" }
+            ],
+            fase4_quim: [
+                { id: "f4_quim_topic18", name: "18. Química de Sedimentos Marinos" },
+                { id: "f4_quim_topic19", name: "19. Química de Sistemas Hidrotermales" },
+                { id: "f4_quim_topic20", name: "20. Contaminación Química Marina" },
+                { id: "f4_quim_topic21", name: "21. Acidificación Oceánica y Cambio Global" },
+                { id: "f4_quim_topic22", name: "22. Productos Naturales Marinos" }
+            ],
+            fase5_quim: [
+                { id: "f5_quim_topic23", name: "23. Quimiometría y Análisis de Big Data" },
+                { id: "f5_quim_topic24", name: "24. Biogeoquímica Computacional" },
+                { id: "f5_quim_topic25", name: "25. Desarrollos Metodológicos de Frontera" },
+                { id: "f5_quim_topic26", name: "26. Integración y Estudios de Caso" },
+                { id: "f5_quim_topic27", name: "27. Proyectos Aplicados y Profesionales" }
+            ]
+        };
+
+        const content = {
+            fase1_quim: {
+                f1_quim_topic1: {
+                    title: "1. La Fábrica Corteza-Océano-Atmósfera",
+                    description: "Introducción al sistema interconectado de la corteza terrestre, el océano y la atmósfera, y los flujos de materia y energía que definen la química oceánica.",
+                    keyPoints: [
+                        "- **El sistema acoplado**",
+                        "  - Interacciones entre corteza terrestre, océano y atmósfera",
+                        "  - Flujos de materiales y energía entre reservorios",
+                        "  - Escalas temporales de intercambio",
+                        "  - Balance global de elementos",
+                        "- **Composición química de la corteza y su influencia**",
+                        "  - Meteorización de rocas y minerales",
+                        "  - Aportes fluviales al océano",
+                        "  - Aportes eólicos y transporte atmosférico",
+                        "  - Hidrotermalismo y aportes desde el interior terrestre",
+                        "- **Evolución geoquímica oceánica**",
+                        "  - Historia de la composición química del océano",
+                        "  - Registros paleoquímicos e indicadores indirectos",
+                        "  - Cambios por factores naturais vs. antropogénicos",
+                        "  - Regulación a largo plazo de la química marina"
+                    ],
+                    applications: [ "Modelado del ciclo global de elementos.", "Estudios de paleoclimatología.", "Evaluación del impacto antropogénico." ]
+                },
+                f1_quim_topic2: {
+                    title: "2. Propiedades Fisicoquímicas del Agua de Mar",
+                    description: "Estudio de las propiedades físicas y químicas fundamentales del agua de mar, incluyendo su estructura molecular, termodinámica y propiedades eléctricas y ópticas.",
+                    keyPoints: [
+                        "- **Estructura y propiedades del agua**",
+                        "  - Estructura molecular y enlaces de hidrógeno",
+                        "  - Propiedades anómalas y su importancia oceanográfica",
+                        "  - Efectos de temperatura y presión",
+                        "  - Polaridad y capacidad como solvente",
+                        "- **Termodinámica del agua marina**",
+                        "  - Ecuación de estado del agua de mar",
+                        "  - Calor específico y capacidad térmica",
+                        "  - Propiedades de congelación y evaporación",
+                        "  - Densidad y estabilidad vertical",
+                        "- **Propiedades eléctricas y ópticas**",
+                        "  - Conductividad y factores que la afectan",
+                        "  - Transmisión y absorción de radiación",
+                        "  - Propiedades refractivas",
+                        "  - Aplicaciones para instrumentación oceanográfica"
+                    ],
+                    applications: [ "Calibración de instrumentos oceanográficos.", "Modelado de la circulación oceánica.", "Estudios de transferencia de calor." ]
+                },
+                f1_quim_topic3: {
+                    title: "3. La Sal Marina más allá del NaCl",
+                    description: "Análisis detallado de la composición iónica del agua de mar, los elementos mayores, menores y traza, y sus estados fisicoquímicos.",
+                    keyPoints: [
+                        "- **Composición iónica del agua de mar**",
+                        "  - Iones conservativos principales",
+                        "  - Iones no conservativos",
+                        "  - Ley de Dittmar y proporción constante",
+                        "  - Distribuciones espaciales y temporales",
+                        "- **Elementos mayores, menores y traza**",
+                        "  - Clasificación según concentración",
+                        "  - Comportamientos biogeoquímicos",
+                        "  - Tiempos de residencia y reactividad",
+                        "  - Métodos de medición según abundancia",
+                        "- **Estados fisicoquímicos de elementos en agua de mar**",
+                        "  - Especiación química",
+                        "  - Complejación orgánica e inorgánica",
+                        "  - Estados redox y su importancia",
+                        "  - Coloides y partículas"
+                    ],
+                    applications: [ "Estudios de biogeoquímica marina.", "Monitoreo de la calidad del agua.", "Investigación de recursos minerales." ]
+                },
+                f1_quim_topic4: {
+                    title: "4. Salinidad como Trazador Conservativo",
+                    description: "Comprensión de la salinidad, su medición, distribución global y su uso como trazador para estudiar masas de agua y circulación oceánica.",
+                    keyPoints: [
+                        "- **Definición y evolución del concepto de salinidad**",
+                        "  - Salinidad absoluta vs. práctica",
+                        "  - Escala de salinidad práctica (PSS)",
+                        "  - Conductividad relativa y relación con salinidad",
+                        "  - Instrumentación para medición de salinidad",
+                        "- **Distribuciones globales de salinidad**",
+                        "  - Patrones superficiales y procesos que los controlan",
+                        "  - Estructura vertical y masas de agua",
+                        "  - Variaciones estacionales",
+                        "  - Tendencias a largo plazo",
+                        "- **Salinidad como trazador oceanográfico**",
+                        "  - Identificación de masas de agua",
+                        "  - Análisis de mezcla y proporciones",
+                        "  - Aplicaciones en estudios de circulación",
+                        "  - Sensores satelitales de salinidad"
+                    ],
+                    applications: [ "Estudios de circulación oceánica y mezcla.", "Identificación y seguimiento de masas de agua.", "Calibración de modelos climáticos." ]
+                },
+                f1_quim_topic5: {
+                    title: "5. Gases Disueltos y Equilibrio Aire-Mar",
+                    description: "Estudio del equilibrio y transferencia de gases entre la atmósfera y el océano, y la relevancia de gases específicos como oxígeno y dióxido de carbono.",
+                    keyPoints: [
+                        "- **Equilibrio de gases en agua de mar**",
+                        "  - Ley de Henry y constantes de solubilidad",
+                        "  - Efectos de temperatura y salinidad",
+                        "  - Gases no reactivos vs. reactivos",
+                        "  - Sobresaturación y subsaturación",
+                        "- **Transferencia de gases en la interfaz aire-mar**",
+                        "  - Modelos de película y renovación superficial",
+                        "  - Velocidad de transferencia y factores de control",
+                        "  - Métodos de medición de flujos gaseosos",
+                        "  - Aplicaciones a gases traza y climáticos",
+                        "- **Gases de relevancia oceanográfica**",
+                        "  - Oxígeno y patrones de distribución",
+                        "  - Dióxido de carbono y acidificación",
+                        "  - Gases traza (N₂O, CH₄, DMS)",
+                        "  - Gases nobles como trazadores"
+                    ],
+                    applications: [ "Estudios de cambio climático y acidificación oceánica.", "Evaluación de la salud de ecosistemas marinos (niveles de oxígeno).", "Modelado de flujos biogeoquímicos globales." ]
+                }
+            },
+            fase2_quim: {
+                f2_quim_topic6: {
+                    title: "6. El Sistema del Carbono Marino",
+                    description: "Análisis del complejo sistema del carbono en el océano, incluyendo especies inorgánicas y orgánicas, el ciclo del carbono y el intercambio de CO₂ con la atmósfera.",
+                    keyPoints: [
+                        "- **Especies de carbono inorgánico disuelto**",
+                        "  - Sistema del carbonato (CO₂, HCO₃⁻, CO₃²⁻)",
+                        "  - Constantes de equilibrio y su dependencia ambiental",
+                        "  - Carbono inorgánico total (CT)",
+                        "  - Alcalinidad total y su significado",
+                        "- **Ciclo del carbono oceánico**",
+                        "  - Bomba biológica",
+                        "  - Bomba de solubilidad",
+                        "  - Bomba de carbonato",
+                        "  - Interacciones con ciclos de nutrientes",
+                        "- **Carbono orgánico**",
+                        "  - Carbono orgánico disuelto (DOC)",
+                        "  - Carbono orgánico particulado (POC)",
+                        "  - Caracterización y reactividad",
+                        "  - Papel en ciclos biogeoquímicos",
+                        "- **Intercambio de CO₂ océano-atmósfera**",
+                        "  - Distribuciones de pCO₂ superficial",
+                        "  - Flujos netos globales y regionales",
+                        "  - Sumideros y fuentes oceánicas",
+                        "  - Influencia de procesos físicos y biológicos"
+                    ],
+                    applications: [ "Estudios de acidificación oceánica.", "Modelado del ciclo global del carbono.", "Evaluación del papel del océano como sumidero de CO₂." ]
+                },
+                f2_quim_topic7: {
+                    title: "7. Ciclos de Nutrientes Marinos",
+                    description: "Estudio de los ciclos biogeoquímicos de nutrientes esenciales como nitrógeno, fósforo y silicio, y su importancia para la productividad primaria marina.",
+                    keyPoints: [
+                        "- **Ciclo del nitrógeno**",
+                        "  - Especies principales (NO₃⁻, NO₂⁻, NH₄⁺, N₂)",
+                        "  - Fijación de nitrógeno",
+                        "  - Nitrificación y desnitrificación",
+                        "  - Anammox y otros procesos",
+                        "- **Ciclo del fósforo**",
+                        "  - Fosfato inorgánico y orgánico",
+                        "  - Adsorción y desorción en partículas",
+                        "  - Tiempo de residencia y limitación",
+                        "  - Regeneración bentónica",
+                        "- **Ciclo del silicio**",
+                        "  - Ácido silícico y su distribución",
+                        "  - Procesos biogénicos (diatomeas)",
+                        "  - Disolución y preservación",
+                        "  - Balance global y diagénesis",
+                        "- **Relaciones estequiométricas**",
+                        "  - Relación de Redfield (C:N:P)",
+                        "  - Variabilidad por regiones y especies",
+                        "  - Limitación por nutrientes y co-limitación",
+                        "  - Implicaciones para productividad primaria"
+                    ],
+                    applications: [ "Estudios de productividad primaria.", "Manejo de la eutrofización costera.", "Modelado de ecosistemas marinos." ]
+                },
+                f2_quim_topic8: {
+                    title: "8. Química Redox del Agua de Mar",
+                    description: "Exploración de los conceptos y procesos redox en el océano, el papel del oxígeno disuelto, los ciclos de elementos redox-sensibles y las características de los ambientes anóxicos.",
+                    keyPoints: [
+                        "- **Conceptos redox en oceanografía**",
+                        "  - Potencial redox (Eh) y pE",
+                        "  - Secuencia de reacciones redox",
+                        "  - Equilibrio vs. cinética",
+                        "  - Zonación vertical redox",
+                        "- **Oxígeno disuelto**",
+                        "  - Distribución global y perfiles verticales",
+                        "  - Zonas de mínimo oxígeno (OMZs)",
+                        "  - Procesos de consumo y ventilación",
+                        "  - Métodos de medición (Winkler, sensores)",
+                        "- **Ciclos redox de elementos**",
+                        "  - Hierro (Fe²⁺/Fe³⁺)",
+                        "  - Manganeso (Mn²⁺/Mn⁴⁺)",
+                        "  - Azufre (SO₄²⁻/H₂S)",
+                        "  - Interconexiones entre ciclos",
+                        "- **Ambientes anóxicos marinos**",
+                        "  - Cuencas anóxicas (Mar Negro, fiordos)",
+                        "  - Sedimentos reductores",
+                        "  - Surgencias de metano y sulfuro",
+                        "  - Comunidades microbianas especializadas"
+                    ],
+                    applications: [ "Estudio de zonas de mínimo oxígeno y su expansión.", "Comprensión de la biogeoquímica de ambientes extremos.", "Investigación de la formación de depósitos minerales." ]
+                },
+                f2_quim_topic9: {
+                    title: "9. Elementos Traza y Micronutrientes",
+                    description: "Estudio de la distribución, comportamiento, transporte y ciclado de elementos traza y micronutrientes esenciales en el océano, y los métodos para su análisis.",
+                    keyPoints: [
+                        "- **Distribuciones y comportamientos**",
+                        "  - Perfiles tipo (conservativo, nutriente, scavenging)",
+                        "  - Control biológico vs. físico-químico",
+                        "  - Tiempo de residencia",
+                        "  - Especiación y biodisponibilidad",
+                        "- **Micronutrientes limitantes**",
+                        "  - Hierro y su papel en la productividad",
+                        "  - Zinc, cobalto y manganeso",
+                        "  - Cobre y toxicidad/esencialidad",
+                        "  - Papel en enzimas marinas",
+                        "- **Transporte y ciclado**",
+                        "  - Fuentes externas (ríos, atmósfera, hidrotermal)",
+                        "  - Remoción por partículas (scavenging)",
+                        "  - Reciclado biológico",
+                        "  - Exportación y enterramiento",
+                        "- **Métodos analíticos para elementos traza**",
+                        "  - Muestreo limpio y contaminación",
+                        "  - Técnicas de preconcentración",
+                        "  - Espectrometría de masas y otros métodos",
+                        "  - Protocolos GEOTRACES"
+                    ],
+                    applications: [ "Estudios de limitación de la productividad primaria por micronutrientes.", "Investigación sobre la contaminación por metales traza.", "Paleoceanografía utilizando elementos traza como proxies." ]
+                },
+                f2_quim_topic10: {
+                    title: "10. Química de Interfaces Marinas",
+                    description: "Análisis de los procesos químicos que ocurren en interfaces clave del ambiente marino, como la microcapa superficial, la interfaz agua-sedimento y las interfaces biológicas.",
+                    keyPoints: [
+                        "- **Microcapa superficial marina (SML)**",
+                        "  - Estructura y composición química",
+                        "  - Enriquecimiento en material orgánico",
+                        "  - Procesos fotoquímicos",
+                        "  - Intercambio con atmósfera y columna de agua",
+                        "- **Interfase agua-sedimento**",
+                        "  - Gradientes químicos y diagénesis temprana",
+                        "  - Flujos bentónicos de nutrientes y gases",
+                        "  - Bioturbación y bioirrigación",
+                        "  - Técnicas de muestreo (porewater)",
+                        "- **Interfases biológicas**",
+                        "  - Química de biopelículas marinas",
+                        "  - Microambientes en agregados y nieve marina",
+                        "  - Exopolímeros y condicionamiento de superficies",
+                        "  - Métodos microanalíticos"
+                    ],
+                    applications: [ "Estudios de intercambio aire-mar de gases y aerosoles.", "Investigación de procesos diagenéticos y flujos bentónicos.", "Comprensión del papel de los microambientes en la biogeoquímica marina." ]
+                }
+            },
+            fase3_quim: {
+                f3_quim_topic11: {
+                    title: "11. Muestreo y Diseño Experimental",
+                    description: "Principios y técnicas para el diseño de estrategias de muestreo efectivas, la recolección de muestras de agua, y su preparación y preservación para análisis químico.",
+                    keyPoints: [
+                        "- **Estrategias de muestreo**",
+                        "  - Diseño espacial y temporal",
+                        "  - Muestreo adaptativo y eventos",
+                        "  - Representatividad y replicación",
+                        "  - Consideraciones estadísticas",
+                        "- **Técnicas de muestreo de agua**",
+                        "  - Botellas Niskin y rosetas",
+                        "  - Sistemas de bombeo limpio",
+                        "  - Go-Flo y botellas para elementos traza",
+                        "  - Muestreadores autónomos",
+                        "- **Preparación y preservación**",
+                        "  - Filtración y fraccionamiento",
+                        "  - Técnicas de preservación por parámetro",
+                        "  - Contaminación y control de calidad",
+                        "  - Almacenamiento y transporte",
+                        "- **Protocolos estándar y manuales**",
+                        "  - GO-SHIP y protocolos globales",
+                        "  - Intercomparación entre laboratorios",
+                        "  - Materiales de referencia certificados",
+                        "  - Documentación y trazabilidad"
+                    ],
+                    applications: [ "Planificación de campañas oceanográficas.", "Obtención de muestras de alta calidad para análisis precisos.", "Aseguramiento de la comparabilidad de datos entre estudios." ]
+                },
+                f3_quim_topic12: {
+                    title: "12. Instrumentación y Mediciones in situ",
+                    description: "Descripción de la instrumentación utilizada para mediciones químicas in situ, incluyendo sistemas CTD, sensores autónomos, perfiladores específicos y sensores ópticos avanzados.",
+                    keyPoints: [
+                        "- **Sistemas CTD y sensores integrados**",
+                        "  - Conductividad, temperatura y presión",
+                        "  - Sensores ópticos (fluorescencia, turbidez)",
+                        "  - Sensores electroquímicos (O₂, pH)",
+                        "  - Calibración y procesamiento de datos",
+                        "- **Sistemas autónomos**",
+                        "  - Flotadores Argo biogeoquímicos",
+                        "  - Gliders y AUVs",
+                        "  - Boyas instrumentadas",
+                        "  - Sistemas cableados y observatorios",
+                        "- **Perfiladores in situ específicos**",
+                        "  - Perfiladores de nutrientes",
+                        "  - Sistemas de CO₂ in situ",
+                        "  - Analizadores de elementos traza",
+                        "  - Colectores de partículas",
+                        "- **Sensores ópticos avanzados**",
+                        "  - Absorbancia y fluorescencia in situ",
+                        "  - Sensores de materia orgánica disuelta",
+                        "  - Citometría de flujo in situ",
+                        "  - Microsensores y optodos"
+                    ],
+                    applications: [ "Monitoreo oceánico en tiempo real y alta resolución.", "Estudio de procesos dinámicos y eventos episódicos.", "Recopilación de datos en áreas remotas o de difícil acceso." ]
+                },
+                f3_quim_topic13: {
+                    title: "13. Técnicas Analíticas de Laboratorio I: Parámetros Principales",
+                    description: "Métodos de laboratorio para la determinación de parámetros químicos fundamentales como salinidad, componentes del sistema de carbono inorgánico, oxígeno disuelto y nutrientes.",
+                    keyPoints: [
+                        "- **Determinación de salinidad**",
+                        "  - Salinómetros de conductividad",
+                        "  - Métodos de titulación (Knudsen-Möhr)",
+                        "  - Refractometría y densitometría",
+                        "  - Calibración con agua estándar",
+                        "- **Análisis de carbono inorgánico**",
+                        "  - pH (potenciométrico, espectrofotométrico)",
+                        "  - Alcalinidad (titulación potenciométrica)",
+                        "  - Carbono inorgánico total (coulombimetría, IR)",
+                        "  - pCO₂ (equilibrador, NDIR)",
+                        "- **Determinación de oxígeno disuelto**",
+                        "  - Método Winkler y modificaciones",
+                        "  - Sensores electroquímicos (Clark)",
+                        "  - Sensores ópticos (optodos)",
+                        "  - Intercomparación y estandarización",
+                        "- **Análisis de nutrientes**",
+                        "  - Métodos colorimétricos automatizados",
+                        "  - Analizadores de flujo continuo",
+                        "  - Analizadores de flujo segmentado",
+                        "  - Métodos de reducción y reacción específica"
+                    ],
+                    applications: [ "Caracterización de masas de agua.", "Estudios de productividad y biogeoquímica.", "Monitoreo de la calidad del agua y acidificación." ]
+                },
+                f3_quim_topic14: {
+                    title: "14. Técnicas Analíticas de Laboratorio II: Métodos Avanzados",
+                    description: "Introducción a técnicas analíticas avanzadas como espectrometría de masas, espectrometría atómica, cromatografía y métodos electroquímicos para análisis químicos detallados.",
+                    keyPoints: [
+                        "- **Espectrometría de masas**",
+                        "  - ICP-MS para elementos traza",
+                        "  - ICP-MS de alta resolución",
+                        "  - Ablación láser",
+                        "  - Análisis isotópico por MC-ICP-MS",
+                        "- **Análisis por espectrometría atómica**",
+                        "  - Absorción atómica (FAAS, GFAAS)",
+                        "  - Emisión atómica (ICP-OES)",
+                        "  - Fluorescencia atómica",
+                        "  - Preparación de muestras y matrices",
+                        "- **Cromatografía**",
+                        "  - Cromatografía iónica",
+                        "  - Cromatografía de gases",
+                        "  - Cromatografía líquida (HPLC)",
+                        "  - Acoplamiento a espectrometría de masas",
+                        "- **Técnicas electroquímicas**",
+                        "  - Voltamperometría de redisolución anódica",
+                        "  - Métodos potenciométricos avanzados",
+                        "  - Microelectrodos",
+                        "  - Técnicas de especiación"
+                    ],
+                    applications: [ "Análisis de elementos traza y sus isótopos.", "Determinación de compuestos orgánicos específicos.", "Estudios de especiación química." ]
+                },
+                f3_quim_topic15: {
+                    title: "15. Análisis de Compuestos Orgánicos",
+                    description: "Métodos para el análisis de la materia orgánica en el océano, incluyendo carbono orgánico total, pigmentos fotosintéticos, compuestos específicos y contaminantes orgánicos.",
+                    keyPoints: [
+                        "- **Carbono orgánico total**",
+                        "  - Métodos de oxidación y detección",
+                        "  - Fraccionamiento DOC/POC",
+                        "  - Técnicas de combustión",
+                        "  - Análisis de muestras de bajo carbono",
+                        "- **Pigmentos fotosintéticos**",
+                        "  - Extracción y preservación",
+                        "  - HPLC para separación de pigmentos",
+                        "  - Análisis espectrofotométrico",
+                        "  - Marcadores taxonómicos",
+                        "- **Compuestos orgánicos específicos**",
+                        "  - Aminoácidos y proteínas",
+                        "  - Carbohidratos",
+                        "  - Lípidos",
+                        "  - CDOM y sustancias húmicas",
+                        "- **Métodos para contaminantes orgánicos**",
+                        "  - Hidrocarburos aromáticos policíclicos",
+                        "  - PCBs y otros compuestos persistentes",
+                        "  - Plaguicidas",
+                        "  - Compuestos emergentes (fármacos, PFAS)"
+                    ],
+                    applications: [ "Estudios del ciclo del carbono orgánico.", "Identificación de comunidades fitoplanctónicas.", "Monitoreo de contaminación orgánica." ]
+                },
+                f3_quim_topic16: {
+                    title: "16. Técnicas Isotópicas en Oceanografía Química",
+                    description: "Aplicación de isótopos estables y radiactivos como trazadores de procesos oceanográficos, incluyendo datación, estudios de fraccionamiento y análisis compuesto-específico.",
+                    keyPoints: [
+                        "- **Isótopos estables ligeros**",
+                        "  - Isótopos de C, N, O, H y S",
+                        "  - Preparación de muestras y análisis",
+                        "  - Fraccionamiento isotópico",
+                        "  - Aplicaciones oceanográficas",
+                        "- **Isótopos radiactivos como trazadores**",
+                        "  - Radiocarbono y aplicaciones",
+                        "  - ²¹⁰Pb, ²³⁴Th y otros radioisótopos",
+                        "  - Técnicas de medición y cálculo",
+                        "  - Datación y tasas de procesos",
+                        "- **Isótopos no tradicionales**",
+                        "  - Isótopos metálicos (Fe, Zn, Cd)",
+                        "  - Isótopos de Si",
+                        "  - Técnicas analíticas específicas",
+                        "  - Trazadores de procesos biogeoquímicos",
+                        "- **Análisis compuesto-específico de isótopos**",
+                        "  - GC-IRMS y LC-IRMS",
+                        "  - Isótopos en compuestos específicos",
+                        "  - Preparación de muestras",
+                        "  - Aplicaciones a redes tróficas y ciclos biogeoquímicos"
+                    ],
+                    applications: [ "Estudios de paleoceanografía y paleoclima.", "Determinación de tasas de procesos biogeoquímicos.", "Investigación de redes tróficas y fuentes de materia orgánica." ]
+                },
+                f3_quim_topic17: {
+                    title: "17. Control de Calidad y Procesamiento de Datos",
+                    description: "Importancia de la garantía de calidad analítica, la gestión de datos oceanográficos, y el uso de métodos estadísticos y herramientas de visualización para el procesamiento de datos químicos.",
+                    keyPoints: [
+                        "- **Garantía de calidad analítica**",
+                        "  - Blancos y contaminación",
+                        "  - Límites de detección y cuantificación",
+                        "  - Precisión y exactitud",
+                        "  - Materiales de referencia y ejercicios de intercomparación",
+                        "- **Gestión de datos oceanográficos**",
+                        "  - Formato y estandarización",
+                        "  - Control de calidad primario y secundario",
+                        "  - Metadatos y documentación",
+                        "  - Bases de datos químicos oceánicos",
+                        "- **Métodos estadísticos para datos químicos**",
+                        "  - Estadística descriptiva y exploratoria",
+                        "  - Análisis multivariante (PCA, cluster)",
+                        "  - Técnicas de interpolación espacial",
+                        "  - Series temporales químicas",
+                        "- **Visualización de datos químicos oceanográficos**",
+                        "  - Perfiles verticales",
+                        "  - Secciones y distribuciones espaciales",
+                        "  - Visualización 3D y 4D",
+                        "  - Herramientas informáticas específicas"
+                    ],
+                    applications: [ "Aseguramiento de la fiabilidad de los datos químicos.", "Facilitación del intercambio y uso de datos.", "Extracción de información significativa de conjuntos de datos complejos." ]
+                }
+            },
+            fase4_quim: {
+                f4_quim_topic18: {
+                    title: "18. Química de Sedimentos Marinos",
+                    description: "Estudio de la composición química de los sedimentos marinos, los minerales autigénicos, los procesos diagenéticos tempranos y las técnicas analíticas específicas para sedimentos.",
+                    keyPoints: [
+                        "- **Clasificación y composición química**",
+                        "  - Sedimentos litogénicos",
+                        "  - Sedimentos biogénicos",
+                        "  - Sedimentos autigénicos",
+                        "  - Análisis composicional",
+                        "- **Minerales autigénicos marinos**",
+                        "  - Carbonatos",
+                        "  - Sílice biogénica",
+                        "  - Fosfatos",
+                        "  - Sulfuros y óxidos metálicos",
+                        "- **Diagénesis temprana**",
+                        "  - Zonación redox en sedimentos",
+                        "  - Modelo diagenético",
+                        "  - Flujos bentónicos",
+                        "  - Preservación de materia orgánica",
+                        "- **Técnicas analíticas para sedimentos**",
+                        "  - Extracción secuencial",
+                        "  - Análisis de agua intersticial",
+                        "  - Microscopía y microanálisis",
+                        "  - Incubaciones y experimentos"
+                    ],
+                    applications: [ "Paleoceanografía y reconstrucción ambiental.", "Estudios de contaminación histórica.", "Exploración de recursos minerales en sedimentos." ]
+                },
+                f4_quim_topic19: {
+                    title: "19. Química de Sistemas Hidrotermales",
+                    description: "Análisis de la química de los sistemas hidrotermales oceánicos, incluyendo la composición de fluidos, reacciones químicas, mineralogía, ecosistemas quimiosintéticos y recursos minerales asociados.",
+                    keyPoints: [
+                        "- **Hidrotermalismo oceánico**",
+                        "  - Tipos de sistemas y configuraciones",
+                        "  - Composición de fluidos hidrotermales",
+                        "  - Gradientes químicos y mezcla",
+                        "  - Distribución global",
+                        "- **Reacciones químicas y mineralogía**",
+                        "  - Interacción agua-roca a alta temperatura",
+                        "  - Precipitación de sulfuros y otros minerales",
+                        "  - Oxidación de compuestos reducidos",
+                        "  - Fraccionamiento isotópico",
+                        "- **Ecosistemas quimiosintéticos**",
+                        "  - Base química para quimiosíntesis",
+                        "  - Gradientes redox como energía",
+                        "  - Ciclos microbianos especializados",
+                        "  - Métodos de estudio in situ",
+                        "- **Recursos minerales asociados**",
+                        "  - Sulfuros masivos polimetálicos",
+                        "  - Técnicas de exploración",
+                        "  - Evaluación geoquímica",
+                        "  - Impactos potenciales de la minería"
+                    ],
+                    applications: [ "Estudio de la transferencia de calor y masa desde el interior de la Tierra.", "Investigación sobre el origen de la vida.", "Exploración de depósitos de sulfuros masivos." ]
+                },
+                f4_quim_topic20: {
+                    title: "20. Contaminación Química Marina",
+                    description: "Estudio de los principales tipos de contaminantes químicos en el medio marino, sus fuentes, rutas de entrada, procesos de transformación y destino, y los métodos para su monitoreo.",
+                    keyPoints: [
+                        "- **Tipos principales de contaminantes**",
+                        "  - Metales pesados",
+                        "  - Compuestos orgánicos persistentes",
+                        "  - Nutrientes y eutrofización",
+                        "  - Contaminantes emergentes",
+                        "- **Fuentes y rutas de entrada**",
+                        "  - Descarga fluvial",
+                        "  - Deposición atmosférica",
+                        "  - Fuentes directas costeras",
+                        "  - Navegación y plataformas",
+                        "- **Procesos y destino**",
+                        "  - Distribución espacial",
+                        "  - Transformación y degradación",
+                        "  - Bioacumulación y biomagnificación",
+                        "  - Sedimentos como archivos históricos",
+                        "- **Métodos analíticos y monitoreo**",
+                        "  - Diseño de programas de vigilancia",
+                        "  - Biomarcadores y bioindicadores",
+                        "  - Muestreadores pasivos",
+                        "  - Técnicas de especiación de contaminantes"
+                    ],
+                    applications: [ "Evaluación del impacto ambiental de actividades humanas.", "Desarrollo de estrategias de remediación.", "Protección de la salud de los ecosistemas marinos y la salud humana." ]
+                },
+                f4_quim_topic21: {
+                    title: "21. Acidificación Oceánica y Cambio Global",
+                    description: "Análisis de los fundamentos químicos de la acidificación oceánica, sus impactos en procesos biogeoquímicos, los métodos experimentales para su estudio y las posibles estrategias de mitigación.",
+                    keyPoints: [
+                        "- **Fundamentos químicos de la acidificación**",
+                        "  - Cambios en el sistema del carbonato",
+                        "  - Medición de parámetros relevantes",
+                        "  - Tasas actuales y proyecciones",
+                        "  - Cambios históricos (paleoquímica)",
+                        "- **Impactos en procesos biogeoquímicos**",
+                        "  - Efectos en calcificación y disolución",
+                        "  - Alteración de especiación metálica",
+                        "  - Cambios en ciclos de nutrientes",
+                        "  - Interacción con hipoxia y otros estresores",
+                        "- **Métodos experimentales**",
+                        "  - Sistemas de mesocosmos",
+                        "  - Experimentos de laboratorio controlados",
+                        "  - Observatorios naturais (surgencias, respiraderos CO₂)",
+                        "  - Diseños factoriales multiestrés",
+                        "- **Estrategias de mitigación**",
+                        "  - Alcalinización oceánica",
+                        "  - Secuestro de carbono azul",
+                        "  - Restauración de ecosistemas costeros",
+                        "  - Reducción de CO₂ atmosférico"
+                    ],
+                    applications: [ "Predicción de los efectos del cambio climático en los océanos.", "Desarrollo de estrategias de adaptación para organismos y ecosistemas marinos.", "Información para políticas de reducción de emisiones de CO₂." ]
+                },
+                f4_quim_topic22: {
+                    title: "22. Productos Naturales Marinos",
+                    description: "Exploración de la diversidad química de compuestos producidos por organismos marinos, los métodos de bioprospección, sus aplicaciones biotecnológicas y consideraciones de química ecológica.",
+                    keyPoints: [
+                        "- **Diversidad química en organismos marinos**",
+                        "  - Metabolitos secundarios",
+                        "  - Diversidad estructural",
+                        "  - Distribución taxonómica",
+                        "  - Funciones ecológicas",
+                        "- **Métodos de bioprospección**",
+                        "  - Muestreo y preservación",
+                        "  - Extracción y fraccionamiento",
+                        "  - Screening de actividad",
+                        "  - Elucidación estructural",
+                        "- **Aplicaciones biotecnológicas**",
+                        "  - Fármacos de origen marino",
+                        "  - Enzimas y proteínas funcionales",
+                        "  - Biomateriales",
+                        "  - Productos alimentarios y cosméticos",
+                        "- **Consideraciones de química ecológica**",
+                        "  - Interacciones químicas organismos-ambiente",
+                        "  - Defensas químicas",
+                        "  - Quimiotaxonomía",
+                        "  - Adaptaciones a condiciones extremas"
+                    ],
+                    applications: [ "Descubrimiento de nuevos fármacos y compuestos bioactivos.", "Desarrollo de productos biotecnológicos sostenibles.", "Comprensión de las interacciones químicas en los ecosistemas marinos." ]
+                }
+            },
+            fase5_quim: {
+                f5_quim_topic23: {
+                    title: "23. Quimiometría y Análisis de Big Data",
+                    description: "Aplicación de métodos quimiométricos y técnicas de aprendizaje automático para el análisis de grandes conjuntos de datos químicos oceánicos y la extracción de información compleja.",
+                    keyPoints: [
+                        "- **Métodos quimiométricos**",
+                        "  - Análisis multivariante avanzado",
+                        "  - Reconocimiento de patrones",
+                        "  - Calibración multivariante",
+                        "  - Métodos de clasificación",
+                        "- **Aprendizaje automático en química oceánica**",
+                        "  - Algoritmos supervisados",
+                        "  - Métodos no supervisados",
+                        "  - Redes neuronales para predicción",
+                        "  - Validación y optimización de modelos",
+                        "- **Integración de datos complejos**",
+                        "  - Fusión de datos de múltiples plataformas",
+                        "  - Integración espaciotemporal",
+                        "  - Procesamiento de imágenes espectrales",
+                        "  - Manejo de datos de sensores autónomos",
+                        "- **Minería de datos químicos**",
+                        "  - Extracción de conocimiento de bases de datos",
+                        "  - Identificación de relaciones no evidentes",
+                        "  - Visualización de datos complejos",
+                        "  - Predicción de parámetros faltantes"
+                    ],
+                    applications: [ "Optimización de procesos analíticos.", "Descubrimiento de patrones en grandes datasets oceanográficos.", "Mejora de la interpretación de datos químicos complejos." ]
+                },
+                f5_quim_topic24: {
+                    title: "24. Biogeoquímica Computacional",
+                    description: "Uso de modelos numéricos y técnicas de simulación para estudiar ciclos biogeoquímicos, modelos de ecosistemas y procesos químicos específicos en el océano.",
+                    keyPoints: [
+                        "- **Modelado de ciclos biogeoquímicos**",
+                        "  - Modelos de cajas",
+                        "  - Modelos acoplados físico-biogeoquímicos",
+                        "  - Parametrización de procesos químicos",
+                        "  - Evaluación y validación",
+                        "- **Modelos de ecosistemas y química**",
+                        "  - Componentes biogeoquímicos en modelos de ecosistemas",
+                        "  - Ciclos de nutrientes y limitación",
+                        "  - Modelos estequiométricos",
+                        "  - Interacción con componentes biológicos",
+                        "- **Modelado de procesos específicos**",
+                        "  - Cinética de reacciones redox",
+                        "  - Intercambio de gases",
+                        "  - Sistemas del carbonato",
+                        "  - Adsorción y desorción de elementos traza",
+                        "- **Técnicas avanzadas de simulación**",
+                        "  - Análisis de sensibilidad e incertidumbre",
+                        "  - Métodos de Monte Carlo",
+                        "  - Asimilación de datos químicos",
+                        "  - Enfoques de modelado inverso"
+                    ],
+                    applications: [ "Simulación de la respuesta de los océanos al cambio climático.", "Predicción de la evolución de ciclos de nutrientes.", "Evaluación de estrategias de geoingeniería." ]
+                },
+                f5_quim_topic25: {
+                    title: "25. Desarrollos Metodológicos de Frontera",
+                    description: "Exploración de los últimos avances en sensores químicos, métodos analíticos emergentes, técnicas para compuestos no tradicionales y la integración con ómicas.",
+                    keyPoints: [
+                        "- **Sensores químicos de nueva generación**",
+                        "  - Microsensores y nanosensores",
+                        "  - Lab-on-chip para oceanografía",
+                        "  - Sensores basados en aptámeros y biomoléculas",
+                        "  - Sistemas autónomos de detección multipropósito",
+                        "- **Métodos analíticos emergentes**",
+                        "  - Espectrometría de masas de alta resolución",
+                        "  - Técnicas de imagen química",
+                        "  - Métodos no invasivos",
+                        "  - Miniaturización de instrumentación",
+                        "- **Métodos para compuestos no tradicionales**",
+                        "  - Microplásticos y nanoplásticos",
+                        "  - Compuestos farmacéuticos",
+                        "  - Disruptores endocrinos",
+                        "  - Radionúclidos antropogénicos",
+                        "- **Integración con ómicas**",
+                        "  - Metabolómica marina",
+                        "  - Proteómica funcional",
+                        "  - Interactómica química-biológica",
+                        "  - Bioinformática para datos químicos"
+                    ],
+                    applications: [ "Desarrollo de nuevas herramientas para la investigación oceanográfica.", "Detección de contaminantes emergentes.", "Avance en la comprensión de la química marina a nivel molecular." ]
+                },
+                f5_quim_topic26: {
+                    title: "26. Integración y Estudios de Caso",
+                    description: "Énfasis en la integración multidisciplinar a través de expediciones oceanográficas, estudios de procesos biogeoquímicos y casos de estudio regionales.",
+                    keyPoints: [
+                        "- **Expediciones oceanográficas integradas**",
+                        "  - Diseño multidisciplinar",
+                        "  - GEOTRACES y programas globales",
+                        "  - Planificación logística y análisis",
+                        "  - Interpretación holística",
+                        "- **Estudios de procesos biogeoquímicos**",
+                        "  - Floraciones de fitoplancton",
+                        "  - Ciclos de nutrientes en surgencias",
+                        "  - Ciclos redox en OMZs",
+                        "  - Transporte de elementos traza",
+                        "- **Casos de estudio regionales**",
+                        "  - Sistemas de alta latitud",
+                        "  - Océano tropical",
+                        "  - Mares marginales",
+                        "  - Estuarios y zonas costeras",
+                        "- **Integración de química con otras disciplinas**",
+                        "  - Biología molecular",
+                        "  - Física de mesoescala",
+                        "  - Geología marina",
+                        "  - Ecotoxicología"
+                    ],
+                    applications: [ "Comprensión holística de los sistemas oceánicos.", "Resolución de problemas complejos mediante enfoques integrados.", "Formación de científicos con visión multidisciplinar." ]
+                },
+                f5_quim_topic27: {
+                    title: "27. Proyectos Aplicados y Profesionales",
+                    description: "Desarrollo de proyectos prácticos que integran los conocimientos adquiridos, enfocados en caracterización química, análisis de ciclos, monitoreo y desarrollo metodológico.",
+                    keyPoints: [
+                        "- **Proyecto 1**: Caracterización química integral",
+                        "  - Muestreo multivariable",
+                        "  - Análisis completo de parámetros",
+                        "  - Interpretación oceanográfica",
+                        "  - Comunicación científica efectiva",
+                        "- **Proyecto 2**: Análisis de ciclo biogeoquímico",
+                        "  - Selección de trazadores",
+                        "  - Balance de masas y flujos",
+                        "  - Análisis de perturbaciones",
+                        "  - Modelado conceptual",
+                        "- **Proyecto 3**: Monitoreo químico marino",
+                        "  - Diseño de programa de seguimiento",
+                        "  - Implementación analítica",
+                        "  - Análisis de tendencias",
+                        "  - Aplicación a gestión ambiental",
+                        "- **Proyecto 4**: Desarrollo metodológico",
+                        "  - Identificación de necesidad analítica",
+                        "  - Optimización de método",
+                        "  - Validación y control de calidad",
+                        "  - Aplicación a muestras reales"
+                    ],
+                    applications: [ "Aplicación práctica de conocimientos en oceanografía química.", "Desarrollo de habilidades para la investigación y el trabajo profesional.", "Contribución a la resolución de problemas ambientales marinos." ]
+                }
+            }
+        };
+
+        let selectedCategory = "fase1_quim";
+        let selectedTopic = "f1_quim_topic1";
+
+        // Función para renderizar las pestañas de categorías
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = `category-tab ${selectedCategory === category.id ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(category.id);
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // Función para renderizar los tópicos
+        function renderTopics() {
+            const topicsGrid = document.getElementById('topicsGrid');
+            topicsGrid.innerHTML = '';
+
+            const topics = topicsByCategory[selectedCategory] || [];
+            topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.className = `topic-button ${selectedTopic === topic.id ? 'active' : ''}`;
+                button.textContent = topic.name;
+                button.onclick = () => selectTopic(topic.id);
+                topicsGrid.appendChild(button);
+            });
+        }
+
+        // Función para renderizar el contenido del tópico
+        function renderTopicContent() {
+            const contentDiv = document.getElementById('topicContent');
+            const categoryData = content[selectedCategory];
+
+            if (!categoryData) {
+                contentDiv.innerHTML = '<div class="error-message">Categoría no encontrada</div>';
+                return;
+            }
+
+            const topicData = categoryData[selectedTopic];
+            if (!topicData) {
+                contentDiv.innerHTML = '<div class="error-message">Tópico no encontrado</div>';
+                return;
+            }
+
+            contentDiv.innerHTML = `
+                <h3 class="topic-title">${topicData.title}</h3>
+                <div class="content-grid">
+                    <div class="main-content">
+                        <p class="description">${topicData.description}</p>
+
+                        <div class="key-points">
+                            <h4 class="section-title">
+                                <i class="fas fa-lightbulb"></i>
+                                Puntos Clave
+                            </h4>
+                            <ul class="points-list">
+                                ${topicData.keyPoints.map(point => `
+                                    <li>
+                                        <span class="bullet-blue">•</span>
+                                        <span>${point}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="applications">
+                            <h4 class="section-title">
+                                <i class="fas fa-cogs"></i>
+                                Aplicaciones
+                            </h4>
+                            <ul class="points-list">
+                                ${topicData.applications.map(app => `
+                                    <li>
+                                        <span class="bullet-green">→</span>
+                                        <span>${app}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sidebar">
+                        <div class="image-placeholder">
+                            <i class="fas fa-water" style="font-size: 2rem; margin-bottom: 1rem;"></i><br>
+                            ${topicData.title}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para seleccionar categoría
+        function selectCategory(categoryId) {
+            selectedCategory = categoryId;
+            const topics = topicsByCategory[categoryId];
+            if (topics && topics.length > 0) {
+                selectedTopic = topics[0].id;
+            }
+            render();
+        }
+
+        // Función para seleccionar tópico
+        function selectTopic(topicId) {
+            selectedTopic = topicId;
+            renderTopicContent();
+            renderTopics();
+        }
+
+        // Función principal de renderizado
+        function render() {
+            renderCategoryTabs();
+            renderTopics();
+            renderTopicContent();
+        }
+
+        // Botón volver arriba
+        function initBackToTop() {
+            const backToTop = document.getElementById('backToTop');
+
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            render();
+            initBackToTop();
+        });
+    </script>
+</body>
+</html>
