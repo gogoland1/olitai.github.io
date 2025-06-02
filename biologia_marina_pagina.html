@@ -156,7 +156,7 @@
             padding: 1rem 1.5rem;
             font-size: 0.9rem;
             font-weight: 600;
-            white-space: nowrap;
+            /* white-space: nowrap; */ /* Managed by container or default button behavior */
             background: none;
             border: none;
             cursor: pointer;
@@ -433,6 +433,31 @@
         .back-to-top:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(121, 85, 72, 0.4); /* Shadow based on new background */
+        }
+
+        /* Scrollbar Styling for WebKit browsers (Chrome, Safari, new Edge) */
+        .category-tabs::-webkit-scrollbar {
+            height: 10px; /* Height of the horizontal scrollbar */
+            background-color: transparent; /* Optional: make scrollbar background transparent */
+        }
+        .category-tabs::-webkit-scrollbar-track {
+            background: #e0e0e0; /* Light grey track, slightly different from #f1f1f1 */
+            border-radius: 10px;
+            margin: 0 5px; /* Optional: add some margin to the track */
+        }
+        .category-tabs::-webkit-scrollbar-thumb {
+            background: #888888; /* Standard grey thumb */
+            border-radius: 10px;
+            border: 2px solid #e0e0e0; /* Creates a thin border around thumb, matching track */
+        }
+        .category-tabs::-webkit-scrollbar-thumb:hover {
+            background: #555555; /* Darker thumb on hover */
+        }
+
+        /* Scrollbar Styling for Firefox */
+        .category-tabs {
+            scrollbar-width: thin; /* Makes scrollbar thinner */
+            scrollbar-color: #888888 #e0e0e0; /* thumb color, track color */
         }
     </style>
 </head>
