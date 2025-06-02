@@ -142,21 +142,28 @@
 
         /* Pestañas de categorías */
         .category-tabs {
-            overflow-x: auto;
+            overflow-x: auto !important; /* Ensuring this is prioritized */
             background: rgba(200, 230, 201, 0.8); /* Green: Light mint green */
+            display: block; /* Or ensure it's a block-level element that can constrain its child */
+            width: 100%; /* Ensure it takes available width to constrain the child */
+            -webkit-overflow-scrolling: touch; /* For smoother scrolling on touch devices */
+            scrollbar-width: thin; /* Makes scrollbar thinner */
+            scrollbar-color: #888888 #e0e0e0; /* thumb color, track color */
         }
 
         .category-tabs-container {
-            display: flex;
+            display: flex !important; /* Ensuring this is prioritized */
             border-bottom: 1px solid #A5D6A7; /* Green: Light green border */
-            min-width: max-content;
+            min-width: max-content !important; /* Crucial for allowing overflow */
+            flex-wrap: nowrap !important; /* Prevent tabs from wrapping to new lines */
         }
 
         .category-tab {
             padding: 1rem 1.5rem;
             font-size: 0.9rem;
             font-weight: 600;
-            /* white-space: nowrap; */ /* Managed by container or default button behavior */
+            white-space: nowrap; /* Re-instate to prevent text inside tabs from wrapping */
+            flex-shrink: 0; /* Prevent tabs from shrinking */
             background: none;
             border: none;
             cursor: pointer;
@@ -455,10 +462,7 @@
         }
 
         /* Scrollbar Styling for Firefox */
-        .category-tabs {
-            scrollbar-width: thin; /* Makes scrollbar thinner */
-            scrollbar-color: #888888 #e0e0e0; /* thumb color, track color */
-        }
+        /* Firefox scrollbar properties moved into the main .category-tabs rule above */
     </style>
 </head>
 <body>
