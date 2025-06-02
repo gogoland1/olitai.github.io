@@ -142,28 +142,37 @@
 
         /* Pestañas de categorías */
         .category-tabs {
-            overflow-x: auto !important; /* Ensuring this is prioritized */
+            position: relative;
+            overflow: hidden; /* Changed from auto to hidden */
             background: rgba(248, 250, 252, 0.8);
-            display: block; /* Or ensure it's a block-level element that can constrain its child */
-            width: 100%; /* Ensure it takes available width to constrain the child */
-            -webkit-overflow-scrolling: touch; /* For smoother scrolling on touch devices */
-            scrollbar-width: thin; /* Makes scrollbar thinner */
-            scrollbar-color: #888888 #e0e0e0; /* thumb color, track color */
+            width: 100%;
+        }
+
+        .category-tabs-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: #64b5f6 rgba(25, 50, 77, 0.5); /* Adapted: blue thumb, dark blue track for physics page */
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         .category-tabs-container {
-            display: flex !important; /* Ensuring this is prioritized */
-            border-bottom: 1px solid #e5e7eb;
-            min-width: max-content !important; /* Crucial for allowing overflow */
-            flex-wrap: nowrap !important; /* Prevent tabs from wrapping to new lines */
+            display: flex !important;
+            border-bottom: 1px solid #e5e7eb; /* Original physics border, keep or adapt */
+            min-width: max-content !important;
+            flex-wrap: nowrap !important;
+            width: max-content; /* Added from quimica */
         }
 
         .category-tab {
-            padding: 1rem 1.5rem;
-            font-size: 0.9rem;
+            padding: 1.2rem 1.8rem; /* Changed */
+            font-size: 0.95rem; /* Changed */
             font-weight: 600;
-            white-space: nowrap; /* Re-instate to prevent text inside tabs from wrapping */
-            flex-shrink: 0; /* Prevent tabs from shrinking */
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: fit-content; /* Added from quimica */
+            text-align: center; /* Added from quimica */
             background: none;
             border: none;
             cursor: pointer;
@@ -443,26 +452,63 @@
         }
 
         /* Scrollbar Styling for WebKit browsers (Chrome, Safari, new Edge) */
-        .category-tabs::-webkit-scrollbar {
-            height: 10px; /* Height of the horizontal scrollbar */
-            background-color: transparent; /* Optional: make scrollbar background transparent */
-        }
-        .category-tabs::-webkit-scrollbar-track {
-            background: #e0e0e0; /* Light grey track, slightly different from #f1f1f1 */
-            border-radius: 10px;
-            margin: 0 5px; /* Optional: add some margin to the track */
-        }
-        .category-tabs::-webkit-scrollbar-thumb {
-            background: #888888; /* Standard grey thumb */
-            border-radius: 10px;
-            border: 2px solid #e0e0e0; /* Creates a thin border around thumb, matching track */
-        }
-        .category-tabs::-webkit-scrollbar-thumb:hover {
-            background: #555555; /* Darker thumb on hover */
-        }
+        /* MOVED to .category-tabs-wrapper */
 
         /* Scrollbar Styling for Firefox */
-        /* Firefox scrollbar properties moved into the main .category-tabs rule above */
+        /* Firefox scrollbar properties moved into the main .category-tabs-wrapper rule */
+
+        .scroll-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: rgba(59, 130, 246, 0.8); /* Adapted: blue from physics theme */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-size: 0.8rem;
+        }
+
+        .scroll-indicator:hover {
+            background: rgba(59, 130, 246, 1); /* Darker blue */
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .scroll-indicator.left {
+            left: 10px;
+        }
+
+        .scroll-indicator.right {
+            right: 10px;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* WebKit scrollbar styles for .category-tabs-wrapper - Adapted for Physics Blue Theme */
+        .category-tabs-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        .category-tabs-wrapper::-webkit-scrollbar-track {
+            background: rgba(25, 50, 77, 0.5); /* Adapted: dark blue track */
+            border-radius: 4px;
+        }
+        .category-tabs-wrapper::-webkit-scrollbar-thumb {
+            background: #64b5f6; /* Adapted: blue thumb */
+            border-radius: 4px;
+            border: 1px solid rgba(25, 50, 77, 0.5); /* Adapted: dark blue border for thumb */
+        }
+        .category-tabs-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; /* Adapted: darker blue thumb on hover */
+        }
     </style>
 </head>
 <body>
@@ -500,8 +546,16 @@
 
             <!-- Pestañas de categorías -->
             <div class="category-tabs">
-                <div class="category-tabs-container" id="categoryTabs">
-                    <!-- Las pestañas se generarán dinámicamente -->
+                <div class="scroll-indicator left hidden" id="scrollLeft">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="scroll-indicator right" id="scrollRight">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="category-tabs-wrapper" id="tabsWrapper">
+                    <div class="category-tabs-container" id="categoryTabs">
+                        <!-- Las pestañas se generarán dinámicamente aquí -->
+                    </div>
                 </div>
             </div>
 
@@ -534,13 +588,13 @@
     <script>
         // Datos de la aplicación (mantienes el mismo contenido)
         const categories = [
-            { id: "fundamentals", name: "Fundamentos de Oceanografía Física" },
-            { id: "circulation", name: "Dinámica y Circulación Oceánica" },
-            { id: "waves", name: "Olas, Ondas y Mareas" },
-            { id: "scales", name: "Fenómenos de Escala" },
-            { id: "interaction", name: "Interacción Océano-Atmósfera" },
-            { id: "observation", name: "Métodos Observacionales y Análisis" },
-            { id: "modeling", name: "Modelado Numérico y Aplicaciones IA" }
+            { id: "fundamentals", name: "FASE I: FUNDAMENTOS" },
+            { id: "circulation", name: "FASE II: CIRCULACIÓN" },
+            { id: "waves", name: "FASE III: OLAS Y MAREAS" },
+            { id: "scales", name: "FASE IV: FENÓMENOS ESCALA" },
+            { id: "interaction", name: "FASE V: INTERACCIÓN OC-ATM" },
+            { id: "observation", name: "FASE VI: OBSERVACIÓN" },
+            { id: "modeling", name: "FASE VII: MODELADO IA" }
         ];
 
         const topicsByCategory = {
@@ -1326,7 +1380,177 @@
         document.addEventListener('DOMContentLoaded', function() {
             render();
             initBackToTop();
+            initScrollControls(); // Added
+            setTimeout(updateScrollIndicators, 200); // Added
         });
+
+        // Funciones para el control del scroll de pestañas
+        function updateScrollIndicators() {
+            const tabsWrapper = document.getElementById('tabsWrapper');
+            const scrollLeftBtn = document.getElementById('scrollLeft');
+            const scrollRightBtn = document.getElementById('scrollRight');
+
+            if (!tabsWrapper || !scrollLeftBtn || !scrollRightBtn) return;
+
+            const maxScrollLeft = tabsWrapper.scrollWidth - tabsWrapper.clientWidth;
+
+            if (tabsWrapper.scrollLeft > 0) {
+                scrollLeftBtn.classList.remove('hidden');
+            } else {
+                scrollLeftBtn.classList.add('hidden');
+            }
+
+            if (tabsWrapper.scrollLeft < maxScrollLeft - 5) { // Added a small tolerance
+                scrollRightBtn.classList.remove('hidden');
+            } else {
+                scrollRightBtn.classList.add('hidden');
+            }
+        }
+
+        function initScrollControls() {
+            const tabsWrapper = document.getElementById('tabsWrapper');
+            const scrollLeftBtn = document.getElementById('scrollLeft');
+            const scrollRightBtn = document.getElementById('scrollRight');
+
+            if (!tabsWrapper || !scrollLeftBtn || !scrollRightBtn) return;
+
+            scrollLeftBtn.addEventListener('click', () => {
+                tabsWrapper.scrollBy({ left: -200, behavior: 'smooth' });
+            });
+
+            scrollRightBtn.addEventListener('click', () => {
+                tabsWrapper.scrollBy({ left: 200, behavior: 'smooth' });
+            });
+
+            tabsWrapper.addEventListener('scroll', updateScrollIndicators);
+            window.addEventListener('resize', updateScrollIndicators); // Update on resize
+
+            // Mouse wheel scroll
+            tabsWrapper.addEventListener('wheel', (event) => {
+                if (event.deltaY !== 0) {
+                    event.preventDefault();
+                    tabsWrapper.scrollLeft += event.deltaY * 2; // Adjust multiplier as needed
+                }
+            });
+
+            // Touch and drag scroll
+            let isDragging = false;
+            let startX;
+            let scrollLeftStart;
+
+            tabsWrapper.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startX = e.touches[0].pageX - tabsWrapper.offsetLeft;
+                scrollLeftStart = tabsWrapper.scrollLeft;
+                tabsWrapper.style.scrollBehavior = 'auto'; // Disable smooth scroll during drag
+                tabsWrapper.style.cursor = 'grabbing';
+            });
+
+            tabsWrapper.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.touches[0].pageX - tabsWrapper.offsetLeft;
+                const walk = (x - startX) * 1.5; // Drag speed multiplier
+                tabsWrapper.scrollLeft = scrollLeftStart - walk;
+                updateScrollIndicators();
+            });
+
+            tabsWrapper.addEventListener('touchend', () => {
+                isDragging = false;
+                tabsWrapper.style.scrollBehavior = 'smooth';
+                tabsWrapper.style.cursor = 'grab';
+                 // Final update to ensure indicators are correct
+                setTimeout(updateScrollIndicators, 50);
+            });
+
+            // Mouse drag scroll (similar to touch)
+            tabsWrapper.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - tabsWrapper.offsetLeft;
+                scrollLeftStart = tabsWrapper.scrollLeft;
+                tabsWrapper.style.scrollBehavior = 'auto';
+                tabsWrapper.style.cursor = 'grabbing';
+                e.preventDefault(); // Prevent text selection
+            });
+
+            tabsWrapper.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - tabsWrapper.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                tabsWrapper.scrollLeft = scrollLeftStart - walk;
+                updateScrollIndicators();
+            });
+
+            document.addEventListener('mouseup', () => { // Listen on document to catch mouseup outside wrapper
+                if (!isDragging) return;
+                isDragging = false;
+                tabsWrapper.style.scrollBehavior = 'smooth';
+                tabsWrapper.style.cursor = 'grab';
+                setTimeout(updateScrollIndicators, 50);
+            });
+            tabsWrapper.addEventListener('mouseleave', () => { // Also stop dragging if mouse leaves wrapper
+                 if (!isDragging) return;
+                isDragging = false;
+                tabsWrapper.style.scrollBehavior = 'smooth';
+                tabsWrapper.style.cursor = 'grab';
+                setTimeout(updateScrollIndicators, 50);
+            });
+
+
+            // Initial check
+            updateScrollIndicators();
+        }
+        // Update renderCategoryTabs and selectCategory to call updateScrollIndicators
+        function renderCategoryTabsOriginal() { // Keep original for clarity before modification
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = `category-tab ${selectedCategory === category.id ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(category.id);
+                tabsContainer.appendChild(tab);
+            });
+        }
+        // Modify renderCategoryTabs
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = `category-tab ${selectedCategory === category.id ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(category.id);
+                tabsContainer.appendChild(tab);
+            });
+            setTimeout(updateScrollIndicators, 100); // Added
+        }
+
+        // Modify selectCategory
+        function selectCategoryOriginal(categoryId) { // Keep original for clarity
+            selectedCategory = categoryId;
+            const topics = topicsByCategory[categoryId];
+            if (topics && topics.length > 0) {
+                selectedTopic = topics[0].id;
+            }
+            render();
+        }
+         function selectCategory(categoryId) {
+            selectedCategory = categoryId;
+            const topics = topicsByCategory[categoryId];
+            if (topics && topics.length > 0) {
+                selectedTopic = topics[0].id; // Default to first topic in new category
+            } else {
+                selectedTopic = null; // Or handle empty category appropriately
+            }
+            render(); // This will call renderCategoryTabs, renderTopics, renderTopicContent
+            setTimeout(updateScrollIndicators, 150); // Added
+        }
+
+
     </script>
 </body>
 </html>

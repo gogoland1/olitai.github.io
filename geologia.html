@@ -142,28 +142,37 @@
 
         /* Pestañas de categorías */
         .category-tabs {
-            overflow-x: auto !important; /* Ensuring this is prioritized */
+            position: relative;
+            overflow: hidden; /* Changed from auto to hidden */
             background: rgba(239, 235, 220, 0.8); /* Earthy: Lighter beige */
-            display: block; /* Or ensure it's a block-level element that can constrain its child */
-            width: 100%; /* Ensure it takes available width to constrain the child */
-            -webkit-overflow-scrolling: touch; /* For smoother scrolling on touch devices */
-            scrollbar-width: thin; /* Makes scrollbar thinner */
-            scrollbar-color: #888888 #e0e0e0; /* thumb color, track color */
+            width: 100%;
+        }
+
+        .category-tabs-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: #a1887f rgba(43, 29, 14, 0.5); /* tan thumb, dark brown track */
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         .category-tabs-container {
-            display: flex !important; /* Ensuring this is prioritized */
-            border-bottom: 1px solid #d7ccc8; /* Earthy: Light brown border */
-            min-width: max-content !important; /* Crucial for allowing overflow */
-            flex-wrap: nowrap !important; /* Prevent tabs from wrapping to new lines */
+            display: flex !important;
+            border-bottom: 1px solid #d7ccc8; /* Earthy: Light brown border, kept */
+            min-width: max-content !important;
+            flex-wrap: nowrap !important;
+            width: max-content; /* Added from other implementations */
         }
 
         .category-tab {
-            padding: 1rem 1.5rem;
-            font-size: 0.9rem;
+            padding: 1.2rem 1.8rem; /* Changed */
+            font-size: 0.95rem; /* Changed */
             font-weight: 600;
-            white-space: nowrap; /* Re-instate to prevent text inside tabs from wrapping */
-            flex-shrink: 0; /* Prevent tabs from shrinking */
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: fit-content; /* Added */
+            text-align: center; /* Added */
             background: none;
             border: none;
             cursor: pointer;
@@ -443,26 +452,63 @@
         }
 
         /* Scrollbar Styling for WebKit browsers (Chrome, Safari, new Edge) */
-        .category-tabs::-webkit-scrollbar {
-            height: 10px; /* Height of the horizontal scrollbar */
-            background-color: transparent; /* Optional: make scrollbar background transparent */
-        }
-        .category-tabs::-webkit-scrollbar-track {
-            background: #e0e0e0; /* Light grey track, slightly different from #f1f1f1 */
-            border-radius: 10px;
-            margin: 0 5px; /* Optional: add some margin to the track */
-        }
-        .category-tabs::-webkit-scrollbar-thumb {
-            background: #888888; /* Standard grey thumb */
-            border-radius: 10px;
-            border: 2px solid #e0e0e0; /* Creates a thin border around thumb, matching track */
-        }
-        .category-tabs::-webkit-scrollbar-thumb:hover {
-            background: #555555; /* Darker thumb on hover */
-        }
+        /* MOVED to .category-tabs-wrapper */
 
         /* Scrollbar Styling for Firefox */
-        /* Firefox scrollbar properties moved into the main .category-tabs rule above */
+        /* Firefox scrollbar properties moved into the main .category-tabs-wrapper rule */
+
+        .scroll-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: rgba(121, 85, 72, 0.8); /* brown from earthy theme */
+            color: #f5f5f5; /* light text from earthy theme */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-size: 0.8rem;
+        }
+
+        .scroll-indicator:hover {
+            background: rgba(121, 85, 72, 1); /* darker brown */
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .scroll-indicator.left {
+            left: 10px;
+        }
+
+        .scroll-indicator.right {
+            right: 10px;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* WebKit scrollbar styles for .category-tabs-wrapper - Adapted for Earthy Theme */
+        .category-tabs-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        .category-tabs-wrapper::-webkit-scrollbar-track {
+            background: rgba(43, 29, 14, 0.5); /* dark brown track */
+            border-radius: 4px;
+        }
+        .category-tabs-wrapper::-webkit-scrollbar-thumb {
+            background: #a1887f; /* tan thumb */
+            border-radius: 4px;
+            border: 1px solid rgba(43, 29, 14, 0.5); /* dark brown border for thumb */
+        }
+        .category-tabs-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #8d6e63; /* darker tan thumb on hover */
+        }
     </style>
 </head>
 <body>
@@ -500,8 +546,16 @@
 
             <!-- Pestañas de categorías -->
             <div class="category-tabs">
-                <div class="category-tabs-container" id="categoryTabs">
-                    <!-- Las pestañas se generarán dinámicamente -->
+                <div class="scroll-indicator left hidden" id="scrollLeft">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="scroll-indicator right" id="scrollRight">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="category-tabs-wrapper" id="tabsWrapper">
+                    <div class="category-tabs-container" id="categoryTabs">
+                        <!-- Las pestañas se generarán dinámicamente aquí -->
+                    </div>
                 </div>
             </div>
 
@@ -534,11 +588,11 @@
     <script>
         // Datos de la aplicación (mantienes el mismo contenido)
         const categories = [
-            { id: "fase1", name: "FASE I: FUNDAMENTOS DE GEOLOGÍA PARA OCEANOGRAFÍA" },
-            { id: "fase2", name: "FASE II: OCEANOGRAFÍA GEOLÓGICA INTERMEDIA" },
-            { id: "fase3", name: "FASE III: OCEANOGRAFÍA GEOLÓGICA AVANZADA" },
-            { id: "fase4", name: "FASE IV: TÉCNICAS AVANZADAS Y APLICACIONES" },
-            { id: "fase5", name: "FASE V: APLICACIONES INTEGRADAS Y PROYECTOS" }
+            { id: "fase1", name: "FASE I: FUNDAMENTOS" },
+            { id: "fase2", name: "FASE II: INTERMEDIA" },
+            { id: "fase3", name: "FASE III: AVANZADA" },
+            { id: "fase4", name: "FASE IV: TÉCNICAS APLIC." },
+            { id: "fase5", name: "FASE V: APLIC. INTEGRADAS" }
         ];
 
         const topicsByCategory = {
@@ -1248,7 +1302,153 @@
         document.addEventListener('DOMContentLoaded', function() {
             render();
             initBackToTop();
+            initScrollControls(); // Added
+            setTimeout(updateScrollIndicators, 200); // Added
         });
+
+        // Funciones para el control del scroll de pestañas
+        function updateScrollIndicators() {
+            const tabsWrapper = document.getElementById('tabsWrapper');
+            const scrollLeftBtn = document.getElementById('scrollLeft');
+            const scrollRightBtn = document.getElementById('scrollRight');
+
+            if (!tabsWrapper || !scrollLeftBtn || !scrollRightBtn) return;
+
+            const maxScrollLeft = tabsWrapper.scrollWidth - tabsWrapper.clientWidth;
+
+            if (tabsWrapper.scrollLeft > 5) { // Small tolerance for left
+                scrollLeftBtn.classList.remove('hidden');
+            } else {
+                scrollLeftBtn.classList.add('hidden');
+            }
+
+            if (tabsWrapper.scrollLeft < maxScrollLeft - 5) { // Small tolerance for right
+                scrollRightBtn.classList.remove('hidden');
+            } else {
+                scrollRightBtn.classList.add('hidden');
+            }
+        }
+
+        function initScrollControls() {
+            const tabsWrapper = document.getElementById('tabsWrapper');
+            const scrollLeftBtn = document.getElementById('scrollLeft');
+            const scrollRightBtn = document.getElementById('scrollRight');
+
+            if (!tabsWrapper || !scrollLeftBtn || !scrollRightBtn) return;
+
+            scrollLeftBtn.addEventListener('click', () => {
+                tabsWrapper.scrollBy({ left: -200, behavior: 'smooth' });
+            });
+
+            scrollRightBtn.addEventListener('click', () => {
+                tabsWrapper.scrollBy({ left: 200, behavior: 'smooth' });
+            });
+
+            tabsWrapper.addEventListener('scroll', updateScrollIndicators);
+            window.addEventListener('resize', updateScrollIndicators);
+
+            // Mouse wheel scroll
+            tabsWrapper.addEventListener('wheel', (event) => {
+                if (event.deltaY !== 0) {
+                    event.preventDefault();
+                    tabsWrapper.scrollLeft += event.deltaY * 2;
+                }
+            });
+
+            // Touch and drag scroll
+            let isDragging = false;
+            let startX;
+            let scrollLeftStart;
+
+            tabsWrapper.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startX = e.touches[0].pageX - tabsWrapper.offsetLeft;
+                scrollLeftStart = tabsWrapper.scrollLeft;
+                tabsWrapper.style.scrollBehavior = 'auto';
+                tabsWrapper.style.cursor = 'grabbing';
+            }, { passive: false }); // Allow preventDefault
+
+            tabsWrapper.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.touches[0].pageX - tabsWrapper.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                tabsWrapper.scrollLeft = scrollLeftStart - walk;
+                updateScrollIndicators();
+            }, { passive: false }); // Allow preventDefault
+
+            tabsWrapper.addEventListener('touchend', () => {
+                if (!isDragging) return;
+                isDragging = false;
+                tabsWrapper.style.scrollBehavior = 'smooth';
+                tabsWrapper.style.cursor = 'grab';
+                setTimeout(updateScrollIndicators, 50);
+            });
+
+            // Mouse drag scroll
+            tabsWrapper.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - tabsWrapper.offsetLeft;
+                scrollLeftStart = tabsWrapper.scrollLeft;
+                tabsWrapper.style.scrollBehavior = 'auto';
+                tabsWrapper.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+
+            tabsWrapper.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - tabsWrapper.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                tabsWrapper.scrollLeft = scrollLeftStart - walk;
+                updateScrollIndicators();
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (!isDragging) return;
+                isDragging = false;
+                tabsWrapper.style.scrollBehavior = 'smooth';
+                tabsWrapper.style.cursor = 'grab';
+                setTimeout(updateScrollIndicators, 50);
+            });
+            tabsWrapper.addEventListener('mouseleave', () => {
+                 if (!isDragging) return;
+                isDragging = false;
+                tabsWrapper.style.scrollBehavior = 'smooth';
+                tabsWrapper.style.cursor = 'grab';
+                setTimeout(updateScrollIndicators, 50);
+            });
+
+            updateScrollIndicators(); // Initial check
+        }
+
+        // Modify renderCategoryTabs
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = `category-tab ${selectedCategory === category.id ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(category.id);
+                tabsContainer.appendChild(tab);
+            });
+            setTimeout(updateScrollIndicators, 100); // Added
+        }
+
+        // Modify selectCategory
+         function selectCategory(categoryId) {
+            selectedCategory = categoryId;
+            const topics = topicsByCategory[categoryId];
+            if (topics && topics.length > 0) {
+                selectedTopic = topics[0].id;
+            } else {
+                selectedTopic = null;
+            }
+            render();
+            setTimeout(updateScrollIndicators, 150); // Added
+        }
     </script>
 </body>
 </html>
