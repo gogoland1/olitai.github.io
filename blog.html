@@ -6,103 +6,9 @@
     <title>Blog - OlitAI</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <div class="bg-overlay"></div>
-
-     <header>
-        <div class="logo">OlitAI</div>
-        <nav>
-            <ul>
-                <li><a href="./index.html">Inicio</a></li>
-                <li><a href="./blog.html">Blog</a></li>
-                <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
-                <li><a href="./biologia_marina_pagina.html">Biologia Marina</a></li>
-                <li><a href="./fisica_integrated.html">Oceanografía Física</a></li>
-                <li><a href="./geologia.html">Geología Marina</a></li>
-                <li><a href="./chemistry_slider_fix.html">Química Marina</a></li>
-                <li><a href="./about.html" class="active">Acerca de</a></li>
-            </ul>
-        </nav>
-        <div class="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </div>
-    </header>
+    
+    <!-- Estilos específicos solo para el blog -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* Fondo oceánico similar al index */
-        .bg-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://i.imgur.com/kI72GlX.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            filter: brightness(0.5) saturate(1.0) hue-rotate(40deg); /* Green: Adjusted for greener tint */
-            z-index: -2;
-        }
-
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #0066cc;
-        }
-
-        .hero {
-            text-align: center;
-            color: white;
-            margin-bottom: 3rem;
-        }
-
-        .main-title {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-        }
-
         /* Sistema de pestañas para capítulos */
         .chapter-tabs {
             display: flex;
@@ -418,15 +324,34 @@
                 font-size: 2.5em;
             }
 
-            .main-title {
-                font-size: 2.5rem;
-            }
-
             .blog-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
+</head>
+
+<!-- PASO 2: Reemplaza todo el <header> de blog.html con esto EXACTO: -->
+<header>
+    <div class="logo">OlitAI</div>
+    <nav>
+        <ul>
+            <li><a href="./index.html">Inicio</a></li>
+            <li><a href="./blog.html" class="active">Blog</a></li>
+            <li><a href="./oceano-ritmos.html">Oceano-ritmos</a></li>
+            <li><a href="./biologia_marina_pagina.html">Biologia Marina</a></li>
+            <li><a href="./fisica_integrated.html">Oceanografía Física</a></li>
+            <li><a href="./geologia.html">Geología Marina</a></li>
+            <li><a href="./chemistry_slider_fix.html">Química Marina</a></li>
+            <li><a href="./about.html">Acerca de</a></li>
+        </ul>
+    </nav>
+    <div class="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </div>
+</header>
+<!-- PASO 3: Asegurar que al final del <body> tengas: -->
+<script src="./js/script.js"></script>
 
     <main>
         <section class="hero">
