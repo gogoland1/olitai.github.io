@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Completa de Zooplancton - OlitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0B1929 0%, #1E3A5F 50%, #2E5984 100%);
+            color: #E8F4FD;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Fondo oceánico */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/kI72GlX.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.3) saturate(1.2) hue-rotate(200deg);
+            z-index: -2;
+        }
+
+        .darken-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(11, 25, 41, 0.4) 0%, rgba(11, 25, 41, 0.8) 100%);
+            z-index: -1;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(11, 25, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #3498DB;
+            text-decoration: none;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #3498DB, #2980B9);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: rgba(232, 244, 253, 0.05);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3498DB, #85C1E9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Navegación de secciones */
+        .section-nav {
+            background: rgba(232, 244, 253, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            position: sticky;
+            top: 120px;
+            z-index: 100;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            color: #E8F4FD;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .nav-tab:hover {
+            background: rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #3498DB, #2980B9);
+            border-color: #3498DB;
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Secciones de contenido */
+        .content-section {
+            display: none;
+            background: rgba(232, 244, 253, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #3498DB;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-content {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .info-card {
+            background: rgba(232, 244, 253, 0.08);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(133, 193, 233, 0.3);
+        }
+
+        .info-card h3 {
+            color: #85C1E9;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card p, .info-card li {
+            color: #D6EAF8;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .info-list {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .info-list li {
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .list-icon {
+            color: #3498DB;
+            font-weight: bold;
+            margin-top: 0.2rem;
+        }
+
+        /* Grid layouts */
+        .two-column {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .three-column {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        /* Phylogeny tree */
+        .phylogeny-container {
+            background: rgba(232, 244, 253, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .phylogeny-tree {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            text-align: left;
+            background: rgba(11, 25, 41, 0.5);
+            padding: 1.5rem;
+            border-radius: 10px;
+            color: #85C1E9;
+            overflow-x: auto;
+        }
+
+        /* Identification guide */
+        .id-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .id-card {
+            background: rgba(232, 244, 253, 0.08);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border-left: 4px solid #3498DB;
+            transition: all 0.3s;
+        }
+
+        .id-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.2);
+        }
+
+        .id-card h4 {
+            color: #3498DB;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                text-align: center;
+            }
+
+            .section-content.two-column,
+            .section-content.three-column {
+                grid-template-columns: 1fr;
+            }
+
+            .section-nav {
+                position: relative;
+                top: auto;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Botón flotante de volver arriba */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #3498DB, #2980B9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Estilos para destacar características importantes */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(133, 193, 233, 0.1));
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .highlight-box h4 {
+            color: #3498DB;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Tablas para comparación */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: rgba(232, 244, 253, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .comparison-table th {
+            background: rgba(52, 152, 219, 0.2);
+            color: #E8F4FD;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            color: #D6EAF8;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="darken-overlay"></div>
+
+    <header>
+        <div class="nav-container">
+            <a href="javascript:history.back()" class="logo">
+                <i class="fas fa-microscope"></i> Zooplancton
+            </a>
+            <a href="javascript:history.back()" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver a Biología Marina
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1><i class="fas fa-water"></i> Guía Completa de Zooplancton</h1>
+            <p>Descubre el fascinante mundo de los organismos microscópicos que forman la base de la vida marina. 
+               Aprende sobre su diversidad, morfología, ciclos de vida y importancia ecológica.</p>
+        </div>
+
+        <!-- Navegación de secciones -->
+        <nav class="section-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('introduccion')">
+                    <i class="fas fa-info-circle"></i> Introducción
+                </button>
+                <button class="nav-tab" onclick="showSection('clasificacion')">
+                    <i class="fas fa-sitemap"></i> Clasificación
+                </button>
+                <button class="nav-tab" onclick="showSection('muestreo')">
+                    <i class="fas fa-flask"></i> Muestreo
+                </button>
+                <button class="nav-tab" onclick="showSection('grupos')">
+                    <i class="fas fa-dna"></i> Grupos Principales
+                </button>
+                <button class="nav-tab" onclick="showSection('identificacion')">
+                    <i class="fas fa-search"></i> Identificación
+                </button>
+                <button class="nav-tab" onclick="showSection('morfologia')">
+                    <i class="fas fa-eye"></i> Morfología
+                </button>
+                <button class="nav-tab" onclick="showSection('ciclos')">
+                    <i class="fas fa-sync-alt"></i> Ciclos de Vida
+                </button>
+            </div>
+        </nav>
+
+        <!-- Sección: Introducción -->
+        <section id="introduccion" class="content-section active">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                ¿Qué es el Zooplancton?
+            </h2>
+            <div class="section-content two-column">
+                <div class="info-card">
+                    <h3><i class="fas fa-lightbulb"></i> Definición</h3>
+                    <p>El zooplancton son organismos animales microscópicos y macroscópicos que flotan o derivan en la columna de agua. 
+                       Son fundamentales en las redes tróficas marinas y comprenden desde organismos unicelulares hasta grandes medusas.</p>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-star"></i> Características Clave</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">•</span> Vida planctónica (flotación/deriva)</li>
+                            <li><span class="list-icon">•</span> Tamaños desde 0.2 mm hasta metros</li>
+                            <li><span class="list-icon">•</span> Representan todos los phyla animales</li>
+                            <li><span class="list-icon">•</span> Base de las cadenas alimentarias marinas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-layer-group"></i> Tipos de Zooplancton</h3>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-clock"></i> Por Duración de Vida Planctónica</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔄</span> <strong>Holoplancton:</strong> Toda su vida en el plancton (copépodos, krill, medusas)</li>
+                            <li><span class="list-icon">⏱️</span> <strong>Meroplancton:</strong> Solo parte de su vida (larvas de peces, cangrejos, estrellas de mar)</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-ruler"></i> Por Tamaño</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔬</span> <strong>Microzooplancton:</strong> 20-200 μm</li>
+                            <li><span class="list-icon">👁️</span> <strong>Mesozooplancton:</strong> 0.2-20 mm</li>
+                            <li><span class="list-icon">🦐</span> <strong>Macrozooplancton:</strong> 2-20 cm</li>
+                            <li><span class="list-icon">🎐</span> <strong>Megaplancton:</strong> >20 cm</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-globe"></i> Importancia Ecológica</h3>
+                <div class="section-content three-column">
+                    <div>
+                        <h4><i class="fas fa-link"></i> Red Trófica</h4>
+                        <p>Eslabón crucial entre productores primarios (fitoplancton) y consumidores superiores (peces, ballenas)</p>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-recycle"></i> Ciclado de Nutrientes</h4>
+                        <p>Transporte vertical de nutrientes y materia orgánica entre diferentes profundidades</p>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-thermometer-half"></i> Cambio Climático</h4>
+                        <p>Indicadores sensibles de cambios oceanográficos y climáticos globales</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Clasificación -->
+        <section id="clasificacion" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-sitemap"></i>
+                Clasificación y Filogenia
+            </h2>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-tree"></i> Árbol Filogenético del Zooplancton</h3>
+                <p>El zooplancton representa prácticamente todos los phyla animales. A continuación se muestra su relación evolutiva:</p>
+                
+                <div class="phylogeny-container">
+                    <div class="phylogeny-tree">
+REINO ANIMALIA
+│
+├── PROTOSTOMADOS
+│   ├── Phylum CNIDARIA
+│   │   ├── Clase Hydrozoa (medusas, sifonóforos)
+│   │   └── Clase Scyphozoa (medusas verdaderas)
+│   │
+│   ├── Phylum MOLLUSCA
+│   │   ├── Gastropoda (caracoles marinos, pterópodos)
+│   │   ├── Bivalvia (larvas de mejillones, ostras)
+│   │   └── Cephalopoda (larvas de calamares, pulpos)
+│   │
+│   ├── Phylum ANNELIDA
+│   │   └── Polychaeta (gusanos marinos, larvas)
+│   │
+│   └── Phylum ARTHROPODA
+│       └── Subphylum CRUSTACEA
+│           ├── Clase Copepoda (copépodos)
+│           ├── Clase Malacostraca
+│           │   ├── Euphausiacea (krill)
+│           │   ├── Decapoda (larvas de camarones, cangrejos)
+│           │   ├── Amphipoda (anfípodos)
+│           │   └── Mysida (mysidos)
+│           ├── Clase Ostracoda (ostrácodos)
+│           ├── Clase Cirripedia (larvas de percebes)
+│           └── Clase Branchiopoda (cladóceros)
+│
+└── DEUTEROSTOMADOS
+    ├── Phylum ECHINODERMATA
+    │   └── Larvas pluteus (estrellas de mar, erizos)
+    │
+    ├── Phylum CHAETOGNATHA
+    │   └── Gusanos flecha
+    │
+    ├── Phylum BRYOZOA
+    │   └── Larvas cyphonautes
+    │
+    └── Phylum CHORDATA
+        ├── Subphylum Tunicata
+        │   ├── Clase Appendicularia (larváceos)
+        │   └── Clase Thaliacea (salpas, dolíolidos)
+        └── Subphylum Vertebrata
+            └── Clase Osteichthyes (huevos y larvas de peces)
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-content two-column">
+                <div class="info-card">
+                    <h3><i class="fas fa-chart-pie"></i> Diversidad Numérica</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Phylum</th>
+                                <th>Especies Marinas</th>
+                                <th>% Planctónicas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Crustacea</td><td>44,950</td><td>~40%</td></tr>
+                            <tr><td>Mollusca</td><td>52,525</td><td>~15%</td></tr>
+                            <tr><td>Chordata</td><td>21,513</td><td>~80% (larvas)</td></tr>
+                            <tr><td>Annelida</td><td>12,000</td><td>~25%</td></tr>
+                            <tr><td>Cnidaria</td><td>10,000</td><td>~60%</td></tr>
+                            <tr><td>Echinodermata</td><td>7,000</td><td>~95% (larvas)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-water"></i> Distribución por Ambientes</h3>
+                    <ul class="info-list">
+                        <li><span class="list-icon">🌊</span> <strong>Nerítico:</strong> Copépodos, cladóceros, larvas bentónicas</li>
+                        <li><span class="list-icon">🌀</span> <strong>Oceánico:</strong> Sifonóforos, salpas, quetognatos</li>
+                        <li><span class="list-icon">❄️</span> <strong>Polar:</strong> Krill antártico, copépodos árticos</li>
+                        <li><span class="list-icon">🌴</span> <strong>Tropical:</strong> Pterópodos, dolíolidos, appendicularias</li>
+                        <li><span class="list-icon">🕳️</span> <strong>Abisal:</strong> Misidáceos, anfípodos, copépodos</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Muestreo -->
+        <section id="muestreo" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-flask"></i>
+                Métodos de Muestreo e Identificación
+            </h2>
+
+            <div class="section-content two-column">
+                <div class="info-card">
+                    <h3><i class="fas fa-net-wired"></i> Redes de Plancton</h3>
+                    <p>Las redes de malla son el método estándar para la recolección de zooplancton.</p>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-cog"></i> Características de las Redes</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">📏</span> <strong>Malla:</strong> 50-500 μm (comúnmente 200 μm)</li>
+                            <li><span class="list-icon">🎯</span> <strong>Selectividad:</strong> Depende del tamaño de malla</li>
+                            <li><span class="list-icon">🌊</span> <strong>Tipos de arrastre:</strong> Horizontal, vertical, oblicuo</li>
+                            <li><span class="list-icon">⚡</span> <strong>Velocidad:</strong> 1-3 nudos para evitar escape</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Consideraciones</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔬</span> Malla fina: retiene más especies pero se obstruye</li>
+                            <li><span class="list-icon">🏃</span> Malla gruesa: organismos rápidos pueden escapar</li>
+                            <li><span class="list-icon">⏰</span> Muestreo nocturno: migración vertical diaria</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-microscope"></i> Técnicas de Identificación</h3>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-eye"></i> Microscopía</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔍</span> <strong>Estereomicroscopio:</strong> Identificación preliminar</li>
+                            <li><span class="list-icon">🔬</span> <strong>Microscopio compuesto:</strong> Detalles morfológicos</li>
+                            <li><span class="list-icon">⚡</span> <strong>Microscopio electrónico:</strong> Ultraestructura</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-dna"></i> Técnicas Moleculares</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🧬</span> <strong>DNA Barcoding:</strong> Identificación genética</li>
+                            <li><span class="list-icon">🌍</span> <strong>eDNA Metabarcoding:</strong> Comunidades completas</li>
+                            <li><span class="list-icon">📊</span> <strong>Filogenia molecular:</strong> Relaciones evolutivas</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-robot"></i> Métodos Automatizados</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">📷</span> <strong>Imagen digital:</strong> Análisis automático</li>
+                            <li><span class="list-icon">🎵</span> <strong>Bioacústica:</strong> Detección de krill</li>
+                            <li><span class="list-icon">🚀</span> <strong>Sensores remotos:</strong> Distribución espacial</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-tools"></i> Equipo Básico de Laboratorio</h3>
+                <div class="section-content three-column">
+                    <div>
+                        <h4><i class="fas fa-vials"></i> Preservación</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🧪</span> Formalina 4-10%</li>
+                            <li><span class="list-icon">🍶</span> Etanol 70-95%</li>
+                            <li><span class="list-icon">❄️</span> Congelación (-80°C)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-sort"></i> Separación</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🥄</span> Bandeja Bogorov</li>
+                            <li><span class="list-icon">💧</span> Pipetas Pasteur</li>
+                            <li><span class="list-icon">⚖️</span> Balanza analítica</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-camera"></i> Documentación</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">📸</span> Cámara digital</li>
+                            <li><span class="list-icon">📏</span> Micrómetro ocular</li>
+                            <li><span class="list-icon">💻</span> Software de análisis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Grupos Principales -->
+        <section id="grupos" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-dna"></i>
+                Grupos Taxonómicos Principales
+            </h2>
+
+            <div class="id-guide">
+                <!-- Copépodos -->
+                <div class="id-card">
+                    <h4><i class="fas fa-bug"></i> COPÉPODOS (Crustacea)</h4>
+                    <p><strong>Los más abundantes del zooplancton</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 0.2-10 mm</li>
+                        <li><span class="list-icon">🎯</span> Forma: Bullet-shaped, cuerpo segmentado</li>
+                        <li><span class="list-icon">🏊</span> Antenas: Largas, natatorias</li>
+                        <li><span class="list-icon">🔄</span> Ciclo: Nauplio → Copepodito → Adulto</li>
+                        <li><span class="list-icon">🌍</span> Hábitat: Todos los océanos</li>
+                    </ul>
+                    <p><strong>Órdenes principales:</strong> Calanoida, Cyclopoida, Harpacticoida</p>
+                </div>
+
+                <!-- Krill -->
+                <div class="id-card">
+                    <h4><i class="fas fa-shrimp"></i> KRILL (Euphausiacea)</h4>
+                    <p><strong>Crustáceos similares a camarones</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 5-60 mm</li>
+                        <li><span class="list-icon">✨</span> Características: Fotóforos, branquias externas</li>
+                        <li><span class="list-icon">👁️</span> Ojos: Grandes, compuestos</li>
+                        <li><span class="list-icon">🌙</span> Comportamiento: Migraciones verticales</li>
+                        <li><span class="list-icon">🐋</span> Importancia: Alimento de ballenas</li>
+                    </ul>
+                    <p><strong>Especie clave:</strong> Euphausia superba (krill antártico)</p>
+                </div>
+
+                <!-- Medusas -->
+                <div class="id-card">
+                    <h4><i class="fas fa-circle"></i> MEDUSAS (Cnidaria)</h4>
+                    <p><strong>Cnidarios gelatinosos</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 1 mm - 2 m</li>
+                        <li><span class="list-icon">☂️</span> Forma: Umbrella, campana</li>
+                        <li><span class="list-icon">⚡</span> Defensa: Células urticantes</li>
+                        <li><span class="list-icon">🔄</span> Ciclo: Pólipo → Medusa</li>
+                        <li><span class="list-icon">🎐</span> Grupos: Hydromedusae, Scyphomedusae</li>
+                    </ul>
+                    <p><strong>Incluye:</strong> Sifonóforos (organismos coloniales)</p>
+                </div>
+
+                <!-- Quetognatos -->
+                <div class="id-card">
+                    <h4><i class="fas fa-arrow-right"></i> QUETOGNATOS (Chaetognatha)</h4>
+                    <p><strong>Gusanos flecha</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 2-120 mm</li>
+                        <li><span class="list-icon">➡️</span> Forma: Torpedo, transparentes</li>
+                        <li><span class="list-icon">🗡️</span> Ganchos: Quitinosos para capturar presas</li>
+                        <li><span class="list-icon">🏊</span> Aletas: Laterales y caudal</li>
+                        <li><span class="list-icon">🎯</span> Depredadores: Activos, hermafroditas</li>
+                    </ul>
+                    <p><strong>Género común:</strong> Sagitta</p>
+                </div>
+
+                <!-- Salpas -->
+                <div class="id-card">
+                    <h4><i class="fas fa-capsules"></i> SALPAS (Tunicata)</h4>
+                    <p><strong>Tunicados pelágicos</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 1-30 cm</li>
+                        <li><span class="list-icon">🎯</span> Forma: Barril, transparente</li>
+                        <li><span class="list-icon">💨</span> Locomoción: Propulsión a chorro</li>
+                        <li><span class="list-icon">🔄</span> Reproducción: Alternancia generacional</li>
+                        <li><span class="list-icon">🌊</span> Filtración: Mucus para capturar alimento</li>
+                    </ul>
+                    <p><strong>Formas:</strong> Solitarias y coloniales en cadenas</p>
+                </div>
+
+                <!-- Appendicularias -->
+                <div class="id-card">
+                    <h4><i class="fas fa-tadpole"></i> APPENDICULARIAS (Tunicata)</h4>
+                    <p><strong>Larváceos</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 0.5-5 mm (cuerpo)</li>
+                        <li><span class="list-icon">🐸</span> Forma: Renacuajo</li>
+                        <li><span class="list-icon">🏠</span> Casa: Filtro mucoso complejo</li>
+                        <li><span class="list-icon">🔄</span> Renovación: Casa cada 4 horas</li>
+                        <li><span class="list-icon">🌱</span> Filtración: Nanoplancton</li>
+                    </ul>
+                    <p><strong>Género común:</strong> Oikopleura</p>
+                </div>
+
+                <!-- Pterópodos -->
+                <div class="id-card">
+                    <h4><i class="fas fa-wing"></i> PTERÓPODOS (Mollusca)</h4>
+                    <p><strong>Caracoles nadadores</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 1-50 mm</li>
+                        <li><span class="list-icon">🦋</span> Aletas: Parapodios natatorios</li>
+                        <li><span class="list-icon">🐚</span> Concha: Presente o ausente</li>
+                        <li><span class="list-icon">🧬</span> Tipos: Thecosomata, Gymnosomata</li>
+                        <li><span class="list-icon">⚠️</span> Amenaza: Acidificación oceánica</li>
+                    </ul>
+                    <p><strong>Grupos:</strong> Con concha y sin concha</p>
+                </div>
+
+                <!-- Larvas de Peces -->
+                <div class="id-card">
+                    <h4><i class="fas fa-fish"></i> LARVAS DE PECES (Vertebrata)</h4>
+                    <p><strong>Ictioplancton</strong></p>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> Tamaño: 2-30 mm</li>
+                        <li><span class="list-icon">🥚</span> Estadios: Huevo → Larva → Juvenil</li>
+                        <li><span class="list-icon">👁️</span> Características: Ojos grandes, aletas</li>
+                        <li><span class="list-icon">🏊</span> Desarrollo: Gradual de capacidades</li>
+                        <li><span class="list-icon">🐟</span> Diversidad: Todas las especies marinas</li>
+                    </ul>
+                    <p><strong>Identificación:</strong> Morfología específica por familia</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Identificación -->
+        <section id="identificacion" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-search"></i>
+                Guía de Identificación Rápida
+            </h2>
+
+            <div class="info-card">
+                <h3><i class="fas fa-key"></i> Clave de Identificación Básica</h3>
+                <p>Sigue esta secuencia para identificar organismos zooplanctónicos:</p>
+                
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 1: ¿Tiene exoesqueleto duro y articulado?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">✅</span> <strong>SÍ:</strong> Probablemente CRUSTÁCEO (ir a Paso 2)</li>
+                        <li><span class="list-icon">❌</span> <strong>NO:</strong> Ir a Paso 5</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 2: ¿Es grande y tipo camarón?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">🦐</span> <strong>SÍ, con ojos grandes:</strong> KRILL (Euphausiacea)</li>
+                        <li><span class="list-icon">🦀</span> <strong>SÍ, con pinzas grandes:</strong> LARVA DE CANGREJO (Decapoda)</li>
+                        <li><span class="list-icon">🔢</span> <strong>NO, pequeño y bullet-shaped:</strong> COPÉPODO</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 3: Copépodos - ¿Forma de antenas?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">📏</span> <strong>Largas como el cuerpo:</strong> CALANOIDA</li>
+                        <li><span class="list-icon">📐</span> <strong>Cortas, cuerpo ancho:</strong> CYCLOPOIDA</li>
+                        <li><span class="list-icon">📌</span> <strong>Muy cortas, cuerpo delgado:</strong> HARPACTICOIDA</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 4: ¿Tiene concha bivalva?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">👁️</span> <strong>Con ojo grande:</strong> CLADÓCERO</li>
+                        <li><span class="list-icon">📍</span> <strong>Con punto en un extremo:</strong> OSTRÁCODO</li>
+                        <li><span class="list-icon">👶</span> <strong>Sin punto, con ojo:</strong> LARVA DE PERCEBE</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 5: ¿Es blando y gelatinoso?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">☂️</span> <strong>Forma de campana:</strong> MEDUSA</li>
+                        <li><span class="list-icon">🎯</span> <strong>Barril con bandas:</strong> SALPA/DOLÍOLIDO</li>
+                        <li><span class="list-icon">🐸</span> <strong>Forma de renacuajo:</strong> APPENDICULARIA</li>
+                        <li><span class="list-icon">➡️</span> <strong>Torpedo transparente:</strong> QUETOGNATO</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 6: ¿Tiene concha única?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">🐌</span> <strong>Caracol con "alas":</strong> PTERÓPODO</li>
+                        <li><span class="list-icon">🐚</span> <strong>Caracol normal:</strong> GASTRÓPODO</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4><i class="fas fa-step-forward"></i> Paso 7: ¿Parece pez pequeño?</h4>
+                    <ul class="info-list">
+                        <li><span class="list-icon">👁️</span> <strong>Con ojos y aletas:</strong> LARVA DE PEZ</li>
+                        <li><span class="list-icon">🥚</span> <strong>Esférico transparente:</strong> HUEVO DE PEZ</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Morfología -->
+        <section id="morfologia" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-eye"></i>
+                Morfología y Características Distintivas
+            </h2>
+
+            <div class="section-content two-column">
+                <div class="info-card">
+                    <h3><i class="fas fa-shapes"></i> Formas Corporales Básicas</h3>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-bullet"></i> Fusiforme (Torpedo)</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🎯</span> <strong>Ejemplos:</strong> Copépodos, quetognatos</li>
+                            <li><span class="list-icon">🏊</span> <strong>Ventaja:</strong> Natación eficiente</li>
+                            <li><span class="list-icon">📏</span> <strong>Relación:</strong> Largo > Ancho</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-circle"></i> Radial (Medusa)</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">☂️</span> <strong>Ejemplos:</strong> Hidromedusas, escifomedusas</li>
+                            <li><span class="list-icon">🌊</span> <strong>Ventaja:</strong> Captura omnidireccional</li>
+                            <li><span class="list-icon">⚡</span> <strong>Defensa:</strong> Tentáculos urticantes</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-cube"></i> Cilíndrica (Barril)</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🎯</span> <strong>Ejemplos:</strong> Salpas, dolíolidos</li>
+                            <li><span class="list-icon">💨</span> <strong>Ventaja:</strong> Propulsión a chorro</li>
+                            <li><span class="list-icon">🌊</span> <strong>Función:</strong> Filtración eficiente</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-cogs"></i> Estructuras Funcionales</h3>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-satellite-dish"></i> Apéndices Sensoriales</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">📡</span> <strong>Antenas:</strong> Quimiorreceptores y mecanorreceptores</li>
+                            <li><span class="list-icon">👁️</span> <strong>Ojos compuestos:</strong> Detección de luz y movimiento</li>
+                            <li><span class="list-icon">📊</span> <strong>Estatocistos:</strong> Equilibrio y orientación</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-swimmer"></i> Estructuras Locomotoras</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🏊</span> <strong>Pleopodos:</strong> Natación en crustáceos</li>
+                            <li><span class="list-icon">🎐</span> <strong>Cilios:</strong> Propulsión en organismos pequeños</li>
+                            <li><span class="list-icon">🦋</span> <strong>Parapodios:</strong> "Alas" en pterópodos</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-utensils"></i> Estructuras Alimentarias</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🕸️</span> <strong>Redes mucosas:</strong> Filtración en larváceos</li>
+                            <li><span class="list-icon">🗡️</span> <strong>Ganchos quitinosos:</strong> Captura en quetognatos</li>
+                            <li><span class="list-icon">🦐</span> <strong>Mandíbulas:</strong> Masticación en crustáceos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-palette"></i> Coloración y Transparencia</h3>
+                <div class="section-content three-column">
+                    <div>
+                        <h4><i class="fas fa-eye-slash"></i> Transparencia</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">👻</span> <strong>Función:</strong> Camuflaje</li>
+                            <li><span class="list-icon">🌊</span> <strong>Ejemplos:</strong> Medusas, quetognatos</li>
+                            <li><span class="list-icon">🔬</span> <strong>Ventaja:</strong> Evitar depredadores</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-lightbulb"></i> Bioluminiscencia</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">✨</span> <strong>Función:</strong> Comunicación, defensa</li>
+                            <li><span class="list-icon">🦐</span> <strong>Ejemplos:</strong> Krill, copépodos</li>
+                            <li><span class="list-icon">🌙</span> <strong>Patrón:</strong> Fotóforos específicos</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-paint-brush"></i> Pigmentación</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔴</span> <strong>Rojo:</strong> Hemoglobina en zonas hipóxicas</li>
+                            <li><span class="list-icon">🟠</span> <strong>Naranja:</strong> Carotenoides de alimento</li>
+                            <li><span class="list-icon">⚫</span> <strong>Negro:</strong> Melanina en ambientes profundos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Ciclos de Vida -->
+        <section id="ciclos" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-sync-alt"></i>
+                Ciclos de Vida y Desarrollo
+            </h2>
+
+            <div class="section-content two-column">
+                <div class="info-card">
+                    <h3><i class="fas fa-infinity"></i> Estrategias Reproductivas</h3>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-heart"></i> Reproducción Sexual</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">👫</span> <strong>Dioicos:</strong> Sexos separados (mayoría)</li>
+                            <li><span class="list-icon">⚤</span> <strong>Hermafroditas:</strong> Quetognatos, algunos copépodos</li>
+                            <li><span class="list-icon">🥚</span> <strong>Gametos:</strong> Fertilización externa/interna</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-copy"></i> Reproducción Asexual</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔄</span> <strong>Partenogénesis:</strong> Cladóceros, rotíferos</li>
+                            <li><span class="list-icon">🌿</span> <strong>Gemación:</strong> Salpas, cnidarios</li>
+                            <li><span class="list-icon">✂️</span> <strong>Fragmentación:</strong> Sifonóforos</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-exchange-alt"></i> Alternancia Generacional</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🔄</span> <strong>Salpas:</strong> Solitario ↔ Colonial</li>
+                            <li><span class="list-icon">🎐</span> <strong>Cnidarios:</strong> Pólipo ↔ Medusa</li>
+                            <li><span class="list-icon">💦</span> <strong>Cladóceros:</strong> Sexual ↔ Asexual</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-seedling"></i> Desarrollo Larval</h3>
+                    
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-baby"></i> Tipos de Larvas</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🍼</span> <strong>Nauplio:</strong> Primera larva de crustáceos</li>
+                            <li><span class="list-icon">👶</span> <strong>Zoea:</strong> Larva de cangrejos</li>
+                            <li><span class="list-icon">⭐</span> <strong>Pluteus:</strong> Larva de equinodermos</li>
+                            <li><span class="list-icon">🐛</span> <strong>Trochófora:</strong> Larva de anélidos</li>
+                            <li><span class="list-icon">🦋</span> <strong>Veliger:</strong> Larva de moluscos</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-chart-line"></i> Estrategias de Desarrollo</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">📈</span> <strong>Desarrollo directo:</strong> Sin metamorfosis</li>
+                            <li><span class="list-icon">🔄</span> <strong>Metamorfosis simple:</strong> Cambios graduales</li>
+                            <li><span class="list-icon">🦋</span> <strong>Metamorfosis compleja:</strong> Cambios drásticos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-clock"></i> Ejemplos de Ciclos de Vida Específicos</h3>
+                
+                <div class="section-content three-column">
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-bug"></i> Copépodos (Calanoida)</h4>
+                        <p><strong>Duración:</strong> 2-6 meses</p>
+                        <ul class="info-list">
+                            <li><span class="list-icon">1️⃣</span> <strong>Huevo:</strong> 1-3 días</li>
+                            <li><span class="list-icon">2️⃣</span> <strong>Nauplio:</strong> 6 estadios (N1-N6)</li>
+                            <li><span class="list-icon">3️⃣</span> <strong>Copepodito:</strong> 5 estadios (C1-C5)</li>
+                            <li><span class="list-icon">4️⃣</span> <strong>Adulto:</strong> C6 reproductivo</li>
+                        </ul>
+                        <p><em>Cada estadio: 3-7 días dependiendo temperatura</em></p>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-shrimp"></i> Krill (Euphausiacea)</h4>
+                        <p><strong>Duración:</strong> 6 meses - 2 años</p>
+                        <ul class="info-list">
+                            <li><span class="list-icon">1️⃣</span> <strong>Huevo:</strong> 2-3 días</li>
+                            <li><span class="list-icon">2️⃣</span> <strong>Nauplio:</strong> 3 estadios</li>
+                            <li><span class="list-icon">3️⃣</span> <strong>Metanauplio:</strong> 3 estadios</li>
+                            <li><span class="list-icon">4️⃣</span> <strong>Caliptopis:</strong> 3 estadios</li>
+                            <li><span class="list-icon">5️⃣</span> <strong>Furcilia:</strong> 6 estadios</li>
+                            <li><span class="list-icon">6️⃣</span> <strong>Juvenil/Adulto</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4><i class="fas fa-capsules"></i> Salpas (Thaliacea)</h4>
+                        <p><strong>Duración:</strong> 2-14 días por generación</p>
+                        <ul class="info-list">
+                            <li><span class="list-icon">1️⃣</span> <strong>Forma Solitaria:</strong> Reproducción asexual</li>
+                            <li><span class="list-icon">2️⃣</span> <strong>Gemación:</strong> Produce cadena</li>
+                            <li><span class="list-icon">3️⃣</span> <strong>Forma Agregada:</strong> En cadenas</li>
+                            <li><span class="list-icon">4️⃣</span> <strong>Reproducción Sexual:</strong> Produce solitarios</li>
+                        </ul>
+                        <p><em>Alternancia estricta entre formas</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-thermometer-half"></i> Factores que Afectan el Desarrollo</h3>
+                <div class="section-content two-column">
+                    <div>
+                        <h4><i class="fas fa-temperature-hot"></i> Temperatura</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">⚡</span> <strong>Desarrollo:</strong> Más rápido en aguas cálidas</li>
+                            <li><span class="list-icon">🔄</span> <strong>Metabolismo:</strong> Q10 = 2-3</li>
+                            <li><span class="list-icon">❄️</span> <strong>Latencia:</strong> Huevos de resistencia en frío</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4><i class="fas fa-utensils"></i> Alimento</h4>
+                        <ul class="info-list">
+                            <li><span class="list-icon">🌱</span> <strong>Abundancia:</strong> Afecta supervivencia larval</li>
+                            <li><span class="list-icon">📏</span> <strong>Tamaño:</strong> Limitante en primeros estadios</li>
+                            <li><span class="list-icon">💊</span> <strong>Calidad:</strong> Ácidos grasos esenciales</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script>
+        // Estado de la aplicación
+        let currentSection = 'introduccion';
+
+        // Función para mostrar sección
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remover clase active de todas las pestañas
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+            }
+
+            // Activar la pestaña correspondiente
+            const activeTab = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+
+            currentSection = sectionId;
+
+            // Scroll suave hacia arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Botón volver arriba
+        function initBackToTop() {
+            const backToTop = document.getElementById('backToTop');
+
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            const sections = ['introduccion', 'clasificacion', 'muestreo', 'grupos', 'identificacion', 'morfologia', 'ciclos'];
+            const currentIndex = sections.indexOf(currentSection);
+
+            if (e.key === 'ArrowRight' && currentIndex < sections.length - 1) {
+                showSection(sections[currentIndex + 1]);
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                showSection(sections[currentIndex - 1]);
+            }
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initBackToTop();
+            
+            // Animación de entrada
+            document.querySelectorAll('.info-card, .id-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in');
+            });
+        });
+
+        // Smooth scrolling para navegación interna
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
