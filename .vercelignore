@@ -1,0 +1,21 @@
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# Development
+node_modules/
+.env*
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
