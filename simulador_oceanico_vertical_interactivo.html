@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Oceánico Vertical - Distribución de Comunidades</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1e3a8a 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .controls-panel {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border-right: 2px solid rgba(59, 130, 246, 0.3);
+            overflow-y: auto;
+        }
+
+        .simulation-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ocean-column {
+            width: 600px;
+            height: 100vh;
+            margin: 0 auto;
+            position: relative;
+            background: linear-gradient(to bottom,
+                rgba(135, 206, 235, 0.9) 0%,    /* Superficie azul claro */
+                rgba(70, 130, 180, 0.8) 10%,    /* 100m */
+                rgba(25, 25, 112, 0.7) 25%,     /* 250m */
+                rgba(0, 0, 139, 0.6) 50%,       /* 500m */
+                rgba(0, 0, 0, 0.8) 75%,         /* 1000m */
+                rgba(0, 0, 0, 0.95) 100%        /* 2000m+ */
+            );
+            border: 2px solid rgba(59, 130, 246, 0.5);
+        }
+
+        .depth-scale {
+            position: absolute;
+            left: -60px;
+            top: 0;
+            height: 100%;
+            width: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border-right: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .depth-marker {
+            position: absolute;
+            right: 5px;
+            font-size: 12px;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .light-penetration {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                rgba(255, 255, 0, 0.6) 0%,      /* 100% luz */
+                rgba(255, 255, 0, 0.3) 10%,     /* 50% luz */
+                rgba(255, 255, 0, 0.1) 25%,     /* 10% luz */
+                rgba(255, 255, 0, 0.05) 50%,    /* 1% luz */
+                rgba(255, 255, 0, 0) 75%        /* 0% luz */
+            );
+            border-right: 1px solid rgba(255, 255, 0, 0.3);
+        }
+
+        .organisms-layer {
+            position: absolute;
+            left: 100px;
+            top: 0;
+            width: 500px;
+            height: 100%;
+        }
+
+        .organism {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .phytoplankton {
+            background: radial-gradient(circle, #4ade80 0%, #22c55e 100%);
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+        }
+
+        .zooplankton {
+            background: radial-gradient(circle, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+
+        .bacteria {
+            background: radial-gradient(circle, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 0 6px rgba(139, 92, 246, 0.6);
+        }
+
+        .fecal-pellet {
+            background: radial-gradient(circle, #78716c 0%, #57534e 100%);
+            box-shadow: 0 0 4px rgba(120, 113, 108, 0.6);
+        }
+
+        .dcm-layer {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(34, 197, 94, 0.8) 20%, 
+                rgba(34, 197, 94, 0.9) 50%, 
+                rgba(34, 197, 94, 0.8) 80%, 
+                transparent 100%
+            );
+            border: 2px solid rgba(34, 197, 94, 0.6);
+            border-radius: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .control-group h3 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .slider-container {
+            margin: 10px 0;
+        }
+
+        .slider-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #93c5fd;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(59, 130, 246, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .value-display {
+            background: rgba(0, 0, 0, 0.5);
+            color: #60a5fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .depth-indicator {
+            position: absolute;
+            left: -80px;
+            width: 20px;
+            height: 4px;
+            background: #ef4444;
+            border-radius: 2px;
+            transition: top 0.3s ease;
+        }
+
+        .depth-indicator::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: -3px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #ef4444;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .migration-trail {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, 
+                rgba(245, 158, 11, 0.8) 0%, 
+                rgba(245, 158, 11, 0.4) 50%, 
+                rgba(245, 158, 11, 0) 100%
+            );
+            border-radius: 1px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+
+        @keyframes sink {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(20px); }
+        }
+
+        @keyframes migrate {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-50px); }
+        }
+
+        .organism.floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .organism.sinking {
+            animation: sink 5s linear infinite;
+        }
+
+        .organism.migrating {
+            animation: migrate 8s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Panel de Controles -->
+        <div class="controls-panel">
+            <h2 style="color: #60a5fa; margin-bottom: 20px;">🌊 Simulador Oceánico</h2>
+            
+            <div class="control-group">
+                <h3>📏 Profundidad de Visualización</h3>
+                <div class="slider-container">
+                    <label class="slider-label">Profundidad Foco (m)</label>
+                    <input type="range" class="slider" id="depthSlider" min="0" max="2000" value="100" step="10">
+                    <div class="value-display" id="depthValue">100 m</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🌞 Condiciones Ambientales</h3>
+                <div class="slider-container">
+                    <label class="slider-label">Hora del Día</label>
+                    <input type="range" class="slider" id="timeSlider" min="0" max="23" value="12" step="1">
+                    <div class="value-display" id="timeValue">12:00 - Mediodía</div>
+                </div>
+                
+                <div class="slider-container">
+                    <label class="slider-label">Intensidad de Luz (%)</label>
+                    <input type="range" class="slider" id="lightSlider" min="0" max="100" value="100" step="5">
+                    <div class="value-display" id="lightValue">100%</div>
+                </div>
+                
+                <div class="slider-container">
+                    <label class="slider-label">Estación del Año</label>
+                    <select id="seasonSelect" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 5px;">
+                        <option value="spring">Primavera</option>
+                        <option value="summer" selected>Verano</option>
+                        <option value="autumn">Otoño</option>
+                        <option value="winter">Invierno</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🧪 Nutrientes y Productividad</h3>
+                <div class="slider-container">
+                    <label class="slider-label">Concentración de Nitrógeno (μM)</label>
+                    <input type="range" class="slider" id="nitrogenSlider" min="0" max="30" value="15" step="1">
+                    <div class="value-display" id="nitrogenValue">15 μM</div>
+                </div>
+                
+                <div class="slider-container">
+                    <label class="slider-label">Upwelling (Intensidad)</label>
+                    <input type="range" class="slider" id="upwellingSlider" min="0" max="100" value="50" step="10">
+                    <div class="value-display" id="upwellingValue">50%</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🎮 Animaciones</h3>
+                <div class="animation-controls">
+                    <button class="btn btn-primary" onclick="startAnimation()">▶️ Play</button>
+                    <button class="btn btn-secondary" onclick="pauseAnimation()">⏸️ Pausa</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 14px;">
+                        <input type="checkbox" id="migrationToggle" checked> Migración Vertical
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; margin-top: 5px;">
+                        <input type="checkbox" id="dcmToggle" checked> Mostrar DCM
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; margin-top: 5px;">
+                        <input type="checkbox" id="pelletsToggle" checked> Pellets Fecales
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Simulación -->
+        <div class="simulation-area">
+            <div class="ocean-column" id="oceanColumn">
+                <!-- Escala de Profundidad -->
+                <div class="depth-scale" id="depthScale"></div>
+                
+                <!-- Indicador de Profundidad Actual -->
+                <div class="depth-indicator" id="depthIndicator"></div>
+                
+                <!-- Penetración de Luz -->
+                <div class="light-penetration" id="lightPenetration"></div>
+                
+                <!-- Capa DCM -->
+                <div class="dcm-layer" id="dcmLayer"></div>
+                
+                <!-- Capa de Organismos -->
+                <div class="organisms-layer" id="organismsLayer"></div>
+            </div>
+
+            <!-- Panel de Información -->
+            <div class="info-panel">
+                <h3 style="color: #60a5fa; margin-bottom: 10px;">📊 Datos en Tiempo Real</h3>
+                <div id="realtimeData">
+                    <div style="font-size: 12px; margin-bottom: 5px;">
+                        <strong>Profundidad:</strong> <span id="currentDepth">100m</span>
+                    </div>
+                    <div style="font-size: 12px; margin-bottom: 5px;">
+                        <strong>Luz Disponible:</strong> <span id="currentLight">50%</span>
+                    </div>
+                    <div style="font-size: 12px; margin-bottom: 5px;">
+                        <strong>Clorofila-a:</strong> <span id="currentChl">2.5 mg/m³</span>
+                    </div>
+                    <div style="font-size: 12px; margin-bottom: 5px;">
+                        <strong>Zona:</strong> <span id="currentZone">Eufótica</span>
+                    </div>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4ade80;"></div>
+                        <span>Fitoplancton</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f59e0b;"></div>
+                        <span>Zooplancton</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #8b5cf6;"></div>
+                        <span>Bacterias</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #78716c;"></div>
+                        <span>Pellets Fecales</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class OceanSimulator {
+            constructor() {
+                this.animationId = null;
+                this.isAnimating = false;
+                this.time = 0;
+                this.organisms = [];
+                
+                this.initializeControls();
+                this.createDepthScale();
+                this.populateOrganisms();
+                this.updateSimulation();
+            }
+
+            initializeControls() {
+                // Sliders y controles
+                document.getElementById('depthSlider').addEventListener('input', () => this.updateSimulation());
+                document.getElementById('timeSlider').addEventListener('input', () => this.updateSimulation());
+                document.getElementById('lightSlider').addEventListener('input', () => this.updateSimulation());
+                document.getElementById('nitrogenSlider').addEventListener('input', () => this.updateSimulation());
+                document.getElementById('upwellingSlider').addEventListener('input', () => this.updateSimulation());
+                document.getElementById('seasonSelect').addEventListener('change', () => this.updateSimulation());
+                document.getElementById('migrationToggle').addEventListener('change', () => this.updateSimulation());
+                document.getElementById('dcmToggle').addEventListener('change', () => this.updateSimulation());
+                document.getElementById('pelletsToggle').addEventListener('change', () => this.updateSimulation());
+            }
+
+            createDepthScale() {
+                const depthScale = document.getElementById('depthScale');
+                const depths = [0, 50, 100, 200, 500, 1000, 1500, 2000];
+                
+                depths.forEach(depth => {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.textContent = `${depth}m`;
+                    marker.style.top = `${(depth / 2000) * 100}%`;
+                    depthScale.appendChild(marker);
+                });
+            }
+
+            populateOrganisms() {
+                const organismsLayer = document.getElementById('organismsLayer');
+                organismsLayer.innerHTML = '';
+                this.organisms = [];
+
+                // Fitoplancton (zona fótica)
+                for (let i = 0; i < 50; i++) {
+                    this.createOrganism('phytoplankton', Math.random() * 300, Math.random() * 200);
+                }
+
+                // Zooplancton (migración vertical)
+                for (let i = 0; i < 30; i++) {
+                    this.createOrganism('zooplankton', Math.random() * 400, 100 + Math.random() * 300);
+                }
+
+                // Bacterias (profundidades medias y altas)
+                for (let i = 0; i < 40; i++) {
+                    this.createOrganism('bacteria', Math.random() * 450, 200 + Math.random() * 600);
+                }
+
+                // Pellets fecales (hundimiento)
+                for (let i = 0; i < 25; i++) {
+                    this.createOrganism('fecal-pellet', Math.random() * 500, Math.random() * 800);
+                }
+            }
+
+            createOrganism(type, x, y) {
+                const organism = document.createElement('div');
+                organism.className = `organism ${type} floating`;
+                
+                // Tamaños variables según tipo
+                const sizes = {
+                    'phytoplankton': Math.random() * 6 + 3,
+                    'zooplankton': Math.random() * 8 + 5,
+                    'bacteria': Math.random() * 4 + 2,
+                    'fecal-pellet': Math.random() * 5 + 3
+                };
+                
+                const size = sizes[type];
+                organism.style.width = `${size}px`;
+                organism.style.height = `${size}px`;
+                organism.style.left = `${x}px`;
+                organism.style.top = `${y}px`;
+                
+                // Datos del organismo
+                organism.organismData = {
+                    type: type,
+                    x: x,
+                    y: y,
+                    size: size,
+                    originalY: y,
+                    migrationSpeed: Math.random() * 2 + 1
+                };
+
+                organism.addEventListener('click', () => this.showOrganismInfo(organism));
+                
+                document.getElementById('organismsLayer').appendChild(organism);
+                this.organisms.push(organism);
+            }
+
+            updateSimulation() {
+                const depth = parseInt(document.getElementById('depthSlider').value);
+                const time = parseInt(document.getElementById('timeSlider').value);
+                const light = parseInt(document.getElementById('lightSlider').value);
+                const nitrogen = parseInt(document.getElementById('nitrogenSlider').value);
+                const upwelling = parseInt(document.getElementById('upwellingSlider').value);
+                const season = document.getElementById('seasonSelect').value;
+                const showMigration = document.getElementById('migrationToggle').checked;
+                const showDCM = document.getElementById('dcmToggle').checked;
+                const showPellets = document.getElementById('pelletsToggle').checked;
+
+                // Actualizar displays
+                document.getElementById('depthValue').textContent = `${depth} m`;
+                document.getElementById('timeValue').textContent = `${time}:00 - ${this.getTimeLabel(time)}`;
+                document.getElementById('lightValue').textContent = `${light}%`;
+                document.getElementById('nitrogenValue').textContent = `${nitrogen} μM`;
+                document.getElementById('upwellingValue').textContent = `${upwelling}%`;
+
+                // Actualizar indicador de profundidad
+                const depthIndicator = document.getElementById('depthIndicator');
+                depthIndicator.style.top = `${(depth / 2000) * 100}%`;
+
+                // Actualizar penetración de luz
+                this.updateLightPenetration(light, time);
+
+                // Actualizar DCM
+                this.updateDCM(depth, nitrogen, upwelling, showDCM);
+
+                // Migración vertical del zooplancton
+                if (showMigration) {
+                    this.updateVerticalMigration(time);
+                }
+
+                // Mostrar/ocultar pellets fecales
+                this.updateFecalPellets(showPellets);
+
+                // Actualizar datos en tiempo real
+                this.updateRealtimeData(depth, light, nitrogen);
+            }
+
+            updateLightPenetration(lightIntensity, time) {
+                const lightLayer = document.getElementById('lightPenetration');
+                const dayIntensity = this.calculateDayIntensity(time);
+                const totalIntensity = (lightIntensity / 100) * dayIntensity;
+                
+                // Actualizar gradiente de luz
+                lightLayer.style.background = `linear-gradient(to bottom,
+                    rgba(255, 255, 0, ${totalIntensity * 0.6}) 0%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.3}) 10%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.1}) 25%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.05}) 50%,
+                    rgba(255, 255, 0, 0) 75%
+                )`;
+            }
+
+            updateDCM(depth, nitrogen, upwelling, show) {
+                const dcmLayer = document.getElementById('dcmLayer');
+                
+                if (!show) {
+                    dcmLayer.style.display = 'none';
+                    return;
+                }
+                
+                dcmLayer.style.display = 'block';
+                
+                // DCM típicamente entre 30-80m, dependiente de nutrientes
+                const dcmDepth = 50 + (30 - nitrogen) + (upwelling / 5);
+                const dcmPosition = Math.max(30, Math.min(120, dcmDepth));
+                
+                dcmLayer.style.top = `${(dcmPosition / 2000) * 100}%`;
+                dcmLayer.style.opacity = Math.min(1, nitrogen / 15 + upwelling / 100);
+            }
+
+            updateVerticalMigration(time) {
+                this.organisms.forEach(organism => {
+                    if (organism.organismData.type === 'zooplankton') {
+                        // Migración nocturna hacia superficie
+                        const migrationFactor = this.calculateMigrationFactor(time);
+                        const newY = organism.organismData.originalY - (migrationFactor * 100);
+                        organism.style.top = `${Math.max(0, newY)}px`;
+                        
+                        if (migrationFactor > 0.3) {
+                            organism.classList.add('migrating');
+                        } else {
+                            organism.classList.remove('migrating');
+                        }
+                    }
+                });
+            }
+
+            updateFecalPellets(show) {
+                this.organisms.forEach(organism => {
+                    if (organism.organismData.type === 'fecal-pellet') {
+                        organism.style.display = show ? 'block' : 'none';
+                        if (show) {
+                            organism.classList.add('sinking');
+                        }
+                    }
+                });
+            }
+
+            calculateDayIntensity(time) {
+                // Simulación del ciclo solar
+                if (time >= 6 && time <= 18) {
+                    const hoursSinceSunrise = time - 6;
+                    const maxIntensity = Math.sin((hoursSinceSunrise / 12) * Math.PI);
+                    return maxIntensity;
+                }
+                return 0; // Noche
+            }
+
+            calculateMigrationFactor(time) {
+                // Mayor migración durante la noche (20:00-6:00)
+                if (time >= 20 || time <= 6) {
+                    return 0.8; // Máxima migración
+                } else if (time >= 18 && time < 20) {
+                    return (time - 18) / 2 * 0.8; // Ascenso gradual
+                } else if (time > 6 && time <= 8) {
+                    return (8 - time) / 2 * 0.8; // Descenso gradual
+                }
+                return 0; // Día - posición normal
+            }
+
+            updateRealtimeData(depth, light, nitrogen) {
+                document.getElementById('currentDepth').textContent = `${depth}m`;
+                document.getElementById('currentLight').textContent = `${this.calculateLightAtDepth(depth, light)}%`;
+                document.getElementById('currentChl').textContent = `${this.calculateChlorophyll(depth, nitrogen)} mg/m³`;
+                document.getElementById('currentZone').textContent = this.getOceanZone(depth);
+            }
+
+            calculateLightAtDepth(depth, surfaceLight) {
+                // Atenuación exponencial de la luz
+                const attenuationCoeff = 0.15; // m⁻¹
+                const lightAtDepth = surfaceLight * Math.exp(-attenuationCoeff * depth);
+                return Math.max(0, lightAtDepth).toFixed(1);
+            }
+
+            calculateChlorophyll(depth, nitrogen) {
+                // Modelo simplificado de clorofila vs profundidad
+                let chl = 0;
+                if (depth < 100) {
+                    chl = (nitrogen / 30) * 2 * Math.exp(-depth / 50);
+                } else if (depth < 150) {
+                    // DCM
+                    chl = (nitrogen / 30) * 3 * Math.exp(-(depth - 60) * (depth - 60) / 800);
+                } else {
+                    chl = 0.1;
+                }
+                return Math.max(0.1, chl).toFixed(1);
+            }
+
+            getOceanZone(depth) {
+                if (depth < 100) return 'Eufótica';
+                if (depth < 200) return 'Disfótica';
+                if (depth < 1000) return 'Batial';
+                return 'Abisal';
+            }
+
+            getTimeLabel(time) {
+                if (time >= 6 && time < 12) return 'Mañana';
+                if (time >= 12 && time < 18) return 'Tarde';
+                if (time >= 18 && time < 22) return 'Atardecer';
+                return 'Noche';
+            }
+
+            showOrganismInfo(organism) {
+                const data = organism.organismData;
+                const info = {
+                    'phytoplankton': 'Fitoplancton: Productor primario, fotosíntesis activa',
+                    'zooplankton': 'Zooplancton: Consumidor primario, migración vertical',
+                    'bacteria': 'Bacterias: Descomponedores, remineralización',
+                    'fecal-pellet': 'Pellet Fecal: Bomba biológica de carbono'
+                };
+                
+                alert(`${info[data.type]}\nTamaño: ${data.size.toFixed(1)}px\nProfundidad: ${data.y.toFixed(0)}px`);
+            }
+
+            animate() {
+                if (!this.isAnimating) return;
+                
+                this.time += 0.01;
+                
+                // Animaciones continuas
+                this.organisms.forEach(organism => {
+                    const data = organism.organismData;
+                    
+                    // Movimiento flotante
+                    if (data.type === 'phytoplankton') {
+                        const drift = Math.sin(this.time + data.x * 0.01) * 2;
+                        organism.style.transform = `translateX(${drift}px)`;
+                    }
+                    
+                    // Hundimiento de pellets
+                    if (data.type === 'fecal-pellet') {
+                        data.y += 0.5;
+                        if (data.y > 800) data.y = 0;
+                        organism.style.top = `${data.y}px`;
+                    }
+                });
+                
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Funciones globales para controles
+        function startAnimation() {
+            if (window.simulator) {
+                window.simulator.isAnimating = true;
+                window.simulator.animate();
+            }
+        }
+
+        function pauseAnimation() {
+            if (window.simulator) {
+                window.simulator.isAnimating = false;
+                if (window.simulator.animationId) {
+                    cancelAnimationFrame(window.simulator.animationId);
+                }
+            }
+        }
+
+        function resetSimulation() {
+            if (window.simulator) {
+                pauseAnimation();
+                window.simulator.time = 0;
+                window.simulator.populateOrganisms();
+                window.simulator.updateSimulation();
+            }
+        }
+
+        // Inicializar simulador al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            window.simulator = new OceanSimulator();
+        });
+    </script>
+</body>
+</html>

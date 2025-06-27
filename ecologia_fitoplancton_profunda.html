@@ -322,41 +322,37 @@
             </div>
 
             <!-- Nodo 5: Comunidades por Profundidad -->
-            <div class="knowledge-node" onclick="expandNode(5)">
+            <div class="knowledge-node" onclick="openVerticalDistribution()">
                 <div class="node-title">
                     <i class="fas fa-layer-group"></i>
-                    Comunidades Verticales
+                    Comunidades Verticales - Simulador Interactivo
                 </div>
                 <div class="node-question">
-                    ¿Qué especies emergen en diferentes profundidades cuando declina el fitoplancton?
+                    ¿Cómo cambian las comunidades marinas con la profundidad y la penetración de luz?
                 </div>
                 <div class="node-content">
-                    <p>La <strong>zonación vertical</strong> determina diferentes comunidades microbianas especializadas.</p>
+                    <p>Explora la <strong>zonación vertical</strong> del océano con nuestra simulación interactiva.</p>
                     
                     <div class="depth-gradient">
-                        <h4>🦠 Succession Vertical:</h4>
-                        <p><strong>Zona Eufótica (0-100m):</strong></p>
-                        <p>• Diatomeas, dinoflagelados, cocolitóforos</p>
-                        <p>• Copépodos, eufáusidos, larvas</p>
-                        
-                        <p><strong>Zona Disfótica (100-1000m):</strong></p>
-                        <p>• Bacterias quimiolitotróficas</p>
-                        <p>• Zooplancton migrador vertical</p>
-                        <p>• Partículas en sedimentación</p>
-                        
-                        <p><strong>Zona Afótica (>1000m):</strong></p>
-                        <p>• Arqueobacterias termófilas</p>
-                        <p>• Bacterias sulfato-reductoras</p>
-                        <p>• Zooplancton de aguas profundas</p>
+                        <h4>🌊 Simulación incluye:</h4>
+                        <p>• <strong>Zona Fótica:</strong> Penetración de luz y fitoplancton</p>
+                        <p>• <strong>DCM:</strong> Deep Chlorophyll Maximum dinámico</p>
+                        <p>• <strong>Zooplancton:</strong> Migración vertical diaria</p>
+                        <p>• <strong>Bacterias:</strong> Remineralización profunda</p>
+                        <p>• <strong>Pellets fecales:</strong> Bomba biológica de carbono</p>
                     </div>
 
                     <div class="calculations">
-                        <h4>📈 Transición de Especies:</h4>
-                        <p>• <strong>50m:</strong> Declina fitoplancton costero</p>
-                        <p>• <strong>100m:</strong> Surgen bacterias heterotróficas</p>
-                        <p>• <strong>200m:</strong> Dominan arqueobacterias</p>
-                        <p>• <strong>500m:</strong> Bacterias quimiosintéticas</p>
+                        <h4>🎮 Controles Interactivos:</h4>
+                        <p>• <strong>Profundidad:</strong> 0-2000m con barra deslizante</p>
+                        <p>• <strong>Hora del día:</strong> Migración vertical circadiana</p>
+                        <p>• <strong>Estación:</strong> Cambios estacionales</p>
+                        <p>• <strong>Nutrientes:</strong> Upwelling vs oligotrófico</p>
                     </div>
+                    
+                    <button style="background: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 10px;" onclick="openVerticalDistribution()">
+                        🚀 Abrir Simulador Oceánico
+                    </button>
                 </div>
             </div>
 
@@ -421,6 +417,11 @@
             // - Conectar con otras páginas
             // - Cargar datos en tiempo real
             // - Mostrar gráficos interactivos
+        }
+
+        function openVerticalDistribution() {
+            // Abrir simulador oceánico en nueva ventana/pestaña
+            window.open('simulador_oceanico_vertical_interactivo.html', '_blank', 'width=1400,height=900');
         }
 
         // Animación de entrada
