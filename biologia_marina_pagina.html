@@ -706,7 +706,8 @@
                             alt: "Floraciones de fitoplancton",
                             caption: "Floraciones masivas de fitoplancton vistas desde satélite"
                         }
-                    ]
+                    ],
+                    interactive: true
                 },
                 f1_bio_topic1_econ: {
                     title: "1.1 Economía del Fitoplancton",
@@ -1141,7 +1142,28 @@
                                 </div>
                             `).join('') : ''}
                             
-                            ${!topicData.images ? `
+                            ${topicData.interactive ? `
+                                <div style="display: flex; gap: 1rem; margin: 1rem 0;">
+                                    <a href="diatomea_3d_interactiva.html" target="_blank" 
+                                       style="flex: 1; padding: 1rem; background: linear-gradient(45deg, #00ff88, #00cc66); 
+                                              color: white; text-decoration: none; border-radius: 12px; text-align: center; 
+                                              font-weight: bold; transition: transform 0.3s;"
+                                       onmouseover="this.style.transform='scale(1.05)'"
+                                       onmouseout="this.style.transform='scale(1)'">
+                                        🔬 Diatomea 3D Interactiva
+                                    </a>
+                                    <a href="ecosistema_interactivo.html" target="_blank" 
+                                       style="flex: 1; padding: 1rem; background: linear-gradient(45deg, #4a90e2, #2171b5); 
+                                              color: white; text-decoration: none; border-radius: 12px; text-align: center; 
+                                              font-weight: bold; transition: transform 0.3s;"
+                                       onmouseover="this.style.transform='scale(1.05)'"
+                                       onmouseout="this.style.transform='scale(1)'">
+                                        🌊 Ecosistema Dinámico
+                                    </a>
+                                </div>
+                            ` : ''}
+                            
+                            ${!topicData.images && !topicData.interactive ? `
                                 <div class="image-placeholder">
                                     <i class="fas fa-water" style="font-size: 2rem; margin-bottom: 1rem;"></i><br>
                                     ${topicData.title}

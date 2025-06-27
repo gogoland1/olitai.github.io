@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosistema Marino Interactivo - OlitAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(180deg, #87CEEB 0%, #4682B4 30%, #1e3a5f 60%, #0f1419 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .depth-indicator {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 100;
+        }
+
+        .depth-scale {
+            height: 400px;
+            width: 20px;
+            background: linear-gradient(to bottom, #87CEEB, #4682B4, #1e3a5f, #0f1419);
+            border-radius: 10px;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .depth-marker {
+            position: absolute;
+            left: 25px;
+            font-size: 12px;
+            color: #00ff88;
+        }
+
+        .ecosystem-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .organism {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            user-select: none;
+        }
+
+        .organism:hover {
+            transform: scale(1.2);
+            z-index: 50;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .phytoplankton {
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, #00ff44, #008822);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .zooplankton {
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #ff6b00, #cc5500);
+            animation: swim 4s ease-in-out infinite;
+        }
+
+        .small-fish {
+            width: 40px;
+            height: 25px;
+            background: radial-gradient(ellipse, #4a90e2, #2171b5);
+            border-radius: 50% 20px 50% 20px;
+            animation: school 6s linear infinite;
+        }
+
+        .large-fish {
+            width: 80px;
+            height: 50px;
+            background: radial-gradient(ellipse, #e74c3c, #c0392b);
+            border-radius: 50% 10px 50% 10px;
+            animation: hunt 8s ease-in-out infinite;
+        }
+
+        .whale {
+            width: 120px;
+            height: 60px;
+            background: radial-gradient(ellipse, #34495e, #2c3e50);
+            border-radius: 60px 20px 60px 20px;
+            animation: migrate 12s linear infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+        }
+
+        @keyframes swim {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(20px); }
+        }
+
+        @keyframes school {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100vw + 100px)); }
+        }
+
+        @keyframes hunt {
+            0%, 100% { transform: translateX(0px) scaleX(1); }
+            25% { transform: translateX(50px) scaleX(1.1); }
+            75% { transform: translateX(-30px) scaleX(0.9); }
+        }
+
+        @keyframes migrate {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        .info-popup {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #00ff88;
+            color: white;
+            font-size: 14px;
+            max-width: 250px;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .info-popup.show {
+            opacity: 1;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 100;
+        }
+
+        .control-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .control-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .food-chain-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            z-index: 1;
+            animation: flow 2s linear infinite;
+        }
+
+        @keyframes flow {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .sunlight {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(180deg, 
+                rgba(255, 255, 0, 0.3) 0%,
+                rgba(255, 255, 0, 0.1) 50%,
+                transparent 100%);
+            pointer-events: none;
+        }
+
+        .current-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 20px;
+            color: #00ff88;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ecosystem-container" id="ecosystem">
+        <div class="sunlight"></div>
+        
+        <div class="depth-indicator">
+            <h3>🌊 Profundidad</h3>
+            <div class="depth-scale">
+                <div class="depth-marker" style="top: 0;">0m</div>
+                <div class="depth-marker" style="top: 25%;">50m</div>
+                <div class="depth-marker" style="top: 50%;">200m</div>
+                <div class="depth-marker" style="top: 75%;">1000m</div>
+                <div class="depth-marker" style="top: 100%;">4000m</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3>🎮 Controles</h3>
+            <button class="control-button" onclick="showFoodChain()">Mostrar Cadena Trófica</button>
+            <button class="control-button" onclick="addOrganisms()">Agregar Vida Marina</button>
+            <button class="control-button" onclick="simulateCurrents()">Simular Corrientes</button>
+            <button class="control-button" onclick="toggleDayNight()">Ciclo Día/Noche</button>
+        </div>
+
+        <div class="current-info" id="currentInfo">
+            🐟 Click en cualquier organismo para información • 🌊 Ecosistema en tiempo real
+        </div>
+    </div>
+
+    <div class="info-popup" id="infoPopup"></div>
+
+    <script>
+        const organisms = [
+            {
+                type: 'phytoplankton',
+                name: 'Fitoplancton',
+                info: '🦠 Productores primarios<br>• Generan 50% del O₂ mundial<br>• Base de la cadena alimentaria<br>• Capturan CO₂ atmosférico',
+                depth: 0.1,
+                count: 50
+            },
+            {
+                type: 'zooplankton',
+                name: 'Zooplancton',
+                info: '🦐 Consumidores primarios<br>• Se alimentan de fitoplancton<br>• Incluye copépodos y krill<br>• Migración vertical diaria',
+                depth: 0.2,
+                count: 30
+            },
+            {
+                type: 'small-fish',
+                name: 'Peces Pequeños',
+                info: '🐟 Consumidores secundarios<br>• Sardinas, anchoas, arenques<br>• Forman cardúmenes grandes<br>• Transferencia energética 10%',
+                depth: 0.3,
+                count: 20
+            },
+            {
+                type: 'large-fish',
+                name: 'Peces Grandes',
+                info: '🦈 Depredadores medianos<br>• Atunes, peces espada<br>• Cazadores activos<br>• Regulan poblaciones',
+                depth: 0.4,
+                count: 10
+            },
+            {
+                type: 'whale',
+                name: 'Ballenas',
+                info: '🐋 Superdepredadores<br>• Ballenas azules, orcas<br>• Migración oceánica<br>• Bomba de nutrientes',
+                depth: 0.5,
+                count: 3
+            }
+        ];
+
+        let currentOrganisms = [];
+        let showingFoodChain = false;
+
+        function createEcosystem() {
+            const container = document.getElementById('ecosystem');
+            
+            organisms.forEach(organism => {
+                for (let i = 0; i < organism.count; i++) {
+                    createOrganism(organism, container);
+                }
+            });
+        }
+
+        function createOrganism(organism, container) {
+            const element = document.createElement('div');
+            element.className = `organism ${organism.type}`;
+            
+            // Posicionamiento basado en profundidad
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = organism.depth * window.innerHeight + (Math.random() * 100);
+            
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+            
+            // Velocidad de animación aleatoria
+            element.style.animationDuration = (3 + Math.random() * 5) + 's';
+            element.style.animationDelay = Math.random() * 2 + 's';
+            
+            // Evento click para mostrar información
+            element.addEventListener('click', (e) => showOrganismInfo(e, organism));
+            
+            container.appendChild(element);
+            currentOrganisms.push(element);
+        }
+
+        function showOrganismInfo(event, organism) {
+            const popup = document.getElementById('infoPopup');
+            popup.innerHTML = `<h4>${organism.name}</h4><p>${organism.info}</p>`;
+            popup.style.left = event.pageX + 10 + 'px';
+            popup.style.top = event.pageY + 10 + 'px';
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        function showFoodChain() {
+            if (showingFoodChain) return;
+            
+            showingFoodChain = true;
+            const container = document.getElementById('ecosystem');
+            
+            // Crear líneas que conecten organismos
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const line = document.createElement('div');
+                    line.className = 'food-chain-line';
+                    line.style.width = Math.random() * 200 + 50 + 'px';
+                    line.style.left = Math.random() * (window.innerWidth - 200) + 'px';
+                    line.style.top = Math.random() * window.innerHeight + 'px';
+                    line.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    
+                    container.appendChild(line);
+                    
+                    setTimeout(() => {
+                        line.remove();
+                    }, 2000);
+                }, i * 100);
+            }
+            
+            setTimeout(() => {
+                showingFoodChain = false;
+            }, 3000);
+        }
+
+        function addOrganisms() {
+            const randomOrganism = organisms[Math.floor(Math.random() * organisms.length)];
+            const container = document.getElementById('ecosystem');
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createOrganism(randomOrganism, container);
+                }, i * 200);
+            }
+            
+            updateInfo('🐟 Nuevos organismos agregados al ecosistema');
+        }
+
+        function simulateCurrents() {
+            currentOrganisms.forEach((organism, index) => {
+                setTimeout(() => {
+                    const currentX = parseInt(organism.style.left);
+                    const currentY = parseInt(organism.style.top);
+                    
+                    organism.style.transition = 'all 2s ease-in-out';
+                    organism.style.left = (currentX + (Math.random() - 0.5) * 200) + 'px';
+                    organism.style.top = (currentY + (Math.random() - 0.5) * 100) + 'px';
+                    
+                    setTimeout(() => {
+                        organism.style.transition = 'all 0.3s ease';
+                    }, 2000);
+                }, index * 50);
+            });
+            
+            updateInfo('🌊 Corrientes oceánicas simuladas');
+        }
+
+        function toggleDayNight() {
+            const body = document.body;
+            const sunlight = document.querySelector('.sunlight');
+            
+            if (body.style.filter === 'brightness(0.3)') {
+                body.style.filter = 'brightness(1)';
+                sunlight.style.opacity = '1';
+                updateInfo('☀️ Amanecer - Actividad fotosintética máxima');
+            } else {
+                body.style.filter = 'brightness(0.3)';
+                sunlight.style.opacity = '0.2';
+                updateInfo('🌙 Anochecer - Migración vertical del zooplancton');
+            }
+        }
+
+        function updateInfo(message) {
+            const info = document.getElementById('currentInfo');
+            info.textContent = message;
+            
+            setTimeout(() => {
+                info.textContent = '🐟 Click en cualquier organismo para información • 🌊 Ecosistema en tiempo real';
+            }, 3000);
+        }
+
+        // Simulación de parámetros ambientales
+        setInterval(() => {
+            const randomChanges = [
+                '🌡️ Temperatura: ' + (15 + Math.random() * 10).toFixed(1) + '°C',
+                '💧 Salinidad: ' + (34 + Math.random() * 2).toFixed(1) + ' PSU',
+                '🧪 pH: ' + (7.8 + Math.random() * 0.4).toFixed(2),
+                '💨 Corriente: ' + (Math.random() * 5).toFixed(1) + ' nudos'
+            ];
+            
+            if (Math.random() > 0.7) {
+                updateInfo(randomChanges[Math.floor(Math.random() * randomChanges.length)]);
+            }
+        }, 5000);
+
+        // Inicializar ecosistema
+        window.addEventListener('load', createEcosystem);
+
+        // Redimensionar
+        window.addEventListener('resize', () => {
+            // Reposicionar organismos si es necesario
+        });
+    </script>
+</body>
+</html>

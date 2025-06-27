@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diatomea 3D Interactiva - OlitAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #001122 0%, #003344 50%, #004466 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #cccccc;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+
+        .info-panel h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .stats div {
+            margin-bottom: 5px;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100vh;
+            display: block;
+        }
+
+        .interaction-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 255, 136, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .photosynthesis-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: float 3s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-20px) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="control-panel">
+        <h3>🔬 Controles de Diatomea</h3>
+        
+        <div class="control-group">
+            <label>Rotación (RPM)</label>
+            <input type="range" class="slider" id="rotationSpeed" min="0" max="50" value="10">
+        </div>
+        
+        <div class="control-group">
+            <label>Zoom</label>
+            <input type="range" class="slider" id="zoomLevel" min="1" max="10" value="5">
+        </div>
+        
+        <div class="control-group">
+            <label>Estructura Interna</label>
+            <input type="range" class="slider" id="internalStructure" min="0" max="100" value="50">
+        </div>
+        
+        <div class="control-group">
+            <label>Actividad Fotosintética</label>
+            <input type="range" class="slider" id="photosynthesis" min="0" max="100" value="75">
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h3>📊 Datos en Tiempo Real</h3>
+        <div id="diatomInfo">
+            <div><strong>Especie:</strong> <span id="species">Thalassiosira pseudonana</span></div>
+            <div><strong>Tamaño:</strong> <span id="size">20 μm</span></div>
+            <div><strong>Producción O₂:</strong> <span id="oxygenRate">2.3 × 10⁻¹² mol/s</span></div>
+            <div><strong>Captura CO₂:</strong> <span id="carbonRate">1.8 × 10⁻¹² mol/s</span></div>
+            <div><strong>Clorofila-a:</strong> <span id="chlorophyll">0.5 pg/célula</span></div>
+        </div>
+        
+        <div class="stats">
+            <h4>🌊 Estado Actual:</h4>
+            <div>Actividad: <span id="activity">Alta</span></div>
+            <div>Luz disponible: <span id="lightLevel">850 μE/m²/s</span></div>
+            <div>Nutrientes: <span id="nutrients">Óptimos</span></div>
+        </div>
+    </div>
+
+    <canvas id="canvas3d"></canvas>
+    
+    <div class="interaction-hint">
+        🖱️ Arrastra para rotar • 🖱️ Scroll para zoom • 🎛️ Usa los controles
+    </div>
+
+    <div class="photosynthesis-particles" id="particleContainer"></div>
+
+    <script>
+        // Variables globales Three.js
+        let scene, camera, renderer, diatom, animationId;
+        let rotationSpeed = 0.01;
+        let isMouseDown = false;
+        let mouseX = 0, mouseY = 0;
+
+        // Inicializar la escena 3D
+        function init() {
+            // Crear escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x001122);
+
+            // Crear cámara
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Crear renderizador
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('canvas3d'),
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Crear la diatomea
+            createDiatom();
+
+            // Iluminación
+            createLighting();
+
+            // Controles de mouse
+            setupControls();
+
+            // Partículas de fotosíntesis
+            createPhotosynthesisParticles();
+
+            // Iniciar animación
+            animate();
+        }
+
+        function createDiatom() {
+            // Grupo principal de la diatomea
+            diatom = new THREE.Group();
+
+            // Cuerpo principal (cápsula de sílice)
+            const bodyGeometry = new THREE.SphereGeometry(1, 32, 32);
+            const bodyMaterial = new THREE.MeshPhongMaterial({
+                color: 0x44aa88,
+                transparent: true,
+                opacity: 0.7,
+                shininess: 100
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            diatom.add(body);
+
+            // Estructura radial (patrón de diatomea)
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const rayGeometry = new THREE.CylinderGeometry(0.02, 0.02, 2, 8);
+                const rayMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x66cc99,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const ray = new THREE.Mesh(rayGeometry, rayMaterial);
+                ray.position.x = Math.cos(angle) * 0.8;
+                ray.position.z = Math.sin(angle) * 0.8;
+                ray.rotation.z = angle + Math.PI/2;
+                diatom.add(ray);
+            }
+
+            // Cloroplastos
+            for (let i = 0; i < 8; i++) {
+                const chloroplastGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+                const chloroplastMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x00ff44,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                const chloroplast = new THREE.Mesh(chloroplastGeometry, chloroplastMaterial);
+                chloroplast.position.x = (Math.random() - 0.5) * 1.5;
+                chloroplast.position.y = (Math.random() - 0.5) * 1.5;
+                chloroplast.position.z = (Math.random() - 0.5) * 1.5;
+                diatom.add(chloroplast);
+            }
+
+            // Núcleo
+            const nucleusGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+            const nucleusMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff4444,
+                transparent: true,
+                opacity: 0.8
+            });
+            const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
+            diatom.add(nucleus);
+
+            scene.add(diatom);
+        }
+
+        function createLighting() {
+            // Luz ambiental
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+
+            // Luz direccional (simula luz solar)
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Luz de color (simula bioluminiscencia)
+            const pointLight = new THREE.PointLight(0x00ff88, 0.5, 10);
+            pointLight.position.set(0, 0, 3);
+            scene.add(pointLight);
+        }
+
+        function setupControls() {
+            const canvas = document.getElementById('canvas3d');
+
+            canvas.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (isMouseDown) {
+                    const deltaX = e.clientX - mouseX;
+                    const deltaY = e.clientY - mouseY;
+                    
+                    diatom.rotation.y += deltaX * 0.01;
+                    diatom.rotation.x += deltaY * 0.01;
+                    
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                }
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
+
+            canvas.addEventListener('wheel', (e) => {
+                camera.position.z += e.deltaY * 0.01;
+                camera.position.z = Math.max(2, Math.min(10, camera.position.z));
+            });
+
+            // Controles de sliders
+            document.getElementById('rotationSpeed').addEventListener('input', (e) => {
+                rotationSpeed = e.target.value / 1000;
+            });
+
+            document.getElementById('zoomLevel').addEventListener('input', (e) => {
+                camera.position.z = 11 - e.target.value;
+            });
+
+            document.getElementById('photosynthesis').addEventListener('input', (e) => {
+                updatePhotosynthesis(e.target.value);
+            });
+        }
+
+        function createPhotosynthesisParticles() {
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                document.getElementById('particleContainer').appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 3000);
+            }, 200);
+        }
+
+        function updatePhotosynthesis(value) {
+            const activity = value > 70 ? 'Alta' : value > 40 ? 'Media' : 'Baja';
+            document.getElementById('activity').textContent = activity;
+            
+            const oxygenRate = (value / 100 * 2.3).toFixed(1);
+            document.getElementById('oxygenRate').textContent = `${oxygenRate} × 10⁻¹² mol/s`;
+        }
+
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+
+            // Rotación automática
+            if (diatom) {
+                diatom.rotation.y += rotationSpeed;
+                
+                // Animación sutil de "respiración"
+                const scale = 1 + Math.sin(Date.now() * 0.001) * 0.05;
+                diatom.scale.setScalar(scale);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Redimensionar
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Inicializar cuando la página cargue
+        window.addEventListener('load', init);
+
+        // Actualizar datos en tiempo real
+        setInterval(() => {
+            const size = (18 + Math.random() * 4).toFixed(1);
+            document.getElementById('size').textContent = `${size} μm`;
+            
+            const light = (800 + Math.random() * 100).toFixed(0);
+            document.getElementById('lightLevel').textContent = `${light} μE/m²/s`;
+        }, 2000);
+    </script>
+</body>
+</html>
