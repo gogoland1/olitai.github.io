@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Biogeoquímico - Ciclos de Sílice y Carbonatos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1D2A21 0%, #2E4A33 50%, #3C6441 100%);
+            color: #E8F5E9;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: rgba(29, 42, 33, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #6AA84F;
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #81c784;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls-panel {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            color: #A5D6A7;
+        }
+
+        .slider {
+            width: 120px;
+            height: 6px;
+            border-radius: 3px;
+            background: #2E4A33;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6AA84F;
+            cursor: pointer;
+        }
+
+        .dashboard-grid {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 2rem;
+        }
+
+        .widget {
+            background: rgba(46, 74, 51, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(106, 168, 79, 0.2);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .widget:hover {
+            border-color: rgba(106, 168, 79, 0.4);
+            box-shadow: 0 8px 32px rgba(106, 168, 79, 0.1);
+        }
+
+        .widget-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #81c784;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .large-chart {
+            height: 400px;
+        }
+
+        .map-container {
+            height: 350px;
+            background: #1e293b;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .data-card {
+            background: rgba(106, 168, 79, 0.1);
+            border: 1px solid rgba(106, 168, 79, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .data-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #81c784;
+        }
+
+        .data-label {
+            font-size: 0.8rem;
+            color: #A5D6A7;
+            margin-top: 0.5rem;
+        }
+
+        .temperature-gradient {
+            height: 30px;
+            background: linear-gradient(90deg, 
+                #0ea5e9 0%,    /* Frío */
+                #06b6d4 25%,
+                #84cc16 50%,
+                #eab308 75%,
+                #ef4444 100%); /* Cálido */
+            border-radius: 15px;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .gradient-marker {
+            position: absolute;
+            top: -5px;
+            width: 3px;
+            height: 40px;
+            background: white;
+            border-radius: 2px;
+            transition: left 0.3s ease;
+        }
+
+        .organism-icons {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .organism {
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .organism.active {
+            opacity: 1;
+            background: rgba(106, 168, 79, 0.2);
+            border: 1px solid rgba(106, 168, 79, 0.4);
+        }
+
+        .organism-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .organism-name {
+            font-size: 0.8rem;
+            color: #A5D6A7;
+        }
+
+        .depth-scale {
+            position: relative;
+            height: 300px;
+            width: 40px;
+            background: linear-gradient(to bottom,
+                #87ceeb 0%,    /* Superficie */
+                #4682b4 30%,   /* Zona fótica */
+                #1e3a5f 60%,   /* Zona afótica */
+                #0f1419 100%); /* Abisal */
+            border-radius: 20px;
+            margin: 0 1rem;
+        }
+
+        .depth-marker {
+            position: absolute;
+            left: 50px;
+            font-size: 0.8rem;
+            color: #A5D6A7;
+            width: 100px;
+        }
+
+        .interactive-globe {
+            width: 100%;
+            height: 350px;
+            background: radial-gradient(circle at 30% 30%, #4CAF50, #2E4A33);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .interactive-globe:active {
+            cursor: grabbing;
+        }
+
+        .opal-belt {
+            position: absolute;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(90deg, transparent, #81c784, transparent);
+            opacity: 0.7;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .opal-belt.north {
+            top: 25%;
+        }
+
+        .opal-belt.south {
+            bottom: 25%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .real-time-data {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .metric {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #81c784;
+        }
+
+        .metric-unit {
+            font-size: 0.8rem;
+            color: #A5D6A7;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .teps-visualization {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tep-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #81c784, #6AA84F);
+            border-radius: 50%;
+            animation: tep-float 4s ease-in-out infinite;
+        }
+
+        @keyframes tep-float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <a href="biologia_marina_pagina.html" style="color: #81c784; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; transition: color 0.3s;" 
+                   onmouseover="this.style.color='#A5D6A7'" onmouseout="this.style.color='#81c784'">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver a Biología Marina</span>
+                </a>
+                <div class="dashboard-title">
+                    <i class="fas fa-globe-americas"></i>
+                    Dashboard Biogeoquímico Global
+                </div>
+            </div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>Temperatura Global (°C)</label>
+                    <input type="range" class="slider" id="tempSlider" min="-2" max="30" value="15">
+                    <span id="tempValue">15°C</span>
+                </div>
+                <div class="control-group">
+                    <label>CO₂ Atmosférico (ppm)</label>
+                    <input type="range" class="slider" id="co2Slider" min="280" max="450" value="420">
+                    <span id="co2Value">420 ppm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Widget 1: Solubilidad Sílice vs Carbonatos -->
+        <div class="widget">
+            <div class="widget-title">
+                <i class="fas fa-flask"></i>
+                Solubilidad vs Temperatura
+            </div>
+            <div class="chart-container">
+                <canvas id="solubilityChart"></canvas>
+            </div>
+            <div class="temperature-gradient">
+                <div class="gradient-marker" id="tempMarker"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8;">
+                <span>Polar (-2°C)</span>
+                <span>Templado (15°C)</span>
+                <span>Tropical (30°C)</span>
+            </div>
+        </div>
+
+        <!-- Widget 2: Distribución de Organismos -->
+        <div class="widget">
+            <div class="widget-title">
+                <i class="fas fa-fish"></i>
+                Distribución de Organismos
+            </div>
+            <div class="organism-icons">
+                <div class="organism active" data-type="diatom">
+                    <div class="organism-icon">🦠</div>
+                    <div class="organism-name">Diatomeas</div>
+                </div>
+                <div class="organism" data-type="coccolith">
+                    <div class="organism-icon">⚪</div>
+                    <div class="organism-name">Cocolitóforos</div>
+                </div>
+                <div class="organism" data-type="foram">
+                    <div class="organism-icon">🐚</div>
+                    <div class="organism-name">Foraminíferos</div>
+                </div>
+                <div class="organism" data-type="sponge">
+                    <div class="organism-icon">🧽</div>
+                    <div class="organism-name">Esponjas</div>
+                </div>
+            </div>
+            <div class="real-time-data">
+                <div class="metric">
+                    <div class="metric-value" id="organismDensity">245</div>
+                    <div class="metric-unit">ind/L</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="biomass">12.5</div>
+                    <div class="metric-unit">mg C/m³</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="productivity">0.8</div>
+                    <div class="metric-unit">g C/m²/día</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 3: Cinturón de Ópalo Global -->
+        <div class="widget full-width">
+            <div class="widget-title">
+                <i class="fas fa-map-marked-alt"></i>
+                Cinturón de Ópalo y Preservación de Carbonatos
+            </div>
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <div class="interactive-globe" id="globe">
+                    <div class="opal-belt north"></div>
+                    <div class="opal-belt south"></div>
+                </div>
+                <div class="depth-scale">
+                    <div class="depth-marker" style="top: 0;">Superficie</div>
+                    <div class="depth-marker" style="top: 25%;">200m Lisoclina</div>
+                    <div class="depth-marker" style="top: 50%;">1000m</div>
+                    <div class="depth-marker" style="top: 75%;">3000m CCD</div>
+                    <div class="depth-marker" style="top: 95%;">Abisal</div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <div class="data-value" id="opalFlux">8.2</div>
+                            <div class="data-label">Tmol Si/año</div>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-value" id="carbonateFlux">0.3</div>
+                            <div class="data-label">Tmol Ca/año</div>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-value" id="preservation">75</div>
+                            <div class="data-label">% Preservación</div>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-value" id="sedRate">2.1</div>
+                            <div class="data-label">mm/año</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #81c784;"></div>
+                    <span>Cinturón de Ópalo (40-60°)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <span>Zona Carbonatos (30°N-30°S)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #8BC34A;"></div>
+                    <span>Zona Mixta</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 4: TEPs y Biomineralización -->
+        <div class="widget">
+            <div class="widget-title">
+                <i class="fas fa-microscope"></i>
+                TEPs y Biomineralización
+            </div>
+            <div class="teps-visualization" id="tepsViz"></div>
+            <div class="real-time-data">
+                <div class="metric">
+                    <div class="metric-value" id="tepsConc">215</div>
+                    <div class="metric-unit">μg Xeq/L</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="silicRate">4.2</div>
+                    <div class="metric-unit">μmol/L/día</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 5: Ciclos Biogeoquímicos -->
+        <div class="widget">
+            <div class="widget-title">
+                <i class="fas fa-recycle"></i>
+                Flujos Globales
+            </div>
+            <div class="chart-container">
+                <canvas id="fluxChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentTemp = 15;
+        let currentCO2 = 420;
+        let charts = {};
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            initializeControls();
+            initializeAnimations();
+            updateDashboard();
+        });
+
+        // Configuración de gráficos
+        function initializeCharts() {
+            // Gráfico de Solubilidad
+            const solubilityCtx = document.getElementById('solubilityChart').getContext('2d');
+            charts.solubility = new Chart(solubilityCtx, {
+                type: 'line',
+                data: {
+                    labels: [-2, 0, 5, 10, 15, 20, 25, 30],
+                    datasets: [{
+                        label: 'Sílice (μM)',
+                        data: [40, 45, 55, 65, 80, 95, 110, 120],
+                        borderColor: '#81c784',
+                        backgroundColor: 'rgba(129, 199, 132, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'CaCO₃ Saturación (Ω)',
+                        data: [0.8, 1.0, 1.5, 2.0, 2.5, 3.5, 4.0, 5.0],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e2e8f0' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Temperatura (°C)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Solubilidad Si (μM)', color: '#81c784' },
+                            ticks: { color: '#81c784' },
+                            grid: { color: 'rgba(129, 199, 132, 0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Saturación CaCO₃ (Ω)', color: '#4CAF50' },
+                            ticks: { color: '#4CAF50' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Flujos
+            const fluxCtx = document.getElementById('fluxChart').getContext('2d');
+            charts.flux = new Chart(fluxCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Weathering', 'Diatomeas', 'Esponjas', 'Enterramiento'],
+                    datasets: [{
+                        data: [6.2, 240, 15, 6.2],
+                        backgroundColor: ['#8BC34A', '#81c784', '#4CAF50', '#6AA84F'],
+                        borderWidth: 2,
+                        borderColor: '#2E4A33'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#e2e8f0', padding: 10 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Controles interactivos
+        function initializeControls() {
+            const tempSlider = document.getElementById('tempSlider');
+            const co2Slider = document.getElementById('co2Slider');
+
+            tempSlider.addEventListener('input', function() {
+                currentTemp = parseFloat(this.value);
+                document.getElementById('tempValue').textContent = currentTemp + '°C';
+                updateTemperatureMarker();
+                updateDashboard();
+            });
+
+            co2Slider.addEventListener('input', function() {
+                currentCO2 = parseFloat(this.value);
+                document.getElementById('co2Value').textContent = currentCO2 + ' ppm';
+                updateDashboard();
+            });
+
+            // Organismos clickeables
+            document.querySelectorAll('.organism').forEach(org => {
+                org.addEventListener('click', function() {
+                    document.querySelectorAll('.organism').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    updateOrganismData(this.dataset.type);
+                });
+            });
+        }
+
+        // Actualizar marcador de temperatura
+        function updateTemperatureMarker() {
+            const marker = document.getElementById('tempMarker');
+            const position = ((currentTemp + 2) / 32) * 100; // Normalizar entre -2 y 30
+            marker.style.left = Math.max(0, Math.min(100, position)) + '%';
+        }
+
+        // Actualizar datos del dashboard
+        function updateDashboard() {
+            // Actualizar datos basados en temperatura
+            const siliceSolubility = 40 + (currentTemp + 2) * 2.5;
+            const carbonateSaturation = Math.max(0.5, 0.8 + currentTemp * 0.14);
+            
+            // Actualizar preservación basada en temperatura
+            const opalPreservation = Math.max(10, 90 - currentTemp * 2.5);
+            const carbonatePreservation = Math.max(5, currentTemp * 3);
+            
+            document.getElementById('preservation').textContent = opalPreservation.toFixed(0);
+            
+            // Actualizar flujos
+            const tempFactor = (30 - currentTemp) / 30; // Factor que favorece aguas frías
+            document.getElementById('opalFlux').textContent = (5 + tempFactor * 5).toFixed(1);
+            document.getElementById('carbonateFlux').textContent = (2 - tempFactor * 1.5).toFixed(1);
+        }
+
+        // Actualizar datos de organismos
+        function updateOrganismData(type) {
+            const data = {
+                diatom: { density: 245, biomass: 12.5, productivity: 0.8 },
+                coccolith: { density: 89, biomass: 8.2, productivity: 0.5 },
+                foram: { density: 12, biomass: 3.1, productivity: 0.1 },
+                sponge: { density: 2, biomass: 45.6, productivity: 0.05 }
+            };
+
+            const orgData = data[type];
+            document.getElementById('organismDensity').textContent = orgData.density;
+            document.getElementById('biomass').textContent = orgData.biomass;
+            document.getElementById('productivity').textContent = orgData.productivity;
+        }
+
+        // Animaciones
+        function initializeAnimations() {
+            // Crear partículas TEPs
+            const tepsContainer = document.getElementById('tepsViz');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'tep-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                tepsContainer.appendChild(particle);
+            }
+
+            // Rotación del globo
+            const globe = document.getElementById('globe');
+            let rotation = 0;
+            setInterval(() => {
+                rotation += 0.5;
+                globe.style.transform = `rotateY(${rotation}deg)`;
+            }, 100);
+
+            // Actualización de datos en tiempo real
+            setInterval(() => {
+                const tepsConc = 180 + Math.random() * 70;
+                const silicRate = 3.5 + Math.random() * 1.4;
+                
+                document.getElementById('tepsConc').textContent = tepsConc.toFixed(0);
+                document.getElementById('silicRate').textContent = silicRate.toFixed(1);
+            }, 3000);
+        }
+
+        // Inicializar posición del marcador
+        updateTemperatureMarker();
+    </script>
+</body>
+</html>
