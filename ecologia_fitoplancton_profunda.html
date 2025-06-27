@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecología Profunda del Fitoplancton - OlitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c2a 0%, #2d5a3d 100%);
+            color: #e8f5e9;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .neural-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #81c784;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .neural-network {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .knowledge-node {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 2px solid rgba(129, 199, 132, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .knowledge-node:hover {
+            transform: translateY(-5px);
+            border-color: #81c784;
+            box-shadow: 0 10px 25px rgba(129, 199, 132, 0.2);
+        }
+
+        .knowledge-node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4caf50, #81c784, #a5d6a7);
+        }
+
+        .node-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #81c784;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .node-question {
+            font-size: 1.1rem;
+            color: #c8e6c9;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .node-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .calculations {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .calculations h4 {
+            color: #81c784;
+            margin-bottom: 0.5rem;
+        }
+
+        .connection-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .interconnection-map {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .interconnection-title {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #81c784;
+            margin-bottom: 1.5rem;
+        }
+
+        .connection-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            margin: 0.25rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .connection-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .neural-network {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .quantitative-data {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .depth-gradient {
+            background: linear-gradient(to bottom, 
+                rgba(100, 200, 255, 0.3) 0%,
+                rgba(50, 150, 200, 0.3) 25%,
+                rgba(30, 100, 150, 0.3) 50%,
+                rgba(20, 50, 100, 0.3) 75%,
+                rgba(10, 20, 50, 0.3) 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="neural-container">
+        <div class="page-header">
+            <h1><i class="fas fa-project-diagram"></i> Ecología Profunda del Fitoplancton</h1>
+            <p>Red de conocimiento interconectado sobre los procesos fundamentales del fitoplancton marino</p>
+        </div>
+
+        <div class="neural-network">
+            <!-- Nodo 1: Balance Carbono-Oxígeno -->
+            <div class="knowledge-node" onclick="expandNode(1)">
+                <div class="node-title">
+                    <i class="fas fa-balance-scale"></i>
+                    Balance Global CO₂-O₂
+                </div>
+                <div class="node-question">
+                    ¿Se mantiene en equilibrio la producción de CO₂ y O₂ en los océanos?
+                </div>
+                <div class="node-content">
+                    <p>El fitoplancton es responsable del <strong>50% del oxígeno global</strong> y captura ~50 Gt C/año.</p>
+                    
+                    <div class="calculations">
+                        <h4>📊 Cálculos del Balance:</h4>
+                        <p>• <strong>Producción O₂:</strong> 330 Gt O₂/año</p>
+                        <p>• <strong>Captura CO₂:</strong> 50 Gt C/año ≈ 183 Gt CO₂/año</p>
+                        <p>• <strong>Ratio estequiométrico:</strong> 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</p>
+                        <p>• <strong>Eficiencia bomba biológica:</strong> ~30% del CO₂ fijado</p>
+                    </div>
+
+                    <div class="quantitative-data">
+                        <strong>Factores de desequilibrio:</strong><br>
+                        • Calentamiento océanos → ↓ solubilidad CO₂<br>
+                        • Acidificación → ↓ calcificación<br>
+                        • Estratificación → ↓ mezcla nutrientes
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nodo 2: Flujo Energético Trófico -->
+            <div class="knowledge-node" onclick="expandNode(2)">
+                <div class="node-title">
+                    <i class="fas fa-arrow-up"></i>
+                    Flujo Energético Trófico
+                </div>
+                <div class="node-question">
+                    ¿Cuánto fitoplancton debe consumir el zooplancton y cuánto zooplancton un pez?
+                </div>
+                <div class="node-content">
+                    <p>Transferencia energética con eficiencia del <strong>10% entre niveles tróficos</strong>.</p>
+                    
+                    <div class="calculations">
+                        <h4>🔢 Cálculos Energéticos:</h4>
+                        <p><strong>Fitoplancton → Zooplancton:</strong></p>
+                        <p>• 1g zooplancton = 10g fitoplancton consumido</p>
+                        <p>• Copépodo (50μg): 500μg fitoplancton/día</p>
+                        <p>• Krill (1g): 10g fitoplancton/día</p>
+                        
+                        <p><strong>Zooplancton → Peces:</strong></p>
+                        <p>• Anchoa pequeña (5g): 50g zooplancton/día</p>
+                        <p>• Sardina (50g): 500g zooplancton/día</p>
+                        <p>• Pez mediaco (500g): 5kg zooplancton/día</p>
+                    </div>
+
+                    <div class="quantitative-data">
+                        <strong>Metabolismo basal (kcal/día):</strong><br>
+                        • Copépodo: 0.001 kcal<br>
+                        • Anchoa: 0.5 kcal<br>
+                        • Sardina: 5 kcal
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nodo 3: Fotosíntesis en Columna de Agua -->
+            <div class="knowledge-node" onclick="expandNode(3)">
+                <div class="node-title">
+                    <i class="fas fa-sun"></i>
+                    Fotosíntesis vs Profundidad
+                </div>
+                <div class="node-question">
+                    ¿Cómo varían los procesos fotosintéticos con la profundidad y los ciclos de luz?
+                </div>
+                <div class="node-content">
+                    <p>La fotosíntesis depende exponencialmente de la <strong>penetración de luz</strong> y los <strong>ritmos circadianos</strong>.</p>
+                    
+                    <div class="depth-gradient">
+                        <h4>🌊 Perfil de Profundidad:</h4>
+                        <p><strong>0-10m:</strong> 100% luz, máxima productividad</p>
+                        <p><strong>10-50m:</strong> 50-10% luz, zona productiva</p>
+                        <p><strong>50-100m:</strong> 10-1% luz, límite fotosíntesis</p>
+                        <p><strong>100-200m:</strong> <1% luz, zona afótica</p>
+                    </div>
+
+                    <div class="calculations">
+                        <h4>💡 Clorofila vs Profundidad:</h4>
+                        <p>• <strong>Superficie:</strong> 0.1-1 mg Chl-a/m³</p>
+                        <p>• <strong>Máximo subsuperficial:</strong> 2-5 mg Chl-a/m³ (30-60m)</p>
+                        <p>• <strong>Zona afótica:</strong> <0.1 mg Chl-a/m³</p>
+                        <p>• <strong>Ritmo diurno:</strong> Pico a mediodía, mínimo nocturno</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nodo 4: Ciclos de Nutrientes -->
+            <div class="knowledge-node" onclick="expandNode(4)">
+                <div class="node-title">
+                    <i class="fas fa-recycle"></i>
+                    Ciclos N-P-Si-Fe-Co-Zn
+                </div>
+                <div class="node-question">
+                    ¿Cómo limitan los nutrientes esenciales la productividad del fitoplancton?
+                </div>
+                <div class="node-content">
+                    <p>Los <strong>micronutrientes</strong> son factores limitantes críticos siguiendo la <strong>Ley de Liebig</strong>.</p>
+                    
+                    <div class="calculations">
+                        <h4>🧪 Concentraciones Críticas:</h4>
+                        <p><strong>Macronutrientes:</strong></p>
+                        <p>• N (NO₃⁻): 0.1-30 μM (limitante en trópicos)</p>
+                        <p>• P (PO₄³⁻): 0.01-2 μM (limitante en Mediterráneo)</p>
+                        <p>• Si (SiO₄²⁻): 0.1-100 μM (limitante para diatomeas)</p>
+                        
+                        <p><strong>Micronutrientes:</strong></p>
+                        <p>• Fe: 0.01-2 nM (limitante en HNLC)</p>
+                        <p>• Co: 1-50 pM (limitante en upwelling)</p>
+                        <p>• Zn: 0.1-10 nM (limitante en Antártico)</p>
+                    </div>
+
+                    <div class="quantitative-data">
+                        <strong>Ratios Redfield modificadas:</strong><br>
+                        C:N:P:Si:Fe = 106:16:1:15:0.001<br>
+                        <strong>Zonas HNLC:</strong> Pacífico Ecuatorial, Océano Austral
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nodo 5: Comunidades por Profundidad -->
+            <div class="knowledge-node" onclick="expandNode(5)">
+                <div class="node-title">
+                    <i class="fas fa-layer-group"></i>
+                    Comunidades Verticales
+                </div>
+                <div class="node-question">
+                    ¿Qué especies emergen en diferentes profundidades cuando declina el fitoplancton?
+                </div>
+                <div class="node-content">
+                    <p>La <strong>zonación vertical</strong> determina diferentes comunidades microbianas especializadas.</p>
+                    
+                    <div class="depth-gradient">
+                        <h4>🦠 Succession Vertical:</h4>
+                        <p><strong>Zona Eufótica (0-100m):</strong></p>
+                        <p>• Diatomeas, dinoflagelados, cocolitóforos</p>
+                        <p>• Copépodos, eufáusidos, larvas</p>
+                        
+                        <p><strong>Zona Disfótica (100-1000m):</strong></p>
+                        <p>• Bacterias quimiolitotróficas</p>
+                        <p>• Zooplancton migrador vertical</p>
+                        <p>• Partículas en sedimentación</p>
+                        
+                        <p><strong>Zona Afótica (>1000m):</strong></p>
+                        <p>• Arqueobacterias termófilas</p>
+                        <p>• Bacterias sulfato-reductoras</p>
+                        <p>• Zooplancton de aguas profundas</p>
+                    </div>
+
+                    <div class="calculations">
+                        <h4>📈 Transición de Especies:</h4>
+                        <p>• <strong>50m:</strong> Declina fitoplancton costero</p>
+                        <p>• <strong>100m:</strong> Surgen bacterias heterotróficas</p>
+                        <p>• <strong>200m:</strong> Dominan arqueobacterias</p>
+                        <p>• <strong>500m:</strong> Bacterias quimiosintéticas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nodo 6: Clorofila y Biomasa -->
+            <div class="knowledge-node" onclick="expandNode(6)">
+                <div class="node-title">
+                    <i class="fas fa-leaf"></i>
+                    Estimadores de Biomasa
+                </div>
+                <div class="node-question">
+                    ¿De qué depende la producción de clorofila como estimador de biomasa?
+                </div>
+                <div class="node-content">
+                    <p>La <strong>clorofila-a</strong> es el principal proxy de biomasa, pero varía con factores ambientales.</p>
+                    
+                    <div class="calculations">
+                        <h4>🧬 Factores de Variación Chl-a:</h4>
+                        <p><strong>Factores intrínsecos:</strong></p>
+                        <p>• Ratio C:Chl = 20-200 (especie-dependiente)</p>
+                        <p>• Aclimatación lumínica: ↑chl en baja luz</p>
+                        <p>• Estado nutricional: ↓chl en N-limitación</p>
+                        
+                        <p><strong>Factores extrínsecos:</strong></p>
+                        <p>• Temperatura: Q₁₀ = 2-3 para síntesis</p>
+                        <p>• Irradiancia: Saturación ~200 μE/m²/s</p>
+                        <p>• Nutrientes: Correlación con N, P, Fe</p>
+                    </div>
+
+                    <div class="quantitative-data">
+                        <strong>Correlaciones empíricas:</strong><br>
+                        • Biomasa (μg C/L) = 30-80 × Chl-a (μg/L)<br>
+                        • Productividad ∝ Chl-a × PAR × T<br>
+                        • Precisión satelital: ±35% en aguas abiertas
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mapa de Interconexiones -->
+        <div class="interconnection-map">
+            <div class="interconnection-title">
+                <i class="fas fa-network-wired"></i> Red de Conocimiento Interconectado
+            </div>
+            <div style="text-align: center;">
+                <a href="biologia_marina_pagina.html" class="connection-link">← Volver a Biología Marina</a>
+                <a href="#" class="connection-link">Oceanografía Química →</a>
+                <a href="#" class="connection-link">Cadenas Tróficas →</a>
+                <a href="#" class="connection-link">Ciclos Biogeoquímicos →</a>
+                <a href="#" class="connection-link">Cambio Climático →</a>
+                <a href="#" class="connection-link">Modelado Ecosistémico →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function expandNode(nodeId) {
+            // Funcionalidad para expandir nodos con más información
+            console.log(`Expandiendo nodo ${nodeId}`);
+            
+            // Aquí se puede agregar lógica para:
+            // - Mostrar información adicional
+            // - Conectar con otras páginas
+            // - Cargar datos en tiempo real
+            // - Mostrar gráficos interactivos
+        }
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const nodes = document.querySelectorAll('.knowledge-node');
+            nodes.forEach((node, index) => {
+                setTimeout(() => {
+                    node.style.opacity = '0';
+                    node.style.transform = 'translateY(20px)';
+                    node.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        node.style.opacity = '1';
+                        node.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 150);
+            });
+        });
+    </script>
+</body>
+</html>
