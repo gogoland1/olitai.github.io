@@ -1,0 +1,342 @@
+/* 🌊 Dashboard CTD - Estilos CSS */
+
+:root {
+    --fjord-color: #2E8B57;
+    --delta-color: #8B4513;
+    --coastal-color: #4682B4;
+    --oceanic-color: #191970;
+    --bg-dark: #1a1a1a;
+    --bg-secondary: #2d3748;
+    --text-light: #f7fafc;
+}
+
+body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar personalizado */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.navbar-brand i {
+    color: #00bcd4;
+    margin-right: 8px;
+}
+
+/* Cards personalizados */
+.card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-header h5, .card-header h6 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.card-header i {
+    color: #00bcd4;
+    margin-right: 8px;
+}
+
+/* Sliders personalizados */
+.form-range {
+    background: transparent;
+}
+
+.form-range::-webkit-slider-track {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    height: 8px;
+    border-radius: 4px;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: #00bcd4;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    width: 20px;
+    height: 20px;
+}
+
+.form-range::-moz-range-track {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    height: 8px;
+    border-radius: 4px;
+    border: none;
+}
+
+.form-range::-moz-range-thumb {
+    background: #00bcd4;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    width: 20px;
+    height: 20px;
+}
+
+/* Botones de ambiente */
+.preset-btn {
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.preset-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.preset-btn[data-preset="fjord"]:hover,
+.preset-btn[data-preset="fjord"].active {
+    background-color: var(--fjord-color);
+    border-color: var(--fjord-color);
+}
+
+.preset-btn[data-preset="delta"]:hover,
+.preset-btn[data-preset="delta"].active {
+    background-color: var(--delta-color);
+    border-color: var(--delta-color);
+}
+
+.preset-btn[data-preset="coastal"]:hover,
+.preset-btn[data-preset="coastal"].active {
+    background-color: var(--coastal-color);
+    border-color: var(--coastal-color);
+}
+
+.preset-btn[data-preset="oceanic"]:hover,
+.preset-btn[data-preset="oceanic"].active {
+    background-color: var(--oceanic-color);
+    border-color: var(--oceanic-color);
+}
+
+/* Estadísticas */
+.stat-box {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.stat-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* Información del ambiente */
+.environment-card {
+    padding: 15px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.environment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.composition-chart {
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Botones de vista de perfil */
+.btn-check:checked + .btn-outline-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-check:checked + .btn-outline-info {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.btn-check:checked + .btn-outline-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.btn-check:checked + .btn-outline-light {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    color: #000;
+}
+
+/* Gráficos */
+#profilesPlot, #tsPlot, #comparisonPlot {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Loading spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #00bcd4;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .preset-btn {
+        margin-bottom: 5px;
+    }
+}
+
+/* Tooltips personalizados */
+.tooltip-inner {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00bcd4;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0097a7;
+}
+
+/* Estados de los sliders según ambiente */
+.environment-slider[data-env="fjord"]::-webkit-slider-thumb {
+    background: var(--fjord-color);
+}
+
+.environment-slider[data-env="delta"]::-webkit-slider-thumb {
+    background: var(--delta-color);
+}
+
+.environment-slider[data-env="coastal"]::-webkit-slider-thumb {
+    background: var(--coastal-color);
+}
+
+.environment-slider[data-env="oceanic"]::-webkit-slider-thumb {
+    background: var(--oceanic-color);
+}
+
+/* Efectos de brillo */
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+}
+
+.card:hover .card-header::before {
+    left: 100%;
+}
+
+/* Indicadores de ambiente activo */
+.environment-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.environment-indicator.fjord {
+    background-color: var(--fjord-color);
+}
+
+.environment-indicator.delta {
+    background-color: var(--delta-color);
+}
+
+.environment-indicator.coastal {
+    background-color: var(--coastal-color);
+}
+
+.environment-indicator.oceanic {
+    background-color: var(--oceanic-color);
+}
+
+.environment-indicator.active {
+    border-color: #fff;
+    box-shadow: 0 0 10px currentColor;
+}

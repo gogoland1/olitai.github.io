@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Dashboard CTD - Ambientes Marinos</title>
+    
+    <!-- Estilos CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <!-- Chart.js para gráficos adicionales -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-dark text-light">
+    
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-water"></i> Dashboard CTD - Ambientes Marinos
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-thermometer-half"></i> Sistema Interactivo de Perfiles Oceanográficos
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Principal -->
+    <div class="container-fluid mt-4">
+        
+        <!-- Controles Principales -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h5><i class="fas fa-sliders-h"></i> Controles de Ambiente Marino</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            
+                            <!-- Sliders de Peso por Ambiente -->
+                            <div class="col-md-8">
+                                <h6>Composición del Ambiente (Pesos Relativos)</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="fjordSlider" class="form-label">
+                                            <i class="fas fa-mountain"></i> Fiordo: <span id="fjordValue">25%</span>
+                                        </label>
+                                        <input type="range" class="form-range environment-slider" id="fjordSlider" 
+                                               min="0" max="100" value="25" data-env="fjord">
+                                        <small class="text-muted">Aguas frías, estratificadas</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="deltaSlider" class="form-label">
+                                            <i class="fas fa-river"></i> Delta: <span id="deltaValue">25%</span>
+                                        </label>
+                                        <input type="range" class="form-range environment-slider" id="deltaSlider" 
+                                               min="0" max="100" value="25" data-env="delta">
+                                        <small class="text-muted">Gradiente salino fuerte</small>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="coastalSlider" class="form-label">
+                                            <i class="fas fa-anchor"></i> Costero: <span id="coastalValue">25%</span>
+                                        </label>
+                                        <input type="range" class="form-range environment-slider" id="coastalSlider" 
+                                               min="0" max="100" value="25" data-env="coastal">
+                                        <small class="text-muted">Influencia terrestre</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="oceanicSlider" class="form-label">
+                                            <i class="fas fa-globe-americas"></i> Oceánico: <span id="oceanicValue">25%</span>
+                                        </label>
+                                        <input type="range" class="form-range environment-slider" id="oceanicSlider" 
+                                               min="0" max="100" value="25" data-env="oceanic">
+                                        <small class="text-muted">Masas de agua oceánicas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controles Adicionales -->
+                            <div class="col-md-4">
+                                <h6>Parámetros de Muestreo</h6>
+                                <div class="mb-3">
+                                    <label for="depthSlider" class="form-label">
+                                        <i class="fas fa-arrows-alt-v"></i> Profundidad Máxima: <span id="depthValue">500m</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="depthSlider" 
+                                           min="50" max="2000" value="500" step="50">
+                                </div>
+                                
+                                <div class="btn-group w-100 mb-3" role="group">
+                                    <button type="button" class="btn btn-outline-info preset-btn" data-preset="fjord">
+                                        <i class="fas fa-mountain"></i> Fiordo
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning preset-btn" data-preset="delta">
+                                        <i class="fas fa-river"></i> Delta
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary preset-btn" data-preset="coastal">
+                                        <i class="fas fa-anchor"></i> Costero
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success preset-btn" data-preset="oceanic">
+                                        <i class="fas fa-globe"></i> Oceánico
+                                    </button>
+                                </div>
+                                
+                                <button type="button" class="btn btn-danger w-100" id="resetBtn">
+                                    <i class="fas fa-redo"></i> Resetear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos Principales -->
+        <div class="row">
+            
+            <!-- Perfiles Verticales -->
+            <div class="col-lg-8">
+                <div class="card bg-secondary h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-chart-line"></i> Perfiles CTD Verticales</h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input type="radio" class="btn-check" name="profileView" id="temperatureView" checked>
+                            <label class="btn btn-outline-danger" for="temperatureView">Temperatura</label>
+                            
+                            <input type="radio" class="btn-check" name="profileView" id="salinityView">
+                            <label class="btn btn-outline-info" for="salinityView">Salinidad</label>
+                            
+                            <input type="radio" class="btn-check" name="profileView" id="oxygenView">
+                            <label class="btn btn-outline-success" for="oxygenView">Oxígeno</label>
+                            
+                            <input type="radio" class="btn-check" name="profileView" id="allView">
+                            <label class="btn btn-outline-light" for="allView">Todos</label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="profilesPlot" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel de Información -->
+            <div class="col-lg-4">
+                <div class="row">
+                    
+                    <!-- Estadísticas -->
+                    <div class="col-12 mb-3">
+                        <div class="card bg-secondary">
+                            <div class="card-header">
+                                <h6><i class="fas fa-chart-bar"></i> Estadísticas del Perfil</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="statsContainer">
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <div class="stat-box bg-danger rounded p-2 mb-2">
+                                                <i class="fas fa-thermometer-half"></i>
+                                                <div class="stat-value" id="tempMean">--</div>
+                                                <div class="stat-label">Temp. Media (°C)</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="stat-box bg-info rounded p-2 mb-2">
+                                                <i class="fas fa-tint"></i>
+                                                <div class="stat-value" id="salMean">--</div>
+                                                <div class="stat-label">Sal. Media (PSU)</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="stat-box bg-success rounded p-2 mb-2">
+                                                <i class="fas fa-lungs"></i>
+                                                <div class="stat-value" id="oxyMean">--</div>
+                                                <div class="stat-label">O₂ Medio (μmol/L)</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="stat-box bg-warning rounded p-2 mb-2">
+                                                <i class="fas fa-layer-group"></i>
+                                                <div class="stat-value" id="stratification">--</div>
+                                                <div class="stat-label">Estratificación</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información del Ambiente -->
+                    <div class="col-12">
+                        <div class="card bg-secondary">
+                            <div class="card-header">
+                                <h6><i class="fas fa-info-circle"></i> Información del Ambiente</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="environmentInfo">
+                                    <div class="environment-card" id="dominantEnvCard">
+                                        <h6 id="dominantEnvName">Ambiente Mixto</h6>
+                                        <p id="dominantEnvDesc" class="small text-muted">
+                                            Perfil generado por combinación de múltiples ambientes marinos
+                                        </p>
+                                        <div class="composition-chart">
+                                            <canvas id="compositionChart" width="200" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos Secundarios -->
+        <div class="row mt-4">
+            
+            <!-- Diagrama T-S -->
+            <div class="col-lg-6">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h5><i class="fas fa-project-diagram"></i> Diagrama Temperatura-Salinidad</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="tsPlot" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Análisis Comparativo -->
+            <div class="col-lg-6">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h5><i class="fas fa-balance-scale"></i> Comparación entre Ambientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="comparisonPlot" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-secondary">
+                    <div class="card-body text-center">
+                        <p class="mb-0">
+                            <i class="fas fa-water"></i> Sistema de Visualización CTD - Ambientes Marinos | 
+                            <strong>OLITAI</strong> | 
+                            <i class="fas fa-code"></i> Desarrollado con Python, Flask y JavaScript
+                        </p>
+                        <small class="text-muted">
+                            Perfiles oceanográficos interactivos para educación e investigación marina
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    
+</body>
+</html>
