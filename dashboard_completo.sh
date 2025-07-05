@@ -8,31 +8,38 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Limpiar virtual environment si existe
-if [ -d "venv_dashboard" ]; then
-    echo "🧹 Limpiando virtual environment existente..."
-    rm -rf venv_dashboard
+# Verificar si virtual environment existe y tiene las dependencias
+if [ -d "venv_dashboard" ] && venv_dashboard/bin/python -c "import flask, plotly, numpy" 2>/dev/null; then
+    echo "✅ Virtual environment ya existe con dependencias instaladas"
+    echo "🔄 Activando virtual environment existente..."
+    source venv_dashboard/bin/activate
+else
+    echo "📦 Creando/actualizando virtual environment..."
+    
+    # Limpiar si existe pero está incompleto
+    if [ -d "venv_dashboard" ]; then
+        rm -rf venv_dashboard
+    fi
+    
+    # Crear nuevo virtual environment
+    python3 -m venv venv_dashboard
+    
+    # Activar virtual environment
+    echo "🔄 Activando virtual environment..."
+    source venv_dashboard/bin/activate
+    
+    # Actualizar pip en el virtual environment
+    echo "⬆️ Actualizando pip..."
+    python -m pip install --upgrade pip --quiet
+    
+    # Instalar dependencias en el virtual environment
+    echo "📦 Instalando dependencias en virtual environment..."
+    pip install flask flask-cors plotly numpy matplotlib scipy pandas --quiet
+    
+    # Verificar instalación
+    echo "✅ Verificando instalación..."
+    python -c "import flask, plotly, numpy; print('✅ Todas las dependencias instaladas correctamente')"
 fi
-
-# Crear nuevo virtual environment
-echo "📦 Creando virtual environment..."
-python3 -m venv venv_dashboard
-
-# Activar virtual environment
-echo "🔄 Activando virtual environment..."
-source venv_dashboard/bin/activate
-
-# Actualizar pip en el virtual environment
-echo "⬆️ Actualizando pip..."
-python -m pip install --upgrade pip
-
-# Instalar dependencias en el virtual environment
-echo "📦 Instalando dependencias en virtual environment..."
-pip install flask flask-cors plotly numpy matplotlib scipy pandas
-
-# Verificar instalación
-echo "✅ Verificando instalación..."
-python -c "import flask, plotly, numpy; print('✅ Todas las dependencias instaladas correctamente')"
 
 # Ejecutar dashboard
 echo "🚀 Ejecutando Dashboard CTD..."

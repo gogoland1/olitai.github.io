@@ -1,4 +1,4 @@
-// 🌊 Dashboard CTD - JavaScript Optimizado
+// 🌊 Dashboard CTD - JavaScript Principal
 // Sistema interactivo de perfiles oceanográficos
 
 class CTDDashboard {
@@ -7,7 +7,6 @@ class CTDDashboard {
         this.environments = {};
         this.compositionChart = null;
         this.currentView = 'temperature';
-        this.updateTimeout = null; // Para debouncing
         
         // Configuración de colores
         this.colors = {
@@ -32,10 +31,6 @@ class CTDDashboard {
             // Configurar event listeners
             this.setupEventListeners();
             
-            // Configurar profundidad por defecto a 500m
-            document.getElementById('depthSlider').value = 500;
-            document.getElementById('depthValue').textContent = '500m';
-            
             // Cargar perfil inicial
             await this.updateProfile();
             
@@ -57,18 +52,18 @@ class CTDDashboard {
     }
     
     setupEventListeners() {
-        // Sliders de ambiente (con debouncing)
+        // Sliders de ambiente
         document.querySelectorAll('.environment-slider').forEach(slider => {
             slider.addEventListener('input', (e) => {
                 this.updateSliderValue(e.target);
-                this.debouncedUpdateProfile();
+                this.updateProfile();
             });
         });
         
-        // Slider de profundidad (con debouncing)
+        // Slider de profundidad
         document.getElementById('depthSlider').addEventListener('input', (e) => {
             document.getElementById('depthValue').textContent = e.target.value + 'm';
-            this.debouncedUpdateProfile();
+            this.updateProfile();
         });
         
         // Botones preset
@@ -91,17 +86,6 @@ class CTDDashboard {
                 this.updateProfilePlot();
             });
         });
-    }
-    
-    // Función con debouncing para evitar actualizaciones excesivas
-    debouncedUpdateProfile() {
-        if (this.updateTimeout) {
-            clearTimeout(this.updateTimeout);
-        }
-        
-        this.updateTimeout = setTimeout(() => {
-            this.updateProfile();
-        }, 150); // Esperar 150ms antes de actualizar
     }
     
     updateSliderValue(slider) {
@@ -275,13 +259,13 @@ class CTDDashboard {
             });
         }
         
-        // Configurar layout con grillas mejoradas
+        // Configurar layout
         const layout = {
             title: `Perfil CTD - ${profile.dominant_environment}`,
             xaxis: { 
                 title: this.getXAxisTitle(),
                 side: 'top',
-                gridcolor: 'rgba(255,255,255,0.08)',
+                gridcolor: 'rgba(255,255,255,0.1)',
                 gridwidth: 1,
                 showgrid: true,
                 zeroline: false
@@ -289,14 +273,14 @@ class CTDDashboard {
             yaxis: { 
                 title: 'Profundidad (m)',
                 autorange: 'reversed',
-                gridcolor: 'rgba(255,255,255,0.08)', 
+                gridcolor: 'rgba(255,255,255,0.1)', 
                 gridwidth: 1,
                 showgrid: true,
                 zeroline: false,
                 range: [-profile.max_depth, 0]
             },
             paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: 'rgba(248,249,250,0.01)',
+            plot_bgcolor: 'rgba(248,249,250,0.02)',
             font: { color: 'white' },
             showlegend: this.currentView === 'all',
             margin: { l: 60, r: 60, t: 80, b: 60 }
@@ -310,7 +294,7 @@ class CTDDashboard {
                     overlaying: 'x',
                     side: 'top',
                     position: 0.85,
-                    gridcolor: 'rgba(255,255,255,0.03)',
+                    gridcolor: 'rgba(255,255,255,0.05)',
                     showgrid: false,
                     zeroline: false
                 },
@@ -319,21 +303,21 @@ class CTDDashboard {
                     overlaying: 'x',
                     side: 'top',
                     position: 0.95,
-                    gridcolor: 'rgba(255,255,255,0.03)',
+                    gridcolor: 'rgba(255,255,255,0.05)',
                     showgrid: false,
                     zeroline: false
                 }
             });
         }
         
-        // Agregar solo líneas clave de profundidad
+        // Agregar líneas de referencia de profundidad
         const shapes = this.getDepthReferenceLines(profile.max_depth);
         layout.shapes = shapes;
         
         const config = {
             responsive: true,
             displayModeBar: true,
-            modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d', 'autoScale2d'],
+            modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
             displaylogo: false
         };
         
@@ -351,11 +335,11 @@ class CTDDashboard {
     }
     
     getDepthReferenceLines(maxDepth) {
-        // Solo líneas clave para evitar sobrecarga visual
+        // Solo mostrar líneas clave para no sobrecargar
         const references = [
-            { depth: 100, color: 'rgba(255,255,255,0.15)' },
-            { depth: 250, color: 'rgba(255,255,255,0.1)' },
-            { depth: 500, color: 'rgba(255,255,255,0.15)' }
+            { depth: 100, label: '100m', color: 'rgba(255,255,255,0.2)' },
+            { depth: 250, label: '250m', color: 'rgba(255,255,255,0.15)' },
+            { depth: 500, label: '500m', color: 'rgba(255,255,255,0.2)' }
         ];
         
         return references
@@ -474,7 +458,7 @@ class CTDDashboard {
             weights.coastal,
             weights.oceanic
         ];
-        this.compositionChart.update('none'); // Sin animación para mejor rendimiento
+        this.compositionChart.update();
     }
     
     async updateTSPlot() {
@@ -491,27 +475,28 @@ class CTDDashboard {
             marker: {
                 color: profile.depths,
                 colorscale: 'Viridis_r',
-                size: 5,
+                size: 6,
                 colorbar: {
                     title: 'Profundidad (m)',
-                    titlefont: { color: 'white', size: 11 },
-                    tickfont: { color: 'white', size: 9 }
+                    titlefont: { color: 'white', size: 12 },
+                    tickfont: { color: 'white', size: 10 }
                 },
                 showscale: true
             },
-            line: { color: this.colors.mixed, width: 2.5 },
+            line: { color: this.colors.mixed, width: 3 },
             hovertemplate: '<b>Diagrama T-S</b><br>' +
                          'Salinidad: %{x:.1f} PSU<br>' +
                          'Temperatura: %{y:.1f}°C<br>' +
                          'Profundidad: %{marker.color:.0f}m<extra></extra>'
         };
 
-        // Agregar traces de referencia para ambientes con peso > 15%
+        // Agregar traces de referencia para ambientes puros
         const traces = [mainTrace];
         const weights = this.getCurrentWeights();
         
+        // Solo mostrar ambientes con peso > 10% para no sobrecargar
         for (const [env, weight] of Object.entries(weights)) {
-            if (weight > 15 && this.environments[env]) {
+            if (weight > 10 && this.environments[env]) {
                 const envData = this.environments[env];
                 traces.push({
                     x: envData.salinity,
@@ -523,7 +508,7 @@ class CTDDashboard {
                         width: 1.5,
                         dash: 'dash'
                     },
-                    opacity: 0.5,
+                    opacity: 0.6,
                     hovertemplate: '<b>' + env + '</b><br>' +
                                  'Salinidad: %{x:.1f} PSU<br>' +
                                  'Temperatura: %{y:.1f}°C<extra></extra>'
@@ -532,26 +517,25 @@ class CTDDashboard {
         }
         
         const layout = {
-            title: 'Diagrama T-S con Comparación de Ambientes',
+            title: 'Diagrama Temperatura-Salinidad',
             xaxis: { 
                 title: 'Salinidad (PSU)',
                 color: 'white',
-                gridcolor: 'rgba(255,255,255,0.08)',
+                gridcolor: 'rgba(255,255,255,0.1)',
                 showgrid: true,
                 zeroline: false
             },
             yaxis: { 
                 title: 'Temperatura (°C)',
                 color: 'white',
-                gridcolor: 'rgba(255,255,255,0.08)',
+                gridcolor: 'rgba(255,255,255,0.1)',
                 showgrid: true,
                 zeroline: false
             },
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: { color: 'white' },
-            margin: { l: 60, r: 60, t: 60, b: 60 },
-            showlegend: traces.length > 1
+            margin: { l: 60, r: 60, t: 60, b: 60 }
         };
         
         const config = {
@@ -559,7 +543,7 @@ class CTDDashboard {
             displayModeBar: false
         };
         
-        Plotly.newPlot('tsPlot', traces, layout, config);
+        Plotly.newPlot('tsPlot', [trace], layout, config);
     }
     
     showLoading(show) {
@@ -567,14 +551,12 @@ class CTDDashboard {
         
         elements.forEach(id => {
             const element = document.getElementById(id);
-            if (element) {
-                if (show) {
-                    element.style.opacity = '0.6';
-                    element.style.pointerEvents = 'none';
-                } else {
-                    element.style.opacity = '1';
-                    element.style.pointerEvents = 'auto';
-                }
+            if (show) {
+                element.style.opacity = '0.5';
+                element.style.pointerEvents = 'none';
+            } else {
+                element.style.opacity = '1';
+                element.style.pointerEvents = 'auto';
             }
         });
     }
