@@ -88,10 +88,12 @@ node_modules/
 *.min.js
 *.min.css
 
-# Archivos de Plotly (grandes)
-*.html
+# Archivos de Plotly (grandes) - solo archivos generados
+*_plotly_output.html
+plotly_*.html
 
 # Excepciones - Mantener estos archivos
 !templates/*.html
 !static/*.css
 !static/*.js
+!*.html
