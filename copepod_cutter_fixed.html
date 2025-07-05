@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦐 Recortador de Copépodos ML - CORREGIDO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c2a 0%, #2d5a3d 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #81c784;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+        }
+
+        .status-banner {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .processing-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .image-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(129, 199, 132, 0.5);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #81c784;
+            background: rgba(129, 199, 132, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #d97706, #f59e0b);
+        }
+
+        .parameters {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .parameter-group {
+            margin: 15px 0;
+        }
+
+        .parameter-group label {
+            display: block;
+            color: #a855f7;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .parameter-group input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .canvas-container {
+            display: none;
+        }
+
+        .debug-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .debug-panel h4 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+
+        .debug-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦐 Recortador ML - VERSIÓN CORREGIDA</h1>
+            <p>Procesamiento híbrido funcionando correctamente</p>
+            <div class="status-banner">
+                ✅ HÍBRIDO ML CORREGIDO - Todas las técnicas funcionan
+            </div>
+        </div>
+
+        <!-- Controles de parámetros -->
+        <div class="parameters">
+            <h3>⚡ Parámetros Procesamiento Híbrido</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div class="parameter-group">
+                    <label>Peso Color:</label>
+                    <input type="range" id="weight-color" min="0" max="1" step="0.1" value="0.4">
+                    <span id="weight-color-value">0.4</span>
+                </div>
+                <div class="parameter-group">
+                    <label>Peso Edge:</label>
+                    <input type="range" id="weight-edge" min="0" max="1" step="0.1" value="0.3">
+                    <span id="weight-edge-value">0.3</span>
+                </div>
+                <div class="parameter-group">
+                    <label>Peso IA:</label>
+                    <input type="range" id="weight-ai" min="0" max="1" step="0.1" value="0.3">
+                    <span id="weight-ai-value">0.3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de procesamiento -->
+        <div class="processing-area">
+            <!-- Panel imagen original -->
+            <div class="image-panel">
+                <h3>📷 Imagen Original</h3>
+                <div class="upload-area" id="uploadArea">
+                    <div>🦐 Arrastra aquí la imagen del copépodo</div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                <div class="image-container" id="originalImageContainer">
+                    <div style="text-align: center; color: #666;">
+                        <p>Imagen aparecerá aquí</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="loadSampleImage()">
+                        🖼️ Cargar Imagen de Prueba
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel resultado -->
+            <div class="image-panel">
+                <h3>✂️ Copépodo Recortado</h3>
+                <div class="image-container" id="resultImageContainer">
+                    <div style="text-align: center; color: #666;">
+                        <p>Resultado aparecerá aquí</p>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="processColor()" id="colorBtn">
+                        🎯 Segmentación Color
+                    </button>
+                    <button class="btn" onclick="processEdge()" id="edgeBtn">
+                        🔍 Edge Detection
+                    </button>
+                    <button class="btn" onclick="processAI()" id="aiBtn">
+                        🧠 Remoción IA
+                    </button>
+                    <button class="btn btn-warning" onclick="processHybridFixed()" id="hybridBtn">
+                        ⚡ HÍBRIDO CORREGIDO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de debug -->
+        <div class="debug-panel">
+            <h4>🔧 Debug y Estado</h4>
+            <div class="debug-log" id="debugLog">
+                <div>🦐 Recortador ML inicializado - Esperando imagen...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas ocultos -->
+    <div class="canvas-container">
+        <canvas id="processCanvas"></canvas>
+        <canvas id="resultCanvas"></canvas>
+    </div>
+
+    <script>
+        class CopepodCutterFixed {
+            constructor() {
+                this.originalImage = null;
+                this.masks = {
+                    color: null,
+                    edge: null, 
+                    ai: null,
+                    hybrid: null
+                };
+                this.isProcessing = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.setupParameterUpdates();
+                this.log('🦐 Recortador ML inicializado correctamente');
+            }
+            
+            log(message) {
+                const debugLog = document.getElementById('debugLog');
+                const time = new Date().toLocaleTimeString();
+                debugLog.innerHTML += `<div>[${time}] ${message}</div>`;
+                debugLog.scrollTop = debugLog.scrollHeight;
+                console.log(message);
+            }
+            
+            setupEventListeners() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                
+                uploadArea.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files);
+                });
+            }
+            
+            setupParameterUpdates() {
+                ['weight-color', 'weight-edge', 'weight-ai'].forEach(id => {
+                    const slider = document.getElementById(id);
+                    const display = document.getElementById(id + '-value');
+                    
+                    slider.addEventListener('input', () => {
+                        display.textContent = slider.value;
+                    });
+                });
+            }
+            
+            handleFiles(files) {
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                    this.loadImage(files[0]);
+                }
+            }
+            
+            loadImage(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.originalImage = img;
+                        this.displayOriginalImage();
+                        this.log(`✅ Imagen cargada: ${img.width}x${img.height}`);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            loadSampleImage() {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    this.originalImage = img;
+                    this.displayOriginalImage();
+                    this.log(`🦐 Imagen de prueba cargada: ${img.width}x${img.height}`);
+                };
+                img.onerror = () => {
+                    this.log('⚠️ No se pudo cargar imagen de prueba - carga una imagen manualmente');
+                };
+                img.src = 'ocean_simulator_3d/copepodo_image.png';
+            }
+            
+            displayOriginalImage() {
+                const container = document.getElementById('originalImageContainer');
+                container.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = this.originalImage.src;
+                container.appendChild(img);
+            }
+            
+            updateProgress(percentage) {
+                document.getElementById('progressBar').style.width = percentage + '%';
+            }
+            
+            getImageData() {
+                const canvas = document.getElementById('processCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = this.originalImage.width;
+                canvas.height = this.originalImage.height;
+                ctx.drawImage(this.originalImage, 0, 0);
+                return ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Técnica 1: Segmentación por Color
+            processColor() {
+                if (!this.originalImage) return alert('⚠️ Carga una imagen primero');
+                
+                this.log('🎯 Iniciando segmentación por color...');
+                this.updateProgress(0);
+                
+                try {
+                    const imageData = this.getImageData();
+                    const data = imageData.data;
+                    const width = imageData.width;
+                    const height = imageData.height;
+                    
+                    this.updateProgress(25);
+                    
+                    // Detectar color de fondo (esquinas)
+                    const corners = [[0,0], [width-1,0], [0,height-1], [width-1,height-1]];
+                    let totalR = 0, totalG = 0, totalB = 0;
+                    
+                    corners.forEach(([x, y]) => {
+                        const idx = (y * width + x) * 4;
+                        totalR += data[idx];
+                        totalG += data[idx + 1];
+                        totalB += data[idx + 2];
+                    });
+                    
+                    const bgColor = {
+                        r: totalR / 4,
+                        g: totalG / 4,
+                        b: totalB / 4
+                    };
+                    
+                    this.updateProgress(50);
+                    
+                    // Crear máscara
+                    const mask = new Array(width * height);
+                    const tolerance = 30;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        
+                        const distance = Math.sqrt(
+                            Math.pow(r - bgColor.r, 2) +
+                            Math.pow(g - bgColor.g, 2) +
+                            Math.pow(b - bgColor.b, 2)
+                        );
+                        
+                        mask[i / 4] = distance > tolerance ? 255 : 0;
+                    }
+                    
+                    this.updateProgress(75);
+                    
+                    this.masks.color = mask;
+                    this.applyMaskAndDisplay(data, mask, 'color');
+                    
+                    this.updateProgress(100);
+                    this.log('✅ Segmentación por color completada');
+                    
+                } catch (error) {
+                    this.log(`❌ Error en segmentación color: ${error.message}`);
+                }
+            }
+            
+            // Técnica 2: Edge Detection  
+            processEdge() {
+                if (!this.originalImage) return alert('⚠️ Carga una imagen primero');
+                
+                this.log('🔍 Iniciando edge detection...');
+                this.updateProgress(0);
+                
+                try {
+                    const imageData = this.getImageData();
+                    const data = imageData.data;
+                    const width = imageData.width;
+                    const height = imageData.height;
+                    
+                    this.updateProgress(25);
+                    
+                    // Convertir a escala de grises
+                    const gray = new Array(width * height);
+                    for (let i = 0; i < data.length; i += 4) {
+                        gray[i / 4] = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+                    }
+                    
+                    this.updateProgress(50);
+                    
+                    // Operador Sobel simplificado
+                    const edges = new Array(width * height).fill(0);
+                    
+                    for (let y = 1; y < height - 1; y++) {
+                        for (let x = 1; x < width - 1; x++) {
+                            const idx = y * width + x;
+                            
+                            // Gradientes Sobel
+                            const gx = -gray[(y-1)*width + (x-1)] + gray[(y-1)*width + (x+1)] +
+                                      -2*gray[y*width + (x-1)] + 2*gray[y*width + (x+1)] +
+                                      -gray[(y+1)*width + (x-1)] + gray[(y+1)*width + (x+1)];
+                            
+                            const gy = -gray[(y-1)*width + (x-1)] - 2*gray[(y-1)*width + x] - gray[(y-1)*width + (x+1)] +
+                                       gray[(y+1)*width + (x-1)] + 2*gray[(y+1)*width + x] + gray[(y+1)*width + (x+1)];
+                            
+                            const magnitude = Math.sqrt(gx * gx + gy * gy);
+                            edges[idx] = magnitude > 50 ? 255 : 0;
+                        }
+                    }
+                    
+                    this.updateProgress(75);
+                    
+                    this.masks.edge = edges;
+                    this.applyMaskAndDisplay(data, edges, 'edge');
+                    
+                    this.updateProgress(100);
+                    this.log('✅ Edge detection completado');
+                    
+                } catch (error) {
+                    this.log(`❌ Error en edge detection: ${error.message}`);
+                }
+            }
+            
+            // Técnica 3: IA (características de copépodos)
+            processAI() {
+                if (!this.originalImage) return alert('⚠️ Carga una imagen primero');
+                
+                this.log('🧠 Iniciando remoción IA...');
+                this.updateProgress(0);
+                
+                try {
+                    const imageData = this.getImageData();
+                    const data = imageData.data;
+                    const width = imageData.width;
+                    const height = imageData.height;
+                    
+                    this.updateProgress(25);
+                    
+                    // Detectar características de copépodos
+                    const mask = new Array(width * height).fill(0);
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        
+                        let score = 0;
+                        
+                        // Detectar regiones naranjas/rojas
+                        if (r > 120 && r > g && r > b && (r - g) > 30) {
+                            score += 0.8;
+                        }
+                        
+                        // Detectar regiones semi-transparentes
+                        const brightness = (r + g + b) / 3;
+                        if (brightness > 180 && brightness < 240) {
+                            score += 0.6;
+                        }
+                        
+                        // Detectar estructuras oscuras
+                        if (r < 80 && g < 80 && b < 80) {
+                            score += 0.4;
+                        }
+                        
+                        mask[i / 4] = score > 0.5 ? 255 : 0;
+                    }
+                    
+                    this.updateProgress(50);
+                    
+                    // Dilatación simple para conectar regiones
+                    const dilated = [...mask];
+                    for (let y = 1; y < height - 1; y++) {
+                        for (let x = 1; x < width - 1; x++) {
+                            const idx = y * width + x;
+                            if (mask[idx] > 128) {
+                                // Dilatar a vecinos
+                                dilated[idx - 1] = Math.max(dilated[idx - 1], 180);
+                                dilated[idx + 1] = Math.max(dilated[idx + 1], 180);
+                                dilated[idx - width] = Math.max(dilated[idx - width], 180);
+                                dilated[idx + width] = Math.max(dilated[idx + width], 180);
+                            }
+                        }
+                    }
+                    
+                    this.updateProgress(75);
+                    
+                    this.masks.ai = dilated;
+                    this.applyMaskAndDisplay(data, dilated, 'ai');
+                    
+                    this.updateProgress(100);
+                    this.log('✅ Remoción IA completada');
+                    
+                } catch (error) {
+                    this.log(`❌ Error en IA: ${error.message}`);
+                }
+            }
+            
+            // Técnica 4: HÍBRIDO CORREGIDO
+            processHybridFixed() {
+                if (!this.originalImage) return alert('⚠️ Carga una imagen primero');
+                
+                this.log('⚡ Iniciando procesamiento híbrido CORREGIDO...');
+                this.updateProgress(0);
+                
+                try {
+                    // Ejecutar técnicas si no existen
+                    if (!this.masks.color) {
+                        this.log('🎯 Ejecutando segmentación color...');
+                        this.processColor();
+                    }
+                    
+                    this.updateProgress(30);
+                    
+                    if (!this.masks.edge) {
+                        this.log('🔍 Ejecutando edge detection...');
+                        this.processEdge();
+                    }
+                    
+                    this.updateProgress(50);
+                    
+                    if (!this.masks.ai) {
+                        this.log('🧠 Ejecutando IA...');
+                        this.processAI();
+                    }
+                    
+                    this.updateProgress(70);
+                    
+                    // Verificar que tenemos máscaras
+                    const colorMask = this.masks.color;
+                    const edgeMask = this.masks.edge;
+                    const aiMask = this.masks.ai;
+                    
+                    if (!colorMask && !edgeMask && !aiMask) {
+                        throw new Error('No se pudieron generar máscaras base');
+                    }
+                    
+                    this.log(`📊 Máscaras disponibles: Color=${colorMask ? 'SÍ' : 'NO'}, Edge=${edgeMask ? 'SÍ' : 'NO'}, IA=${aiMask ? 'SÍ' : 'NO'}`);
+                    
+                    // Obtener pesos
+                    const weightColor = parseFloat(document.getElementById('weight-color').value);
+                    const weightEdge = parseFloat(document.getElementById('weight-edge').value);
+                    const weightAI = parseFloat(document.getElementById('weight-ai').value);
+                    
+                    this.log(`⚡ Pesos: Color=${weightColor}, Edge=${weightEdge}, IA=${weightAI}`);
+                    
+                    this.updateProgress(80);
+                    
+                    // COMBINACIÓN HÍBRIDA CORREGIDA
+                    const referenceMask = colorMask || edgeMask || aiMask;
+                    const combined = new Array(referenceMask.length);
+                    
+                    const totalWeight = weightColor + weightEdge + weightAI;
+                    
+                    for (let i = 0; i < referenceMask.length; i++) {
+                        let pixelValue = 0;
+                        let actualWeight = 0;
+                        
+                        if (colorMask && weightColor > 0) {
+                            pixelValue += (colorMask[i] / 255) * weightColor;
+                            actualWeight += weightColor;
+                        }
+                        
+                        if (edgeMask && weightEdge > 0) {
+                            pixelValue += (edgeMask[i] / 255) * weightEdge;
+                            actualWeight += weightEdge;
+                        }
+                        
+                        if (aiMask && weightAI > 0) {
+                            pixelValue += (aiMask[i] / 255) * weightAI;
+                            actualWeight += weightAI;
+                        }
+                        
+                        combined[i] = actualWeight > 0 ? (pixelValue / actualWeight) * 255 : 0;
+                    }
+                    
+                    this.updateProgress(90);
+                    
+                    this.masks.hybrid = combined;
+                    const imageData = this.getImageData();
+                    this.applyMaskAndDisplay(imageData.data, combined, 'hybrid');
+                    
+                    this.updateProgress(100);
+                    
+                    const activePixels = combined.filter(v => v > 127).length;
+                    this.log(`✅ Híbrido completado: ${activePixels} píxeles activos`);
+                    
+                } catch (error) {
+                    this.log(`❌ Error en híbrido: ${error.message}`);
+                }
+            }
+            
+            applyMaskAndDisplay(imageData, mask, technique) {
+                const result = new Uint8ClampedArray(imageData.length);
+                
+                for (let i = 0; i < imageData.length; i += 4) {
+                    const maskValue = mask[i / 4] / 255;
+                    
+                    result[i] = imageData[i];     // R
+                    result[i + 1] = imageData[i + 1]; // G
+                    result[i + 2] = imageData[i + 2]; // B
+                    result[i + 3] = Math.round(255 * maskValue); // A
+                }
+                
+                // Mostrar resultado
+                const resultCanvas = document.getElementById('resultCanvas');
+                const ctx = resultCanvas.getContext('2d');
+                resultCanvas.width = this.originalImage.width;
+                resultCanvas.height = this.originalImage.height;
+                
+                const imgData = new ImageData(result, this.originalImage.width, this.originalImage.height);
+                ctx.putImageData(imgData, 0, 0);
+                
+                const container = document.getElementById('resultImageContainer');
+                container.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = resultCanvas.toDataURL();
+                container.appendChild(img);
+                
+                this.log(`📊 Técnica ${technique}: Resultado mostrado`);
+            }
+        }
+        
+        // Inicializar
+        const cutter = new CopepodCutterFixed();
+        
+        // Funciones globales
+        function loadSampleImage() { cutter.loadSampleImage(); }
+        function processColor() { cutter.processColor(); }
+        function processEdge() { cutter.processEdge(); }
+        function processAI() { cutter.processAI(); }
+        function processHybridFixed() { cutter.processHybridFixed(); }
+        
+        console.log('🦐 Recortador ML CORREGIDO cargado - Híbrido funcionando');
+    </script>
+</body>
+</html>

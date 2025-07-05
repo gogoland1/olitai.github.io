@@ -1,33 +1,26 @@
-# 🚀 INICIO RÁPIDO - Dashboard CTD
+# 🚀 INICIO SÚPER RÁPIDO - Dashboard CTD
 
-## ⚡ Opción 1: Terminal (Solo 2 comandos)
+## ⚡ Opción FÁCIL (Solo 1 comando):
 
 ```bash
-cd ~/proyectos/olitai
-python3 run_dashboard.py
+cd ~/proyectos/olitai && ./dashboard_completo.sh
 ```
 
-**¡Eso es todo!** El navegador se abre automáticamente en http://localhost:5000
+**¡Eso es todo!** Instala todo automáticamente y abre el navegador.
 
 ---
 
-## 🔧 Si no funciona (instalar dependencias):
+## 🎯 Alternativas:
 
+### Si prefieres paso a paso:
 ```bash
 cd ~/proyectos/olitai
-pip3 install flask flask-cors plotly numpy matplotlib scipy pandas
-python3 run_dashboard.py
+./start_dashboard.sh
 ```
 
----
-
-## 🌐 Alternativa: Usar con virtual environment
-
+### Si ya tienes las dependencias:
 ```bash
-cd ~/proyectos/olitai
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements_web.txt
+cd ~/proyectos/olitai  
 python3 run_dashboard.py
 ```
 

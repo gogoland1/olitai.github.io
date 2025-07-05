@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Simulador Oceánico Ligero - Demo Rápido</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1e3a8a 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .header h1 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            min-width: 200px;
+        }
+
+        .control-group h3 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 10px 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .ocean-container {
+            display: flex;
+            height: 600px;
+            margin: 20px;
+            gap: 20px;
+        }
+
+        .ocean-panel {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .ocean-view {
+            height: calc(100% - 60px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .depth-scale {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 2px solid rgba(59, 130, 246, 0.3);
+            z-index: 10;
+        }
+
+        .depth-marker {
+            position: absolute;
+            right: 5px;
+            font-size: 10px;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .light-column {
+            position: absolute;
+            left: 50px;
+            top: 0;
+            width: 60px;
+            height: 100%;
+            z-index: 5;
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .organisms-area {
+            position: absolute;
+            left: 110px;
+            top: 0;
+            right: 0;
+            height: 100%;
+        }
+
+        .organism {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .phytoplankton {
+            background: radial-gradient(circle, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+        }
+
+        .zooplankton {
+            background: radial-gradient(circle, #f97316 0%, #ea580c 100%);
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+            border-radius: 60% 40% 60% 40%;
+            position: relative;
+        }
+
+        .zooplankton::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 4px;
+            background: rgba(249, 115, 22, 0.8);
+            border-radius: 1px;
+        }
+
+        .zooplankton::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 20%;
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(249, 115, 22, 0.6) 50%, transparent 100%);
+            border-radius: 0.5px;
+        }
+
+        .copepod {
+            /* Cuerpo principal fusiforme del copépodo */
+            background: linear-gradient(45deg, 
+                rgba(255, 140, 100, 0.9) 0%,
+                rgba(255, 120, 80, 1) 30%,
+                rgba(240, 100, 60, 1) 70%,
+                rgba(220, 80, 40, 0.8) 100%);
+            border-radius: 60% 40% 80% 20%;
+            position: relative;
+            z-index: 5;
+            border: 1px solid rgba(255, 100, 50, 0.6);
+            box-shadow: 
+                0 0 8px rgba(255, 120, 80, 0.6),
+                inset 2px 2px 4px rgba(255, 160, 120, 0.3),
+                inset -1px -1px 2px rgba(200, 60, 20, 0.3);
+        }
+
+        /* Prosoma (cabeza + tórax anterior) */
+        .copepod::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: 30%;
+            width: 40%;
+            height: 50%;
+            background: linear-gradient(135deg, 
+                rgba(255, 160, 120, 1) 0%,
+                rgba(240, 140, 100, 1) 50%,
+                rgba(220, 100, 70, 0.9) 100%);
+            border-radius: 70% 30% 60% 40%;
+            border: 1px solid rgba(255, 120, 80, 0.4);
+            z-index: 6;
+        }
+
+        /* Metasoma (abdomen) */
+        .copepod::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: 40%;
+            width: 20%;
+            height: 40%;
+            background: linear-gradient(180deg, 
+                rgba(240, 120, 80, 0.8) 0%,
+                rgba(220, 100, 60, 0.6) 50%,
+                rgba(200, 80, 40, 0.4) 100%);
+            border-radius: 50% 50% 70% 30%;
+            border: 1px solid rgba(255, 100, 50, 0.3);
+        }
+
+        /* Antenas (A1) */
+        .copepod-antenna1 {
+            position: absolute;
+            top: 5%;
+            left: 15%;
+            width: 2px;
+            height: 60%;
+            background: linear-gradient(180deg, 
+                rgba(255, 200, 150, 0.9) 0%,
+                rgba(240, 150, 100, 0.7) 50%,
+                transparent 100%);
+            border-radius: 1px;
+            transform: rotate(-25deg);
+            z-index: 7;
+        }
+
+        .copepod-antenna2 {
+            position: absolute;
+            top: 5%;
+            right: 15%;
+            width: 2px;
+            height: 60%;
+            background: linear-gradient(180deg, 
+                rgba(255, 200, 150, 0.9) 0%,
+                rgba(240, 150, 100, 0.7) 50%,
+                transparent 100%);
+            border-radius: 1px;
+            transform: rotate(25deg);
+            z-index: 7;
+        }
+
+        /* Antenas secundarias (A2) */
+        .copepod-antenna-secondary1 {
+            position: absolute;
+            top: 15%;
+            left: 25%;
+            width: 1.5px;
+            height: 40%;
+            background: linear-gradient(180deg, 
+                rgba(255, 180, 130, 0.8) 0%,
+                rgba(220, 120, 80, 0.5) 70%,
+                transparent 100%);
+            border-radius: 0.5px;
+            transform: rotate(-15deg);
+            z-index: 7;
+        }
+
+        .copepod-antenna-secondary2 {
+            position: absolute;
+            top: 15%;
+            right: 25%;
+            width: 1.5px;
+            height: 40%;
+            background: linear-gradient(180deg, 
+                rgba(255, 180, 130, 0.8) 0%,
+                rgba(220, 120, 80, 0.5) 70%,
+                transparent 100%);
+            border-radius: 0.5px;
+            transform: rotate(15deg);
+            z-index: 7;
+        }
+
+        /* Patas nadadoras (pleopods) */
+        .copepod-swimleg {
+            position: absolute;
+            width: 1px;
+            height: 25%;
+            background: linear-gradient(180deg, 
+                rgba(255, 150, 100, 0.7) 0%,
+                rgba(240, 120, 80, 0.5) 60%,
+                transparent 100%);
+            border-radius: 0.5px;
+        }
+
+        .copepod-swimleg1 {
+            top: 30%;
+            left: 5%;
+            transform: rotate(-60deg);
+        }
+
+        .copepod-swimleg2 {
+            top: 35%;
+            left: 10%;
+            transform: rotate(-45deg);
+        }
+
+        .copepod-swimleg3 {
+            top: 40%;
+            left: 12%;
+            transform: rotate(-30deg);
+        }
+
+        .copepod-swimleg4 {
+            top: 30%;
+            right: 5%;
+            transform: rotate(60deg);
+        }
+
+        .copepod-swimleg5 {
+            top: 35%;
+            right: 10%;
+            transform: rotate(45deg);
+        }
+
+        .copepod-swimleg6 {
+            top: 40%;
+            right: 12%;
+            transform: rotate(30deg);
+        }
+
+        /* Furca (cola bifurcada) */
+        .copepod-furca1 {
+            position: absolute;
+            bottom: -25%;
+            left: 35%;
+            width: 1px;
+            height: 30%;
+            background: linear-gradient(180deg, 
+                rgba(240, 100, 60, 0.8) 0%,
+                rgba(200, 80, 40, 0.6) 50%,
+                transparent 100%);
+            border-radius: 0.5px;
+            transform: rotate(-20deg);
+        }
+
+        .copepod-furca2 {
+            position: absolute;
+            bottom: -25%;
+            right: 35%;
+            width: 1px;
+            height: 30%;
+            background: linear-gradient(180deg, 
+                rgba(240, 100, 60, 0.8) 0%,
+                rgba(200, 80, 40, 0.6) 50%,
+                transparent 100%);
+            border-radius: 0.5px;
+            transform: rotate(20deg);
+        }
+
+        /* Ojos compuestos */
+        .copepod-eye {
+            position: absolute;
+            top: 8%;
+            width: 3px;
+            height: 3px;
+            background: radial-gradient(circle, 
+                rgba(50, 50, 50, 1) 0%,
+                rgba(100, 100, 100, 0.8) 60%,
+                transparent 100%);
+            border-radius: 50%;
+            border: 0.5px solid rgba(30, 30, 30, 0.6);
+        }
+
+        .copepod-eye1 {
+            left: 25%;
+        }
+
+        .copepod-eye2 {
+            right: 25%;
+        }
+
+        .migration-trail {
+            position: absolute;
+            width: 1px;
+            background: linear-gradient(to bottom, 
+                rgba(239, 68, 68, 0.8) 0%, 
+                rgba(239, 68, 68, 0.4) 50%, 
+                rgba(239, 68, 68, 0) 100%);
+            border-radius: 0.5px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bacteria {
+            background: radial-gradient(circle, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 0 4px rgba(139, 92, 246, 0.8);
+        }
+
+        .fecal-pellet {
+            background: radial-gradient(circle, #78716c 0%, #57534e 100%);
+            box-shadow: 0 0 4px rgba(120, 113, 108, 0.6);
+            border-radius: 30%;
+        }
+
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            z-index: 1000;
+        }
+
+        .info-panel h4 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            margin: 5px 0;
+            font-size: 12px;
+            color: #93c5fd;
+        }
+
+        .narrative-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 400px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(34, 197, 94, 0.5);
+            z-index: 1000;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .narrative-panel h4 {
+            color: #22c55e;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .narrative-text {
+            font-size: 12px;
+            color: #a7f3d0;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .time-progress {
+            width: 100%;
+            height: 20px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .time-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 100%);
+        }
+
+        .day-night-indicator {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            transition: all 0.5s ease;
+        }
+
+        .process-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .process-active {
+            background: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .process-inactive {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            border: 1px solid #8b5cf6;
+        }
+
+        .btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #3b82f6;
+        }
+
+        .btn-secondary:hover {
+            background: #1d4ed8;
+        }
+
+        @keyframes photosynthesize {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 15px rgba(34, 197, 94, 1);
+            }
+        }
+
+        @keyframes migrate-ascent {
+            0% { 
+                transform: translateY(0px) rotateZ(0deg);
+                opacity: 0.6;
+            }
+            25% { 
+                transform: translateY(-20px) rotateZ(-5deg);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(-50px) rotateZ(3deg);
+                opacity: 1;
+            }
+            75% { 
+                transform: translateY(-35px) rotateZ(-2deg);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateY(-60px) rotateZ(0deg);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes migrate-descent {
+            0% { 
+                transform: translateY(-60px) rotateZ(0deg);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateY(-40px) rotateZ(2deg);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: translateY(-15px) rotateZ(-3deg);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateY(-5px) rotateZ(1deg);
+                opacity: 0.6;
+            }
+            100% { 
+                transform: translateY(0px) rotateZ(0deg);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes copepod-swim {
+            0%, 100% { 
+                transform: translateY(0px) rotateZ(0deg) scaleX(1);
+            }
+            25% { 
+                transform: translateY(-3px) rotateZ(-2deg) scaleX(1.05);
+            }
+            50% { 
+                transform: translateY(-1px) rotateZ(1deg) scaleX(0.95);
+            }
+            75% { 
+                transform: translateY(-2px) rotateZ(-1deg) scaleX(1.02);
+            }
+        }
+
+        @keyframes antenna-wave {
+            0%, 100% { 
+                transform: rotate(-25deg) scaleY(1);
+            }
+            50% { 
+                transform: rotate(-30deg) scaleY(1.1);
+            }
+        }
+
+        @keyframes antenna-wave-right {
+            0%, 100% { 
+                transform: rotate(25deg) scaleY(1);
+            }
+            50% { 
+                transform: rotate(30deg) scaleY(1.1);
+            }
+        }
+
+        @keyframes swimleg-paddle {
+            0% { 
+                transform: rotate(-60deg) scaleY(1);
+                opacity: 0.7;
+            }
+            50% { 
+                transform: rotate(-40deg) scaleY(1.2);
+                opacity: 1;
+            }
+            100% { 
+                transform: rotate(-60deg) scaleY(1);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes furca-flick {
+            0%, 100% { 
+                transform: rotate(-20deg) scaleY(1);
+            }
+            50% { 
+                transform: rotate(-15deg) scaleY(1.1);
+            }
+        }
+
+        @keyframes furca-flick-right {
+            0%, 100% { 
+                transform: rotate(20deg) scaleY(1);
+            }
+            50% { 
+                transform: rotate(15deg) scaleY(1.1);
+            }
+        }
+
+        /* Aplicar animaciones a partes específicas */
+        .copepod.swimming .copepod-antenna1 {
+            animation: antenna-wave 2s ease-in-out infinite;
+        }
+
+        .copepod.swimming .copepod-antenna2 {
+            animation: antenna-wave-right 2s ease-in-out infinite;
+        }
+
+        .copepod.swimming .copepod-swimleg1,
+        .copepod.swimming .copepod-swimleg2,
+        .copepod.swimming .copepod-swimleg3 {
+            animation: swimleg-paddle 1.5s ease-in-out infinite;
+        }
+
+        .copepod.swimming .copepod-swimleg4,
+        .copepod.swimming .copepod-swimleg5,
+        .copepod.swimming .copepod-swimleg6 {
+            animation: swimleg-paddle 1.5s ease-in-out infinite reverse;
+        }
+
+        .copepod.swimming .copepod-furca1 {
+            animation: furca-flick 3s ease-in-out infinite;
+        }
+
+        .copepod.swimming .copepod-furca2 {
+            animation: furca-flick-right 3s ease-in-out infinite;
+        }
+
+        /* Intensificar animaciones durante migración */
+        .copepod.migrating-up .copepod-antenna1,
+        .copepod.migrating-up .copepod-antenna2 {
+            animation-duration: 1s;
+            animation-timing-function: linear;
+        }
+
+        .copepod.migrating-up .copepod-swimleg {
+            animation-duration: 0.8s;
+            animation-timing-function: ease-out;
+        }
+
+        .copepod.migrating-down .copepod-antenna1,
+        .copepod.migrating-down .copepod-antenna2 {
+            animation-duration: 2.5s;
+            animation-timing-function: ease-in;
+        }
+
+        @keyframes trail-fade {
+            0% { 
+                opacity: 1;
+                height: 20px;
+            }
+            100% { 
+                opacity: 0;
+                height: 5px;
+            }
+        }
+
+        @keyframes sink {
+            0% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(20px) rotate(90deg);
+                opacity: 0.6;
+            }
+            100% { 
+                transform: translateY(40px) rotate(180deg);
+                opacity: 0.4;
+            }
+        }
+
+        .organism.active-photosynthesis {
+            animation: photosynthesize 2s ease-in-out infinite;
+        }
+
+        .organism.migrating-up {
+            animation: migrate-ascent 8s ease-in-out infinite;
+        }
+
+        .organism.migrating-down {
+            animation: migrate-descent 6s ease-in-out infinite;
+        }
+
+        .organism.swimming {
+            animation: copepod-swim 3s ease-in-out infinite;
+        }
+
+        .organism.sinking {
+            animation: sink 8s linear infinite;
+        }
+
+        .migration-trail.active {
+            animation: trail-fade 2s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌊 Simulador Oceánico Ligero - Demo Rápido</h1>
+        <p>Simulación temporal realista: 1 segundo = 1 hora oceánica</p>
+        
+        <div style="margin-top: 15px;">
+            <button class="btn" onclick="startTimeSimulation()">▶️ Iniciar Ciclo 24h</button>
+            <button class="btn btn-secondary" onclick="pauseAnimation()">⏸️ Pausar</button>
+            <button class="btn btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+            <button class="btn btn-secondary" onclick="toggleSpeed()">⚡ Velocidad: <span id="speedDisplay">1x</span></button>
+        </div>
+        
+        <!-- Indicador día/noche -->
+        <div class="day-night-indicator" id="dayNightIndicator">🌅</div>
+        
+        <!-- Barra de progreso temporal -->
+        <div class="time-progress">
+            <div class="time-progress-bar" id="timeProgressBar" style="width: 50%;"></div>
+        </div>
+        
+        <!-- Indicadores de procesos -->
+        <div style="text-align: center; margin-top: 10px;">
+            <span class="process-indicator process-active" id="photosynthesisIndicator">☀️ Fotosíntesis</span>
+            <span class="process-indicator process-inactive" id="migrationIndicator">🔄 Migración Vertical</span>
+            <span class="process-indicator process-active" id="remineralizationIndicator">♻️ Remineralización</span>
+            <span class="process-indicator process-inactive" id="pelletsIndicator">⬇️ Flujo Carbono</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <h3>⏰ Hora del Día</h3>
+            <input type="range" class="slider" id="timeSlider" min="0" max="23" value="12" step="1">
+            <div id="timeDisplay">12:00</div>
+        </div>
+
+        <div class="control-group">
+            <h3>🌊 Tipo de Agua</h3>
+            <select id="waterType" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px;">
+                <option value="oceanic">Oceánico (K=0.05)</option>
+                <option value="coastal">Costero (K=0.15)</option>
+                <option value="estuarine">Estuarino (K=0.5)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <h3>💡 Intensidad Lumínica</h3>
+            <input type="range" class="slider" id="lightSlider" min="0" max="100" value="80" step="5">
+            <div id="lightDisplay">80%</div>
+        </div>
+
+        <div class="control-group">
+            <h3>🧪 Nutrientes</h3>
+            <input type="range" class="slider" id="nutrientsSlider" min="0" max="30" value="15" step="1">
+            <div id="nutrientsDisplay">15 μM</div>
+        </div>
+    </div>
+
+    <div class="ocean-container">
+        <!-- Panel Zona Fótica -->
+        <div class="ocean-panel">
+            <div class="panel-header">
+                <h3 style="color: #22c55e;">☀️ Zona Fótica (0-100m)</h3>
+            </div>
+            <div class="ocean-view" id="phototicZone">
+                <div class="depth-scale" id="phototicDepthScale"></div>
+                <div class="light-column" id="phototicLight"></div>
+                <div class="organisms-area" id="phototicOrganisms"></div>
+            </div>
+        </div>
+
+        <!-- Panel Zona Profunda -->
+        <div class="ocean-panel">
+            <div class="panel-header">
+                <h3 style="color: #8b5cf6;">🌊 Zona Profunda (100-2000m)</h3>
+            </div>
+            <div class="ocean-view" id="deepZone">
+                <div class="depth-scale" id="deepDepthScale"></div>
+                <div class="light-column" id="deepLight"></div>
+                <div class="organisms-area" id="deepOrganisms"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de información -->
+    <div class="info-panel">
+        <h4>📊 Datos en Tiempo Real</h4>
+        <div class="info-item">Hora: <span id="currentTime">12:00</span></div>
+        <div class="info-item">Productividad: <span id="currentProductivity">85%</span></div>
+        <div class="info-item">Migración: <span id="currentMigration">0%</span></div>
+        <div class="info-item">Zona Eufótica: <span id="currentEuphotic">92m</span></div>
+        <div class="info-item">Clorofila-a: <span id="currentChlorophyll">3.2 mg/m³</span></div>
+        <hr style="border: 1px solid rgba(59, 130, 246, 0.3); margin: 10px 0;">
+        <div class="info-item">Organismos Fóticos: <span id="phototicCount">75</span></div>
+        <div class="info-item">Organismos Profundos: <span id="deepCount">150</span></div>
+        <hr style="border: 1px solid rgba(59, 130, 246, 0.3); margin: 10px 0;">
+        <div class="info-item">Ciclo: <span id="cycleProgress">0%</span></div>
+        <div class="info-item">Velocidad: <span id="currentSpeed">1x</span></div>
+    </div>
+    
+    <!-- Panel narrativo -->
+    <div class="narrative-panel">
+        <h4>🌊 Procesos Oceánicos en Tiempo Real</h4>
+        <div class="narrative-text" id="narrativeText">
+            Esperando inicio de simulación temporal...
+        </div>
+        <div class="narrative-text" id="processStatus">
+            Los organismos están en su estado inicial.
+        </div>
+    </div>
+
+    <script>
+        class OceanSimulatorLite {
+            constructor() {
+                this.isAnimating = false;
+                this.animationId = null;
+                this.time = 0;
+                this.currentHour = 12;
+                this.phototicOrganisms = [];
+                this.deepOrganisms = [];
+                
+                // Sistema temporal
+                this.timeSimulationActive = false;
+                this.timeInterval = null;
+                this.simulationSpeed = 1000; // 1 segundo = 1 hora
+                this.speeds = [500, 1000, 2000, 4000]; // 0.5x, 1x, 2x, 4x
+                this.currentSpeedIndex = 1;
+                
+                // Narrativas por hora
+                this.hourlyNarratives = this.createHourlyNarratives();
+                
+                this.initializeControls();
+                this.createDepthScales();
+                this.populateOrganisms();
+                this.updateSimulation();
+            }
+
+            createHourlyNarratives() {
+                return {
+                    0: "🌙 Medianoche: Máxima migración vertical. El zooplancton asciende hacia la superficie para alimentarse en la oscuridad.",
+                    1: "🌃 1:00 AM: El fitoplancton reduce su actividad metabólica. Las bacterias continúan la remineralización en aguas profundas.",
+                    2: "🌌 2:00 AM: Pico de actividad del zooplancton en superficie. Los pellets fecales se acumulan y comienzan a hundirse.",
+                    3: "🌙 3:00 AM: Respiración nocturna domina sobre fotosíntesis. El CO₂ se acumula en las aguas superficiales.",
+                    4: "🌔 4:00 AM: Gradual preparación para el amanecer. Algunos organismos comienzan migración descendente temprana.",
+                    5: "🌅 5:00 AM: Pre-amanecer: Los ritmos circadianos se preparan para el ciclo diurno de fotosíntesis.",
+                    6: "🌅 Amanecer: ¡Comienza la fotosíntesis! El fitoplancton activa su maquinaria fotosintética. Zooplancton inicia migración descendente.",
+                    7: "☀️ 7:00 AM: Incremento exponencial de la productividad primaria. La luz penetra hasta 50-80m según el tipo de agua.",
+                    8: "🌞 8:00 AM: Fotosíntesis activa plena. El fitoplancton produce O₂ y consume CO₂. DCM comienza a formarse.",
+                    9: "☀️ 9:00 AM: Pico matutino de división celular del fitoplancton. Aumento visible de la biomasa en zona fótica.",
+                    10: "🌞 10:00 AM: Intensificación de la bomba biológica. Mayor producción de materia orgánica particulada.",
+                    11: "☀️ 11:00 AM: Aproximación al mediodía. Máxima penetración lumínica y stress fotoquímico en superficie.",
+                    12: "🌞 Mediodía: ¡MÁXIMA fotosíntesis! Pico de productividad primaria. DCM bien establecido en 40-60m.",
+                    13: "☀️ 1:00 PM: Sostenimiento del pico fotosintético. Exportación activa de carbono hacia aguas profundas.",
+                    14: "🌞 2:00 PM: Continúa alta productividad. El zooplancton permanece en profundidades intermedias evitando depredación.",
+                    15: "☀️ 3:00 PM: Gradual declive de la intensidad lumínica. Fotosíntesis aún activa pero decreciente.",
+                    16: "🌤️ 4:00 PM: Transición vespertina. Algunos organismos comienzan preparativos para migración nocturna.",
+                    17: "🌅 5:00 PM: Atardecer temprano. Reducción notable de la fotosíntesis. Activación gradual de procesos nocturnos.",
+                    18: "🌇 Atardecer: Cambio de turno oceánico. El zooplancton inicia migración ascendente. Declive fotosintético.",
+                    19: "🌆 7:00 PM: Crepúsculo. Transición de productores primarios a consumidores. Aumento de actividad planctónica.",
+                    20: "🌃 8:00 PM: Inicio de la noche oceánica. Migración vertical masiva del zooplancton hacia superficie.",
+                    21: "🌙 9:00 PM: Noche plena. Máxima actividad del zooplancton en superficie. Intensa alimentación y reproducción.",
+                    22: "🌌 10:00 PM: Pico nocturno de remineralización bacteriana. Los pellets fecales transportan carbono a profundidad.",
+                    23: "🌙 11:00 PM: Avance hacia medianoche. Respiración supera fotosíntesis. Liberación de CO₂ acumulado."
+                };
+            }
+
+            initializeControls() {
+                document.getElementById('timeSlider').addEventListener('input', (e) => {
+                    this.currentHour = parseInt(e.target.value);
+                    this.updateSimulation();
+                });
+                document.getElementById('waterType').addEventListener('change', () => this.updateSimulation());
+                document.getElementById('lightSlider').addEventListener('input', () => this.updateSimulation());
+                document.getElementById('nutrientsSlider').addEventListener('input', () => this.updateSimulation());
+            }
+
+            createDepthScales() {
+                // Escala zona fótica
+                const phototicScale = document.getElementById('phototicDepthScale');
+                const phototicDepths = [0, 20, 40, 60, 80, 100];
+                phototicDepths.forEach(depth => {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.textContent = `${depth}m`;
+                    marker.style.top = `${(depth / 100) * 100}%`;
+                    phototicScale.appendChild(marker);
+                });
+
+                // Escala zona profunda
+                const deepScale = document.getElementById('deepDepthScale');
+                const deepDepths = [100, 300, 500, 800, 1200, 1600, 2000];
+                deepDepths.forEach(depth => {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.textContent = `${depth}m`;
+                    marker.style.top = `${((depth - 100) / 1900) * 100}%`;
+                    deepScale.appendChild(marker);
+                });
+            }
+
+            populateOrganisms() {
+                this.createPhototicOrganisms();
+                this.createDeepOrganisms();
+            }
+
+            createPhototicOrganisms() {
+                const container = document.getElementById('phototicOrganisms');
+                container.innerHTML = '';
+                this.phototicOrganisms = [];
+
+                // Fitoplancton
+                for (let i = 0; i < 25; i++) {
+                    this.createOrganism('phytoplankton', container, 'phototic');
+                }
+
+                // Copépodos (más realistas)
+                for (let i = 0; i < 15; i++) {
+                    this.createOrganism('copepod', container, 'phototic');
+                }
+
+                // Zooplancton pequeño
+                for (let i = 0; i < 10; i++) {
+                    this.createOrganism('zooplankton', container, 'phototic');
+                }
+            }
+
+            createDeepOrganisms() {
+                const container = document.getElementById('deepOrganisms');
+                container.innerHTML = '';
+                this.deepOrganisms = [];
+
+                // Copépodos migratorios (mayor tamaño)
+                for (let i = 0; i < 20; i++) {
+                    this.createOrganism('copepod', container, 'deep');
+                }
+
+                // Zooplancton diverso
+                for (let i = 0; i < 15; i++) {
+                    this.createOrganism('zooplankton', container, 'deep');
+                }
+
+                // Bacterias
+                for (let i = 0; i < 35; i++) {
+                    this.createOrganism('bacteria', container, 'deep');
+                }
+
+                // Pellets fecales
+                for (let i = 0; i < 20; i++) {
+                    this.createOrganism('fecal-pellet', container, 'deep');
+                }
+            }
+
+            createOrganism(type, container, zone) {
+                const organism = document.createElement('div');
+                organism.className = `organism ${type}`;
+                
+                const sizes = {
+                    'phytoplankton': Math.random() * 4 + 2,
+                    'copepod': zone === 'deep' ? Math.random() * 8 + 6 : Math.random() * 6 + 4,
+                    'zooplankton': Math.random() * 5 + 3,
+                    'bacteria': Math.random() * 3 + 1,
+                    'fecal-pellet': Math.random() * 5 + 3
+                };
+                
+                const size = sizes[type];
+                organism.style.width = `${size}px`;
+                organism.style.height = `${size}px`;
+                
+                const maxWidth = container.clientWidth - size;
+                const maxHeight = container.clientHeight - size;
+                
+                // Distribución específica por tipo y zona
+                let x, y;
+                if (type === 'copepod' && zone === 'deep') {
+                    // Copépodos profundos distribuidos en columna central para migración
+                    x = (maxWidth * 0.2) + Math.random() * (maxWidth * 0.6);
+                    y = (maxHeight * 0.3) + Math.random() * (maxHeight * 0.6);
+                } else if (type === 'phytoplankton') {
+                    // Fitoplancton concentrado en zona superior
+                    x = Math.random() * maxWidth;
+                    y = Math.random() * (maxHeight * 0.6);
+                } else {
+                    x = Math.random() * maxWidth;
+                    y = Math.random() * maxHeight;
+                }
+                
+                organism.style.left = `${x}px`;
+                organism.style.top = `${y}px`;
+                
+                // Propiedades específicas del organismo
+                organism.organismData = {
+                    type: type,
+                    zone: zone,
+                    originalY: y,
+                    x: x,
+                    size: size,
+                    phase: Math.random() * Math.PI * 2,
+                    migrationSpeed: type === 'copepod' ? Math.random() * 2 + 1.5 : Math.random() * 1 + 0.5,
+                    swimPattern: type === 'copepod' ? 'jerky' : 'smooth',
+                    migrationState: 'resting', // resting, ascending, descending
+                    lastMigrationTime: 0
+                };
+
+                // Crear anatomía detallada para copépodos
+                if (type === 'copepod') {
+                    this.createCopepodAnatomy(organism);
+                    this.createMigrationTrail(organism, container);
+                }
+
+                organism.addEventListener('click', () => this.showOrganismInfo(organism));
+                
+                container.appendChild(organism);
+                
+                if (zone === 'phototic') {
+                    this.phototicOrganisms.push(organism);
+                } else {
+                    this.deepOrganisms.push(organism);
+                }
+            }
+
+            createCopepodAnatomy(copepod) {
+                // Antenas primarias (A1)
+                const antenna1 = document.createElement('div');
+                antenna1.className = 'copepod-antenna1';
+                copepod.appendChild(antenna1);
+
+                const antenna2 = document.createElement('div');
+                antenna2.className = 'copepod-antenna2';
+                copepod.appendChild(antenna2);
+
+                // Antenas secundarias (A2)
+                const antennaSecondary1 = document.createElement('div');
+                antennaSecondary1.className = 'copepod-antenna-secondary1';
+                copepod.appendChild(antennaSecondary1);
+
+                const antennaSecondary2 = document.createElement('div');
+                antennaSecondary2.className = 'copepod-antenna-secondary2';
+                copepod.appendChild(antennaSecondary2);
+
+                // Patas nadadoras (6 pares)
+                for (let i = 1; i <= 6; i++) {
+                    const swimleg = document.createElement('div');
+                    swimleg.className = `copepod-swimleg copepod-swimleg${i}`;
+                    copepod.appendChild(swimleg);
+                }
+
+                // Furca (cola bifurcada)
+                const furca1 = document.createElement('div');
+                furca1.className = 'copepod-furca1';
+                copepod.appendChild(furca1);
+
+                const furca2 = document.createElement('div');
+                furca2.className = 'copepod-furca2';
+                copepod.appendChild(furca2);
+
+                // Ojos compuestos
+                const eye1 = document.createElement('div');
+                eye1.className = 'copepod-eye copepod-eye1';
+                copepod.appendChild(eye1);
+
+                const eye2 = document.createElement('div');
+                eye2.className = 'copepod-eye copepod-eye2';
+                copepod.appendChild(eye2);
+
+                // Guardar referencias para animaciones
+                copepod.copepodParts = {
+                    antennas: [antenna1, antenna2, antennaSecondary1, antennaSecondary2],
+                    swimlegs: copepod.querySelectorAll('.copepod-swimleg'),
+                    furca: [furca1, furca2],
+                    eyes: [eye1, eye2]
+                };
+            }
+
+            createMigrationTrail(copepod, container) {
+                const trail = document.createElement('div');
+                trail.className = 'migration-trail';
+                trail.style.left = copepod.style.left;
+                trail.style.top = copepod.style.top;
+                trail.style.height = '0px';
+                trail.style.opacity = '0';
+                
+                container.appendChild(trail);
+                copepod.migrationTrail = trail;
+            }
+
+            startTimeSimulation() {
+                if (this.timeSimulationActive) return;
+                
+                this.timeSimulationActive = true;
+                this.currentHour = 0;
+                
+                this.timeInterval = setInterval(() => {
+                    this.currentHour = (this.currentHour + 1) % 24;
+                    
+                    // Actualizar slider
+                    document.getElementById('timeSlider').value = this.currentHour;
+                    
+                    // Actualizar simulación
+                    this.updateSimulation();
+                    
+                    // Actualizar narrativa
+                    this.updateNarrative();
+                    
+                    // Actualizar progreso
+                    this.updateProgress();
+                    
+                }, this.simulationSpeed);
+                
+                this.updateNarrative();
+            }
+
+            stopTimeSimulation() {
+                this.timeSimulationActive = false;
+                if (this.timeInterval) {
+                    clearInterval(this.timeInterval);
+                    this.timeInterval = null;
+                }
+            }
+
+            toggleSpeed() {
+                this.currentSpeedIndex = (this.currentSpeedIndex + 1) % this.speeds.length;
+                this.simulationSpeed = this.speeds[this.currentSpeedIndex];
+                
+                const speedLabels = ['2x', '1x', '0.5x', '0.25x'];
+                document.getElementById('speedDisplay').textContent = speedLabels[this.currentSpeedIndex];
+                document.getElementById('currentSpeed').textContent = speedLabels[this.currentSpeedIndex];
+                
+                if (this.timeSimulationActive) {
+                    this.stopTimeSimulation();
+                    this.startTimeSimulation();
+                }
+            }
+
+            updateNarrative() {
+                const narrative = this.hourlyNarratives[this.currentHour];
+                document.getElementById('narrativeText').textContent = narrative;
+                
+                // Actualizar estado de procesos
+                this.updateProcessStatus();
+                
+                // Actualizar indicador día/noche
+                this.updateDayNightIndicator();
+            }
+
+            updateProcessStatus() {
+                const time = this.currentHour;
+                const dayFactor = this.getDayIntensity(time);
+                const migrationFactor = this.getMigrationFactor(time);
+                
+                // Status de procesos
+                let processText = "";
+                
+                if (dayFactor > 0.3) {
+                    processText += "☀️ Fotosíntesis ACTIVA • ";
+                    document.getElementById('photosynthesisIndicator').className = 'process-indicator process-active';
+                } else {
+                    processText += "🌙 Fotosíntesis inactiva • ";
+                    document.getElementById('photosynthesisIndicator').className = 'process-indicator process-inactive';
+                }
+                
+                if (migrationFactor > 0.3) {
+                    processText += "🔄 Migración EN CURSO • ";
+                    document.getElementById('migrationIndicator').className = 'process-indicator process-active';
+                } else {
+                    processText += "⏸️ Migración mínima • ";
+                    document.getElementById('migrationIndicator').className = 'process-indicator process-inactive';
+                }
+                
+                // Remineralización siempre activa pero variable
+                const remineralizationIntensity = migrationFactor * 0.5 + 0.5;
+                if (remineralizationIntensity > 0.7) {
+                    processText += "♻️ Remineralización INTENSA • ";
+                    document.getElementById('remineralizationIndicator').className = 'process-indicator process-active';
+                } else {
+                    processText += "♻️ Remineralización normal • ";
+                    document.getElementById('remineralizationIndicator').className = 'process-indicator process-inactive';
+                }
+                
+                // Flujo de carbono
+                if (dayFactor > 0.5 || migrationFactor > 0.5) {
+                    processText += "⬇️ Flujo carbono ALTO";
+                    document.getElementById('pelletsIndicator').className = 'process-indicator process-active';
+                } else {
+                    processText += "⬇️ Flujo carbono bajo";
+                    document.getElementById('pelletsIndicator').className = 'process-indicator process-inactive';
+                }
+                
+                document.getElementById('processStatus').textContent = processText;
+            }
+
+            updateDayNightIndicator() {
+                const indicators = {
+                    0: '🌙', 1: '🌙', 2: '🌌', 3: '🌙', 4: '🌔', 5: '🌅',
+                    6: '🌅', 7: '☀️', 8: '🌞', 9: '☀️', 10: '🌞', 11: '☀️',
+                    12: '🌞', 13: '☀️', 14: '🌞', 15: '☀️', 16: '🌤️', 17: '🌅',
+                    18: '🌇', 19: '🌆', 20: '🌃', 21: '🌙', 22: '🌌', 23: '🌙'
+                };
+                
+                document.getElementById('dayNightIndicator').textContent = indicators[this.currentHour];
+            }
+
+            updateProgress() {
+                const progress = (this.currentHour / 24) * 100;
+                document.getElementById('timeProgressBar').style.width = `${progress}%`;
+                document.getElementById('cycleProgress').textContent = `${progress.toFixed(0)}%`;
+            }
+
+            updateSimulation() {
+                const time = this.currentHour;
+                const waterType = document.getElementById('waterType').value;
+                const light = parseInt(document.getElementById('lightSlider').value);
+                const nutrients = parseInt(document.getElementById('nutrientsSlider').value);
+
+                // Actualizar displays
+                document.getElementById('timeDisplay').textContent = `${time}:00`;
+                document.getElementById('lightDisplay').textContent = `${light}%`;
+                document.getElementById('nutrientsDisplay').textContent = `${nutrients} μM`;
+
+                // Calcular parámetros
+                const dayFactor = this.getDayIntensity(time);
+                const productivity = (light / 100) * (nutrients / 30) * dayFactor * 100;
+                const migrationFactor = this.getMigrationFactor(time);
+                const chlorophyll = productivity * 0.04;
+
+                const attenuationCoeffs = { oceanic: 0.05, coastal: 0.15, estuarine: 0.5 };
+                const euphoticDepth = Math.round(4.6 / attenuationCoeffs[waterType]);
+
+                // Actualizar info panel
+                document.getElementById('currentTime').textContent = `${time}:00`;
+                document.getElementById('currentProductivity').textContent = `${Math.min(100, productivity).toFixed(0)}%`;
+                document.getElementById('currentMigration').textContent = `${(migrationFactor * 100).toFixed(0)}%`;
+                document.getElementById('currentEuphotic').textContent = `${Math.min(100, euphoticDepth)}m`;
+                document.getElementById('currentChlorophyll').textContent = `${chlorophyll.toFixed(1)} mg/m³`;
+                document.getElementById('phototicCount').textContent = this.phototicOrganisms.length;
+                document.getElementById('deepCount').textContent = this.deepOrganisms.length;
+
+                // Actualizar gradientes de luz
+                this.updateLightColumns(light, dayFactor, waterType);
+
+                // Actualizar comportamiento de organismos
+                this.updateOrganismBehavior(time, productivity, migrationFactor);
+            }
+
+            updateLightColumns(light, dayFactor, waterType) {
+                const totalIntensity = (light / 100) * dayFactor;
+                
+                // Zona fótica
+                const phototicLight = document.getElementById('phototicLight');
+                phototicLight.style.background = `linear-gradient(to bottom,
+                    rgba(255, 255, 0, ${totalIntensity * 0.8}) 0%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.6}) 25%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.4}) 50%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.2}) 75%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.1}) 100%
+                )`;
+
+                // Zona profunda
+                const deepLight = document.getElementById('deepLight');
+                deepLight.style.background = `linear-gradient(to bottom,
+                    rgba(255, 255, 0, ${totalIntensity * 0.05}) 0%,
+                    rgba(255, 255, 0, ${totalIntensity * 0.01}) 25%,
+                    rgba(255, 255, 0, 0) 50%
+                )`;
+            }
+
+            updateOrganismBehavior(time, productivity, migrationFactor) {
+                // Determinar estado de migración
+                const isMigrationTime = migrationFactor > 0.3;
+                const isNightPeak = time >= 21 && time <= 3;
+                
+                // Zona fótica
+                this.phototicOrganisms.forEach(organism => {
+                    const data = organism.organismData;
+                    
+                    if (data.type === 'phytoplankton') {
+                        if (productivity > 50 && time >= 6 && time <= 18) {
+                            organism.classList.add('active-photosynthesis');
+                        } else {
+                            organism.classList.remove('active-photosynthesis');
+                        }
+                        
+                        // Movimiento flotante suave
+                        const floatOffset = Math.sin(this.time * 0.005 + data.phase) * 8;
+                        organism.style.top = `${data.originalY + floatOffset}px`;
+                    }
+                    
+                    if (data.type === 'copepod') {
+                        this.updateCopepodMigration(organism, migrationFactor, time, 'phototic');
+                    }
+                    
+                    if (data.type === 'zooplankton') {
+                        const migrationOffset = migrationFactor * 25;
+                        organism.style.top = `${Math.max(0, data.originalY - migrationOffset)}px`;
+                        
+                        // Animación de natación constante
+                        organism.classList.add('swimming');
+                        
+                        if (migrationFactor > 0.3) {
+                            organism.classList.add('migrating-up');
+                            organism.classList.remove('migrating-down');
+                        } else {
+                            organism.classList.add('migrating-down');
+                            organism.classList.remove('migrating-up');
+                        }
+                    }
+                });
+
+                // Zona profunda - Comportamientos más complejos
+                this.deepOrganisms.forEach(organism => {
+                    const data = organism.organismData;
+                    
+                    if (data.type === 'copepod') {
+                        this.updateCopepodMigration(organism, migrationFactor, time, 'deep');
+                    }
+                    
+                    if (data.type === 'zooplankton') {
+                        const migrationOffset = migrationFactor * 60;
+                        organism.style.top = `${Math.max(0, data.originalY - migrationOffset)}px`;
+                        
+                        organism.classList.add('swimming');
+                        
+                        if (migrationFactor > 0.5) {
+                            organism.classList.add('migrating-up');
+                            organism.classList.remove('migrating-down');
+                        } else if (migrationFactor < 0.2) {
+                            organism.classList.add('migrating-down');
+                            organism.classList.remove('migrating-up');
+                        }
+                    }
+                    
+                    if (data.type === 'fecal-pellet') {
+                        organism.classList.add('sinking');
+                        
+                        // Hundimiento continuo más realista
+                        data.originalY += 0.3 + (Math.random() * 0.4);
+                        const maxHeight = organism.parentElement.clientHeight;
+                        if (data.originalY > maxHeight) {
+                            // Reaparece en la zona fótica
+                            data.originalY = Math.random() * 100;
+                        }
+                        organism.style.top = `${data.originalY}px`;
+                    }
+                    
+                    if (data.type === 'bacteria') {
+                        // Movimiento errático suave
+                        const wobbleX = Math.sin(this.time * 0.003 + data.phase) * 3;
+                        const wobbleY = Math.cos(this.time * 0.004 + data.phase) * 2;
+                        organism.style.left = `${data.x + wobbleX}px`;
+                        organism.style.top = `${data.originalY + wobbleY}px`;
+                    }
+                });
+            }
+
+            updateCopepodMigration(copepod, migrationFactor, time, zone) {
+                const data = copepod.organismData;
+                const trail = copepod.migrationTrail;
+                
+                // Siempre nadando
+                copepod.classList.add('swimming');
+                
+                // Lógica de migración específica para copépodos
+                if (migrationFactor > 0.6) {
+                    // Migración ascendente intensa
+                    const migrationDistance = zone === 'deep' ? 80 : 40;
+                    const newY = data.originalY - (migrationFactor * migrationDistance);
+                    copepod.style.top = `${Math.max(0, newY)}px`;
+                    
+                    // Activar animación ascendente
+                    copepod.classList.remove('migrating-down');
+                    copepod.classList.add('migrating-up');
+                    
+                    // Mostrar trail de migración
+                    if (trail) {
+                        trail.style.opacity = migrationFactor.toString();
+                        trail.style.height = `${migrationFactor * 30}px`;
+                        trail.classList.add('active');
+                    }
+                    
+                    data.migrationState = 'ascending';
+                    
+                } else if (migrationFactor < 0.2 && data.migrationState === 'ascending') {
+                    // Migración descendente
+                    const returnSpeed = 0.8;
+                    const targetY = data.originalY;
+                    const currentY = parseFloat(copepod.style.top);
+                    const newY = currentY + (targetY - currentY) * returnSpeed;
+                    
+                    copepod.style.top = `${newY}px`;
+                    
+                    // Activar animación descendente
+                    copepod.classList.remove('migrating-up');
+                    copepod.classList.add('migrating-down');
+                    
+                    // Desvanecer trail
+                    if (trail) {
+                        trail.style.opacity = '0';
+                        trail.style.height = '5px';
+                        trail.classList.remove('active');
+                    }
+                    
+                    // Cambiar estado cuando regrese cerca de posición original
+                    if (Math.abs(newY - targetY) < 10) {
+                        data.migrationState = 'resting';
+                        copepod.classList.remove('migrating-down');
+                    }
+                    
+                } else if (data.migrationState === 'resting') {
+                    // Movimiento de reposo con pequeñas variaciones
+                    const restMovement = Math.sin(this.time * 0.01 + data.phase) * 5;
+                    copepod.style.top = `${data.originalY + restMovement}px`;
+                    
+                    // Limpiar clases de migración
+                    copepod.classList.remove('migrating-up', 'migrating-down');
+                    
+                    if (trail) {
+                        trail.style.opacity = '0';
+                        trail.style.height = '0px';
+                    }
+                }
+                
+                // Actualizar posición del trail
+                if (trail) {
+                    trail.style.left = copepod.style.left;
+                    const copepodY = parseFloat(copepod.style.top);
+                    trail.style.top = `${copepodY + data.size}px`;
+                }
+            }
+
+            getDayIntensity(time) {
+                if (time >= 6 && time <= 18) {
+                    const hoursSinceSunrise = time - 6;
+                    return Math.sin((hoursSinceSunrise / 12) * Math.PI);
+                }
+                return 0.1;
+            }
+
+            getMigrationFactor(time) {
+                if (time >= 20 || time <= 6) {
+                    return 0.8;
+                } else if (time >= 18 && time < 20) {
+                    return (time - 18) / 2 * 0.8;
+                } else if (time > 6 && time <= 8) {
+                    return (8 - time) / 2 * 0.8;
+                }
+                return 0;
+            }
+
+            showOrganismInfo(organism) {
+                const data = organism.organismData;
+                const info = {
+                    'phytoplankton': 'Fitoplancton: Productor primario, realiza fotosíntesis activa durante el día',
+                    'copepod': 'Copépodo: Crustáceo migratorio. Asciende de noche para alimentarse, desciende de día para evitar depredadores',
+                    'zooplankton': 'Zooplancton: Consumidor primario diverso, migración vertical moderada',
+                    'bacteria': 'Bacterias: Descomponedores clave, remineralización de materia orgánica',
+                    'fecal-pellet': 'Pellet Fecal: Bomba biológica de carbono, transporta CO₂ a profundidad'
+                };
+                
+                let migrationInfo = '';
+                if (data.type === 'copepod') {
+                    migrationInfo = `\nEstado migración: ${data.migrationState}`;
+                    migrationInfo += `\nVelocidad: ${data.migrationSpeed.toFixed(1)}x`;
+                    migrationInfo += `\nPatrón nado: ${data.swimPattern}`;
+                }
+                
+                alert(`${info[data.type]}\nZona: ${data.zone}\nTamaño: ${data.size.toFixed(1)}px${migrationInfo}`);
+            }
+
+            animate() {
+                if (!this.isAnimating) return;
+                
+                this.time += 1;
+                this.animationId = requestAnimationFrame(() => this.animate());
+                
+                // Actualizar animaciones continuas
+                if (this.time % 30 === 0) { // Cada 30 frames
+                    this.updateSimulation();
+                }
+            }
+
+            start() {
+                this.isAnimating = true;
+                this.animate();
+            }
+
+            stop() {
+                this.isAnimating = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+
+            reset() {
+                this.stop();
+                this.time = 0;
+                this.populateOrganisms();
+                this.updateSimulation();
+            }
+        }
+
+        // Inicializar simulador
+        let simulator;
+
+        function startTimeSimulation() {
+            if (!simulator) {
+                simulator = new OceanSimulatorLite();
+            }
+            simulator.startTimeSimulation();
+        }
+
+        function startAnimation() {
+            if (!simulator) {
+                simulator = new OceanSimulatorLite();
+            }
+            simulator.start();
+        }
+
+        function pauseAnimation() {
+            if (simulator) {
+                simulator.stop();
+                simulator.stopTimeSimulation();
+            }
+        }
+
+        function resetSimulation() {
+            if (simulator) {
+                simulator.stopTimeSimulation();
+                simulator.reset();
+                // Reset hora a mediodía
+                simulator.currentHour = 12;
+                document.getElementById('timeSlider').value = 12;
+                simulator.updateSimulation();
+                simulator.updateNarrative();
+                simulator.updateProgress();
+            }
+        }
+
+        function toggleSpeed() {
+            if (simulator) {
+                simulator.toggleSpeed();
+            }
+        }
+
+        // Auto-inicializar
+        window.addEventListener('load', function() {
+            simulator = new OceanSimulatorLite();
+            // Inicializar narrativa
+            simulator.updateNarrative();
+        });
+    </script>
+</body>
+</html>

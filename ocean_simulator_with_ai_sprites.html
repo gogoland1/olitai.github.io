@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Simulador Oceánico con Sprites IA - Copépodos Realistas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1e3a8a 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .header h1 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .sprite-upload-section {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .upload-area {
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px dashed rgba(139, 92, 246, 0.5);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #a855f7;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .sprite-gallery {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sprite-preview {
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sprite-preview.loaded {
+            border-color: #22c55e;
+        }
+
+        .sprite-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            min-width: 200px;
+        }
+
+        .control-group h3 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 10px 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .ocean-container {
+            display: flex;
+            height: 600px;
+            margin: 20px;
+            gap: 20px;
+        }
+
+        .ocean-panel {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .ocean-view {
+            height: calc(100% - 60px);
+            position: relative;
+            background: linear-gradient(180deg, 
+                rgba(135, 206, 235, 0.8) 0%,
+                rgba(70, 130, 180, 0.9) 30%,
+                rgba(25, 25, 112, 0.95) 70%,
+                rgba(0, 0, 139, 1) 100%);
+        }
+
+        .depth-indicator {
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(180deg, 
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .depth-marker {
+            position: absolute;
+            right: 2px;
+            font-size: 8px;
+        }
+
+        /* Organism styles - enhanced for sprites */
+        .organism {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .organism:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        /* Traditional organisms (non-copepod) */
+        .phytoplankton {
+            background: radial-gradient(circle, #22c55e 0%, #16a34a 70%, #15803d 100%);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+            animation: photosynthesis 4s ease-in-out infinite;
+        }
+
+        .zooplankton {
+            background: radial-gradient(circle, #f97316 0%, #ea580c 70%, #c2410c 100%);
+            box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);
+            animation: swim 3s ease-in-out infinite;
+        }
+
+        .bacteria {
+            background: radial-gradient(circle, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 0 4px rgba(139, 92, 246, 0.8);
+        }
+
+        .fecal-pellet {
+            background: radial-gradient(circle, #78716c 0%, #57534e 100%);
+            box-shadow: 0 0 4px rgba(120, 113, 108, 0.6);
+            border-radius: 30%;
+        }
+
+        /* Copepod sprite styling */
+        .copepod {
+            background: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .copepod img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* Migration trail effect for copepods */
+        .migration-trail {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, 
+                rgba(249, 115, 22, 0.6) 0%,
+                rgba(249, 115, 22, 0.3) 50%,
+                rgba(249, 115, 22, 0) 100%);
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .migration-trail.active {
+            opacity: 1;
+        }
+
+        /* Enhanced animations for sprites */
+        @keyframes copepod-swim {
+            0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+            25% { transform: translateY(-3px) rotateZ(-2deg); }
+            50% { transform: translateY(-1px) rotateZ(1deg); }
+            75% { transform: translateY(-2px) rotateZ(-1deg); }
+        }
+
+        @keyframes migrate-ascent {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px) rotateZ(-5deg); }
+            100% { transform: translateY(-30px); }
+        }
+
+        @keyframes migrate-descent {
+            0% { transform: translateY(-30px); }
+            50% { transform: translateY(-15px) rotateZ(3deg); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes photosynthesis {
+            0%, 100% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+            50% { box-shadow: 0 0 15px rgba(34, 197, 94, 0.9); }
+        }
+
+        @keyframes swim {
+            0%, 100% { transform: translateX(0px) rotateZ(0deg); }
+            25% { transform: translateX(2px) rotateZ(-3deg); }
+            50% { transform: translateX(4px) rotateZ(0deg); }
+            75% { transform: translateX(2px) rotateZ(3deg); }
+        }
+
+        .copepod.swimming {
+            animation: copepod-swim 3s ease-in-out infinite;
+        }
+
+        .copepod.migrating-up {
+            animation: migrate-ascent 8s ease-in-out infinite;
+        }
+
+        .copepod.migrating-down {
+            animation: migrate-descent 6s ease-in-out infinite;
+        }
+
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            z-index: 1000;
+        }
+
+        .info-panel h4 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            margin: 5px 0;
+            font-size: 12px;
+            color: #93c5fd;
+        }
+
+        .sprite-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(139, 92, 246, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .sprite-status h4 {
+            color: #a855f7;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #22c55e;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌊 Simulador Oceánico con Sprites IA</h1>
+        <p>Copépodos realistas generados con Inteligencia Artificial</p>
+    </div>
+
+    <!-- Sección de carga de sprites -->
+    <div class="sprite-upload-section">
+        <h3>🎨 Cargar Sprites de Copépodos Generados con IA</h3>
+        <p>Arrastra aquí las imágenes de copépodos generadas con Midjourney, DALL-E o Stable Diffusion</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <div>📁 Haz click aquí o arrastra sprites PNG/JPG</div>
+            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="sprite-gallery" id="spriteGallery">
+            <!-- Sprites cargados aparecerán aquí -->
+        </div>
+        
+        <button class="btn btn-success" onclick="simulator.populateWithAISprites()">
+            🚀 Poblar Océano con Sprites IA
+        </button>
+        <button class="btn" onclick="simulator.showSampleSprites()">
+            👁️ Mostrar Sprites de Ejemplo
+        </button>
+    </div>
+
+    <!-- Controles del simulador -->
+    <div class="controls">
+        <div class="control-group">
+            <h3>⏰ Control Temporal</h3>
+            <label>Hora del día: <span id="time-display">12:00</span></label>
+            <input type="range" class="slider" id="time-slider" min="0" max="23" value="12" oninput="simulator.updateTime()">
+            <button class="btn" onclick="simulator.startTimeSimulation()" id="time-btn">▶️ Iniciar Simulación 24h</button>
+        </div>
+        
+        <div class="control-group">
+            <h3>🌊 Parámetros Oceánicos</h3>
+            <label>Tipo de agua:</label>
+            <select id="water-type" onchange="simulator.updateParameters()">
+                <option value="oceanic">Oceánico (K=0.05)</option>
+                <option value="coastal">Costero (K=0.15)</option>
+                <option value="estuarine">Estuarino (K=0.5)</option>
+            </select>
+            <label>Intensidad lumínica: <span id="light-display">80%</span></label>
+            <input type="range" class="slider" id="light-slider" min="0" max="100" value="80" oninput="simulator.updateParameters()">
+        </div>
+        
+        <div class="control-group">
+            <h3>🧪 Condiciones Biológicas</h3>
+            <label>Nutrientes: <span id="nutrients-display">15μM</span></label>
+            <input type="range" class="slider" id="nutrients-slider" min="0" max="30" value="15" oninput="simulator.updateParameters()">
+            <label>Temperatura: <span id="temp-display">18°C</span></label>
+            <input type="range" class="slider" id="temp-slider" min="5" max="25" value="18" oninput="simulator.updateParameters()">
+        </div>
+    </div>
+
+    <!-- Contenedor del océano -->
+    <div class="ocean-container">
+        <!-- Panel Zona Fótica -->
+        <div class="ocean-panel">
+            <div class="panel-header">
+                <h3>🌞 Zona Fótica (0-100m)</h3>
+                <p>Fotosíntesis y productividad primaria</p>
+            </div>
+            <div class="ocean-view" id="photic-zone">
+                <div class="depth-indicator" id="photic-depth-indicator"></div>
+            </div>
+        </div>
+        
+        <!-- Panel Zona Profunda -->
+        <div class="ocean-panel">
+            <div class="panel-header">
+                <h3>🌑 Zona Profunda (100-2000m)</h3>
+                <p>Migración vertical y loop microbiano</p>
+            </div>
+            <div class="ocean-view" id="deep-zone">
+                <div class="depth-indicator" id="deep-depth-indicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de información -->
+    <div class="info-panel">
+        <h4>📊 Datos en Tiempo Real</h4>
+        <div class="info-item">Hora: <span id="current-time">12:00</span></div>
+        <div class="info-item">Productividad: <span id="current-productivity">85%</span></div>
+        <div class="info-item">Migración: <span id="current-migration">0%</span></div>
+        <div class="info-item">Zona Eufótica: <span id="current-euphotic">92m</span></div>
+        <div class="info-item">Copépodos IA: <span id="ai-copepods-count">0</span></div>
+    </div>
+
+    <!-- Estado de sprites -->
+    <div class="sprite-status">
+        <h4>🎨 Estado de Sprites IA</h4>
+        <div class="info-item">Sprites cargados: <span id="sprites-loaded">0</span></div>
+        <div class="info-item">Copépodos activos: <span id="copepods-active">0</span></div>
+        <div class="info-item">Migrando: <span id="copepods-migrating">0</span></div>
+    </div>
+
+    <script>
+        class OceanSimulatorWithAISprites {
+            constructor() {
+                this.loadedSprites = [];
+                this.aiCopepods = [];
+                this.phototicOrganisms = [];
+                this.deepOrganisms = [];
+                this.timeSimulationActive = false;
+                this.currentHour = 12;
+                this.simulationSpeed = 1000; // 1 segundo = 1 hora
+                this.timeInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupDragAndDrop();
+                this.createDepthIndicators();
+                this.populateOcean();
+                this.updateParameters();
+                this.animate();
+                
+                console.log('🦐 Simulador oceánico con sprites IA inicializado');
+            }
+            
+            setupDragAndDrop() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                
+                uploadArea.addEventListener('click', () => fileInput.click());
+                
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files);
+                });
+            }
+            
+            handleFiles(files) {
+                Array.from(files).forEach((file) => {
+                    if (file.type.startsWith('image/')) {
+                        this.loadSprite(file);
+                    }
+                });
+            }
+            
+            loadSprite(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const spriteData = {
+                        src: e.target.result,
+                        name: file.name,
+                        id: Date.now() + Math.random()
+                    };
+                    
+                    this.loadedSprites.push(spriteData);
+                    this.addSpriteToGallery(spriteData);
+                    this.updateSpriteStatus();
+                    
+                    console.log(`✅ Sprite cargado: ${file.name}`);
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            addSpriteToGallery(spriteData) {
+                const gallery = document.getElementById('spriteGallery');
+                const preview = document.createElement('div');
+                preview.className = 'sprite-preview loaded';
+                
+                const img = document.createElement('img');
+                img.src = spriteData.src;
+                img.alt = spriteData.name;
+                
+                preview.appendChild(img);
+                gallery.appendChild(preview);
+            }
+            
+            showSampleSprites() {
+                // Crear sprites de ejemplo para demostración
+                const sampleSprites = [
+                    { name: 'Calanus_finmarchicus.png', placeholder: true },
+                    { name: 'Copepod_nauplius.png', placeholder: true },
+                    { name: 'Acartia_tonsa.png', placeholder: true }
+                ];
+                
+                sampleSprites.forEach(sprite => {
+                    this.loadedSprites.push({
+                        src: this.generateSampleSpriteData(sprite.name),
+                        name: sprite.name,
+                        id: Date.now() + Math.random(),
+                        isSample: true
+                    });
+                });
+                
+                this.updateSpriteGallery();
+                this.updateSpriteStatus();
+            }
+            
+            generateSampleSpriteData(name) {
+                // Generar un SVG placeholder para sprites de ejemplo
+                const svg = `
+                <svg width="40" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="20" cy="10" rx="18" ry="8" fill="#f97316" opacity="0.8"/>
+                    <ellipse cx="15" cy="8" rx="3" ry="2" fill="#ea580c"/>
+                    <line x1="5" y1="6" x2="1" y2="3" stroke="#c2410c" stroke-width="1"/>
+                    <line x1="5" y1="14" x2="1" y2="17" stroke="#c2410c" stroke-width="1"/>
+                    <text x="20" y="15" font-size="6" text-anchor="middle" fill="white">${name.split('_')[0]}</text>
+                </svg>`;
+                
+                return 'data:image/svg+xml;base64,' + btoa(svg);
+            }
+            
+            updateSpriteGallery() {
+                const gallery = document.getElementById('spriteGallery');
+                gallery.innerHTML = '';
+                
+                this.loadedSprites.forEach(sprite => {
+                    this.addSpriteToGallery(sprite);
+                });
+            }
+            
+            populateWithAISprites() {
+                if (this.loadedSprites.length === 0) {
+                    alert('⚠️ Primero carga algunos sprites de copépodos generados con IA');
+                    return;
+                }
+                
+                // Limpiar copépodos existentes
+                this.aiCopepods.forEach(copepod => {
+                    if (copepod.element && copepod.element.parentNode) {
+                        copepod.element.parentNode.removeChild(copepod.element);
+                    }
+                });
+                this.aiCopepods = [];
+                
+                // Crear nuevos copépodos con sprites IA
+                const phototicZone = document.getElementById('photic-zone');
+                const deepZone = document.getElementById('deep-zone');
+                
+                // Copépodos en zona fótica (menor cantidad)
+                for (let i = 0; i < 8; i++) {
+                    this.createAICopepod(phototicZone, 'photic');
+                }
+                
+                // Copépodos en zona profunda (mayor cantidad y tamaño)
+                for (let i = 0; i < 15; i++) {
+                    this.createAICopepod(deepZone, 'deep');
+                }
+                
+                this.updateSpriteStatus();
+                console.log(`🦐 ${this.aiCopepods.length} copépodos IA poblaron el océano`);
+            }
+            
+            createAICopepod(container, zone) {
+                if (this.loadedSprites.length === 0) return;
+                
+                const copepod = document.createElement('div');
+                copepod.className = 'organism copepod swimming';
+                
+                // Seleccionar sprite aleatorio
+                const randomSprite = this.loadedSprites[Math.floor(Math.random() * this.loadedSprites.length)];
+                
+                const img = document.createElement('img');
+                img.src = randomSprite.src;
+                img.alt = `Copépodo ${randomSprite.name}`;
+                copepod.appendChild(img);
+                
+                // Tamaño basado en zona
+                const size = zone === 'deep' ? Math.random() * 15 + 20 : Math.random() * 10 + 15;
+                copepod.style.width = `${size}px`;
+                copepod.style.height = `${size * 0.6}px`; // Proporción realista
+                
+                // Posición inicial
+                const maxWidth = container.clientWidth - size;
+                const maxHeight = container.clientHeight - size;
+                
+                let x, y;
+                if (zone === 'deep') {
+                    // Distribución para migración vertical
+                    x = (maxWidth * 0.1) + Math.random() * (maxWidth * 0.8);
+                    y = (maxHeight * 0.2) + Math.random() * (maxHeight * 0.6);
+                } else {
+                    x = Math.random() * maxWidth;
+                    y = Math.random() * (maxHeight * 0.7);
+                }
+                
+                copepod.style.left = `${x}px`;
+                copepod.style.top = `${y}px`;
+                
+                // Datos del copépodo
+                const copepodData = {
+                    element: copepod,
+                    type: 'ai_copepod',
+                    zone: zone,
+                    originalY: y,
+                    x: x,
+                    size: size,
+                    sprite: randomSprite,
+                    phase: Math.random() * Math.PI * 2,
+                    migrationSpeed: Math.random() * 2 + 1.5,
+                    swimPattern: 'jerky',
+                    migrationState: 'resting',
+                    lastMigrationTime: 0,
+                    verticalVelocity: 0
+                };
+                
+                copepod.copepodData = copepodData;
+                
+                // Crear rastro de migración
+                this.createMigrationTrail(copepod, container);
+                
+                // Event listeners
+                copepod.addEventListener('click', () => this.showCopepodInfo(copepodData));
+                
+                container.appendChild(copepod);
+                this.aiCopepods.push(copepodData);
+                
+                if (zone === 'photic') {
+                    this.phototicOrganisms.push(copepod);
+                } else {
+                    this.deepOrganisms.push(copepod);
+                }
+            }
+            
+            createMigrationTrail(copepod, container) {
+                const trail = document.createElement('div');
+                trail.className = 'migration-trail';
+                trail.style.left = copepod.style.left;
+                trail.style.top = '0';
+                trail.style.height = '100%';
+                container.appendChild(trail);
+                
+                copepod.migrationTrail = trail;
+            }
+            
+            showCopepodInfo(copepodData) {
+                const info = `
+🦐 Copépodo IA
+Especie: ${copepodData.sprite.name}
+Zona: ${copepodData.zone}
+Tamaño: ${copepodData.size.toFixed(1)}px
+Estado: ${copepodData.migrationState}
+Velocidad migración: ${copepodData.migrationSpeed.toFixed(1)}
+Patrón nado: ${copepodData.swimPattern}`;
+                
+                alert(info);
+            }
+            
+            createDepthIndicators() {
+                const phototicIndicator = document.getElementById('photic-depth-indicator');
+                const deepIndicator = document.getElementById('deep-depth-indicator');
+                
+                // Marcadores para zona fótica (0-100m)
+                for (let depth = 0; depth <= 100; depth += 20) {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.style.top = `${(depth / 100) * 100}%`;
+                    marker.textContent = `${depth}m`;
+                    phototicIndicator.appendChild(marker);
+                }
+                
+                // Marcadores para zona profunda (100-2000m)
+                for (let depth = 100; depth <= 2000; depth += 300) {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.style.top = `${((depth - 100) / 1900) * 100}%`;
+                    marker.textContent = `${depth}m`;
+                    deepIndicator.appendChild(marker);
+                }
+            }
+            
+            populateOcean() {
+                const phototicZone = document.getElementById('photic-zone');
+                const deepZone = document.getElementById('deep-zone');
+                
+                // Zona fótica
+                this.createTraditionalOrganisms(phototicZone, 'photic');
+                
+                // Zona profunda
+                this.createTraditionalOrganisms(deepZone, 'deep');
+            }
+            
+            createTraditionalOrganisms(container, zone) {
+                const organisms = zone === 'photic' ? 
+                    [{ type: 'phytoplankton', count: 25 }, { type: 'zooplankton', count: 12 }] :
+                    [{ type: 'bacteria', count: 35 }, { type: 'fecal-pellet', count: 20 }, { type: 'zooplankton', count: 15 }];
+                
+                organisms.forEach(({ type, count }) => {
+                    for (let i = 0; i < count; i++) {
+                        this.createTraditionalOrganism(type, container, zone);
+                    }
+                });
+            }
+            
+            createTraditionalOrganism(type, container, zone) {
+                const organism = document.createElement('div');
+                organism.className = `organism ${type}`;
+                
+                const sizes = {
+                    'phytoplankton': Math.random() * 4 + 2,
+                    'zooplankton': Math.random() * 5 + 3,
+                    'bacteria': Math.random() * 3 + 1,
+                    'fecal-pellet': Math.random() * 5 + 3
+                };
+                
+                const size = sizes[type];
+                organism.style.width = `${size}px`;
+                organism.style.height = `${size}px`;
+                
+                const maxWidth = container.clientWidth - size;
+                const maxHeight = container.clientHeight - size;
+                
+                let x, y;
+                if (type === 'phytoplankton') {
+                    x = Math.random() * maxWidth;
+                    y = Math.random() * (maxHeight * 0.6);
+                } else {
+                    x = Math.random() * maxWidth;
+                    y = Math.random() * maxHeight;
+                }
+                
+                organism.style.left = `${x}px`;
+                organism.style.top = `${y}px`;
+                
+                organism.organismData = {
+                    type: type,
+                    zone: zone,
+                    originalY: y,
+                    x: x,
+                    size: size,
+                    phase: Math.random() * Math.PI * 2
+                };
+                
+                container.appendChild(organism);
+                
+                if (zone === 'photic') {
+                    this.phototicOrganisms.push(organism);
+                } else {
+                    this.deepOrganisms.push(organism);
+                }
+            }
+            
+            updateTime() {
+                const timeSlider = document.getElementById('time-slider');
+                this.currentHour = parseInt(timeSlider.value);
+                document.getElementById('time-display').textContent = `${this.currentHour}:00`;
+                this.updateParameters();
+            }
+            
+            startTimeSimulation() {
+                const btn = document.getElementById('time-btn');
+                
+                if (this.timeSimulationActive) {
+                    this.timeSimulationActive = false;
+                    clearInterval(this.timeInterval);
+                    btn.textContent = '▶️ Iniciar Simulación 24h';
+                } else {
+                    this.timeSimulationActive = true;
+                    btn.textContent = '⏸️ Pausar Simulación';
+                    
+                    this.timeInterval = setInterval(() => {
+                        this.currentHour = (this.currentHour + 1) % 24;
+                        document.getElementById('time-slider').value = this.currentHour;
+                        this.updateTime();
+                    }, this.simulationSpeed);
+                }
+            }
+            
+            updateParameters() {
+                const lightSlider = document.getElementById('light-slider');
+                const nutrientsSlider = document.getElementById('nutrients-slider');
+                const tempSlider = document.getElementById('temp-slider');
+                const waterType = document.getElementById('water-type').value;
+                
+                const light = parseInt(lightSlider.value);
+                const nutrients = parseInt(nutrientsSlider.value);
+                const temperature = parseInt(tempSlider.value);
+                
+                // Actualizar displays
+                document.getElementById('light-display').textContent = `${light}%`;
+                document.getElementById('nutrients-display').textContent = `${nutrients}μM`;
+                document.getElementById('temp-display').textContent = `${temperature}°C`;
+                document.getElementById('current-time').textContent = `${this.currentHour}:00`;
+                
+                // Calcular parámetros
+                const dayFactor = (this.currentHour >= 6 && this.currentHour <= 18) ? 1 : 0.3;
+                const productivity = (light/100) * (nutrients/30) * (temperature/25) * dayFactor * 100;
+                const migrationFactor = this.calculateMigrationFactor(this.currentHour);
+                
+                const attenuationCoeffs = { oceanic: 0.05, coastal: 0.15, estuarine: 0.5 };
+                const euphoticDepth = Math.round(4.6 / attenuationCoeffs[waterType]);
+                
+                document.getElementById('current-productivity').textContent = `${productivity.toFixed(0)}%`;
+                document.getElementById('current-migration').textContent = `${(migrationFactor*100).toFixed(0)}%`;
+                document.getElementById('current-euphotic').textContent = `${Math.min(100, euphoticDepth)}m`;
+            }
+            
+            calculateMigrationFactor(timeHour) {
+                if (timeHour >= 20 || timeHour <= 6) {
+                    return 0.8;
+                } else if (timeHour >= 18 && timeHour < 20) {
+                    return (timeHour - 18) / 2 * 0.8;
+                } else if (timeHour > 6 && timeHour <= 8) {
+                    return (8 - timeHour) / 2 * 0.8;
+                }
+                return 0;
+            }
+            
+            updateSpriteStatus() {
+                document.getElementById('sprites-loaded').textContent = this.loadedSprites.length;
+                document.getElementById('ai-copepods-count').textContent = this.aiCopepods.length;
+                document.getElementById('copepods-active').textContent = this.aiCopepods.length;
+                
+                const migrating = this.aiCopepods.filter(c => c.migrationState === 'ascending' || c.migrationState === 'descending').length;
+                document.getElementById('copepods-migrating').textContent = migrating;
+            }
+            
+            animate() {
+                // Animar copépodos IA
+                const migrationFactor = this.calculateMigrationFactor(this.currentHour);
+                
+                this.aiCopepods.forEach(copepodData => {
+                    const copepod = copepodData.element;
+                    if (!copepod) return;
+                    
+                    // Determinar estado de migración
+                    if (migrationFactor > 0.5 && copepodData.migrationState === 'resting') {
+                        copepodData.migrationState = 'ascending';
+                        copepod.classList.add('migrating-up');
+                        copepod.classList.remove('swimming');
+                        if (copepod.migrationTrail) {
+                            copepod.migrationTrail.classList.add('active');
+                        }
+                    } else if (migrationFactor < 0.2 && copepodData.migrationState === 'ascending') {
+                        copepodData.migrationState = 'descending';
+                        copepod.classList.add('migrating-down');
+                        copepod.classList.remove('migrating-up');
+                    } else if (migrationFactor === 0 && copepodData.migrationState !== 'resting') {
+                        copepodData.migrationState = 'resting';
+                        copepod.classList.add('swimming');
+                        copepod.classList.remove('migrating-up', 'migrating-down');
+                        if (copepod.migrationTrail) {
+                            copepod.migrationTrail.classList.remove('active');
+                        }
+                    }
+                    
+                    // Movimiento vertical suave para migración
+                    if (copepodData.migrationState === 'ascending') {
+                        copepodData.verticalVelocity = -copepodData.migrationSpeed * 0.5;
+                    } else if (copepodData.migrationState === 'descending') {
+                        copepodData.verticalVelocity = copepodData.migrationSpeed * 0.3;
+                    } else {
+                        copepodData.verticalVelocity *= 0.95; // Amortiguación
+                    }
+                    
+                    // Aplicar movimiento
+                    const currentY = parseFloat(copepod.style.top);
+                    const newY = currentY + copepodData.verticalVelocity;
+                    const maxY = copepod.parentNode.clientHeight - copepodData.size;
+                    
+                    if (newY >= 0 && newY <= maxY) {
+                        copepod.style.top = `${newY}px`;
+                    }
+                    
+                    // Movimiento horizontal aleatorio
+                    const currentX = parseFloat(copepod.style.left);
+                    const horizontalDrift = (Math.random() - 0.5) * 0.5;
+                    const newX = currentX + horizontalDrift;
+                    const maxX = copepod.parentNode.clientWidth - copepodData.size;
+                    
+                    if (newX >= 0 && newX <= maxX) {
+                        copepod.style.left = `${newX}px`;
+                    }
+                });
+                
+                this.updateSpriteStatus();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Inicializar simulador
+        const simulator = new OceanSimulatorWithAISprites();
+        
+        console.log('🌊 Simulador oceánico con sprites IA cargado');
+        console.log('🎨 Carga sprites de copépodos generados con IA para ver organismos realistas');
+    </script>
+</body>
+</html>

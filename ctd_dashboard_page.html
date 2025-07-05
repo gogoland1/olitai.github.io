@@ -175,12 +175,11 @@
                 <h2 style="text-align: center; margin-bottom: 30px;">⚡ INICIO SÚPER RÁPIDO</h2>
                 
                 <div style="background: #059669; color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; font-size: 1.5rem;">🚀 Solo 2 comandos en terminal:</h3>
+                    <h3 style="margin: 0 0 15px 0; font-size: 1.5rem;">🚀 Solo 1 comando en terminal:</h3>
                     <div class="code-block" style="background: #064e3b; margin: 15px 0;">
-cd ~/proyectos/olitai
-python3 run_dashboard.py
+cd ~/proyectos/olitai && ./dashboard_completo.sh
                     </div>
-                    <p style="margin: 15px 0 0 0; font-size: 1.1rem;">¡El navegador se abre automáticamente! 🎉</p>
+                    <p style="margin: 15px 0 0 0; font-size: 1.1rem;">¡Instala TODO automáticamente y abre el navegador! 🎉</p>
                 </div>
 
                 <div class="step-card">
@@ -324,13 +323,13 @@ python3 run_dashboard.py
     <script src="./js/script.js"></script>
     <script>
         function showQuickStart() {
-            alert('🚀 INICIO SÚPER RÁPIDO\n\n' +
+            alert('🚀 INICIO SÚPER FÁCIL\n\n' +
                   '1. Abre terminal\n' +
-                  '2. cd ~/proyectos/olitai\n' +
-                  '3. python3 run_dashboard.py\n\n' +
-                  '¡El navegador se abre automáticamente!\n\n' +
-                  '❓ ¿No funciona? Primero instala:\n' +
-                  'pip3 install flask flask-cors plotly numpy matplotlib scipy pandas');
+                  '2. cd ~/proyectos/olitai && ./dashboard_completo.sh\n\n' +
+                  '¡SOLO 1 COMANDO! 🎉\n' +
+                  'Instala TODO automáticamente y abre el navegador.\n\n' +
+                  '🔄 Alternativa:\n' +
+                  './start_dashboard.sh');
         }
         
         // Efecto de scroll suave para la navegación

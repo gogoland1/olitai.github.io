@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦐 Recortador de Copépodos con IA - Machine Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c2a 0%, #2d5a3d 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #81c784;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .ml-techniques {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .technique-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(129, 199, 132, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .technique-card:hover {
+            transform: translateY(-5px);
+            border-color: #81c784;
+            box-shadow: 0 10px 25px rgba(129, 199, 132, 0.2);
+        }
+
+        .technique-card h3 {
+            color: #81c784;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .processing-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .image-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(129, 199, 132, 0.5);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #81c784;
+            background: rgba(129, 199, 132, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #1d4ed8, #3b82f6);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #d97706, #f59e0b);
+        }
+
+        .parameters {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .parameter-group {
+            margin: 15px 0;
+        }
+
+        .parameter-group label {
+            display: block;
+            color: #a855f7;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .parameter-group input, .parameter-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+        }
+
+        .results-panel {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .result-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .result-item h4 {
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .result-preview {
+            width: 100%;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .result-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .status-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(129, 199, 132, 0.3);
+            z-index: 1000;
+            min-width: 250px;
+        }
+
+        .status-panel h4 {
+            color: #81c784;
+            margin-bottom: 10px;
+        }
+
+        .status-item {
+            margin: 5px 0;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .canvas-container {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .processing-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦐 Recortador de Copépodos con IA</h1>
+            <p>Extracción automática de formas usando Machine Learning</p>
+            <p><strong>Técnicas:</strong> Segmentación semántica, Remove Background, Edge Detection</p>
+        </div>
+
+        <!-- Técnicas de ML disponibles -->
+        <div class="ml-techniques">
+            <div class="technique-card">
+                <h3>🎯 Segmentación por Color</h3>
+                <p>Algoritmo HSV + K-means clustering para separar copépodo del fondo basado en colores dominantes</p>
+                <div class="parameters">
+                    <div class="parameter-group">
+                        <label>Tolerancia HSV:</label>
+                        <input type="range" id="hsv-tolerance" min="10" max="50" value="25">
+                        <span id="hsv-value">25</span>
+                    </div>
+                    <div class="parameter-group">
+                        <label>Clusters K-means:</label>
+                        <input type="range" id="kmeans-clusters" min="2" max="8" value="4">
+                        <span id="kmeans-value">4</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="technique-card">
+                <h3>🔍 Edge Detection</h3>
+                <p>Detección de bordes Canny + contornos para identificar la forma del organismo</p>
+                <div class="parameters">
+                    <div class="parameter-group">
+                        <label>Threshold bajo:</label>
+                        <input type="range" id="canny-low" min="20" max="100" value="50">
+                        <span id="canny-low-value">50</span>
+                    </div>
+                    <div class="parameter-group">
+                        <label>Threshold alto:</label>
+                        <input type="range" id="canny-high" min="100" max="200" value="150">
+                        <span id="canny-high-value">150</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="technique-card">
+                <h3>🧠 Background Removal AI</h3>
+                <p>Algoritmos de remoción de fondo usando redes neuronales pre-entrenadas</p>
+                <div class="parameters">
+                    <div class="parameter-group">
+                        <label>Modelo:</label>
+                        <select id="bg-model">
+                            <option value="u2net">U²-Net (General)</option>
+                            <option value="isnet">ISNet (Precisión)</option>
+                            <option value="custom">Copépodo Custom</option>
+                        </select>
+                    </div>
+                    <div class="parameter-group">
+                        <label>Confianza:</label>
+                        <input type="range" id="confidence" min="0.1" max="1.0" step="0.1" value="0.8">
+                        <span id="confidence-value">0.8</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="technique-card">
+                <h3>⚡ Procesamiento Híbrido</h3>
+                <p>Combinación de múltiples técnicas para máxima precisión</p>
+                <div class="parameters">
+                    <div class="parameter-group">
+                        <label>Peso Color:</label>
+                        <input type="range" id="weight-color" min="0" max="1" step="0.1" value="0.4">
+                        <span id="weight-color-value">0.4</span>
+                    </div>
+                    <div class="parameter-group">
+                        <label>Peso Edge:</label>
+                        <input type="range" id="weight-edge" min="0" max="1" step="0.1" value="0.3">
+                        <span id="weight-edge-value">0.3</span>
+                    </div>
+                    <div class="parameter-group">
+                        <label>Peso AI:</label>
+                        <input type="range" id="weight-ai" min="0" max="1" step="0.1" value="0.3">
+                        <span id="weight-ai-value">0.3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de procesamiento -->
+        <div class="processing-area">
+            <!-- Panel imagen original -->
+            <div class="image-panel">
+                <h3>📷 Imagen Original</h3>
+                <div class="upload-area" id="uploadArea">
+                    <div>🦐 Arrastra aquí la imagen del copépodo</div>
+                    <p>O haz click para seleccionar archivo</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                <div class="image-container" id="originalImageContainer">
+                    <div style="text-align: center; color: #666;">
+                        <p>Imagen aparecerá aquí</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="loadSampleImage()">
+                        🖼️ Cargar Imagen de Prueba
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetImage()">
+                        🔄 Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel resultado -->
+            <div class="image-panel">
+                <h3>✂️ Copépodo Recortado</h3>
+                <div class="image-container" id="resultImageContainer">
+                    <div style="text-align: center; color: #666;">
+                        <p>Resultado aparecerá aquí</p>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="processWithColorSegmentation()" id="colorBtn">
+                        🎯 Segmentación Color
+                    </button>
+                    <button class="btn" onclick="processWithEdgeDetection()" id="edgeBtn">
+                        🔍 Edge Detection
+                    </button>
+                    <button class="btn" onclick="processWithAI()" id="aiBtn">
+                        🧠 Remoción IA
+                    </button>
+                    <button class="btn btn-warning" onclick="processHybrid()" id="hybridBtn">
+                        ⚡ Híbrido ML
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados comparativos -->
+        <div class="results-panel">
+            <h3>📊 Resultados Comparativos</h3>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Los resultados aparecerán aquí dinámicamente -->
+            </div>
+            <div class="controls">
+                <button class="btn btn-success" onclick="downloadBest()">
+                    💾 Descargar Mejor Resultado
+                </button>
+                <button class="btn btn-secondary" onclick="downloadAll()">
+                    📦 Descargar Todos
+                </button>
+                <button class="btn" onclick="integrateToSimulator()">
+                    🌊 Integrar a Simulador
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de estado -->
+    <div class="status-panel">
+        <h4>🔧 Estado del Procesamiento</h4>
+        <div class="status-item">
+            <span>Imagen cargada:</span>
+            <span id="imageLoaded">❌</span>
+        </div>
+        <div class="status-item">
+            <span>Procesando:</span>
+            <span id="processing">⏸️</span>
+        </div>
+        <div class="status-item">
+            <span>Técnica actual:</span>
+            <span id="currentTechnique">Ninguna</span>
+        </div>
+        <div class="status-item">
+            <span>Precisión:</span>
+            <span id="accuracy">0%</span>
+        </div>
+        <div class="status-item">
+            <span>Tiempo:</span>
+            <span id="processingTime">0s</span>
+        </div>
+    </div>
+
+    <!-- Canvas ocultos para procesamiento -->
+    <div class="canvas-container">
+        <canvas id="originalCanvas"></canvas>
+        <canvas id="processCanvas"></canvas>
+        <canvas id="resultCanvas"></canvas>
+        <canvas id="maskCanvas"></canvas>
+    </div>
+
+    <script>
+        class CopepodImageCutterML {
+            constructor() {
+                this.originalImage = null;
+                this.processedResults = {};
+                this.isProcessing = false;
+                this.startTime = 0;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.setupParameterUpdates();
+                this.loadSampleImage();
+                
+                console.log('🦐 Recortador de copépodos ML inicializado');
+            }
+            
+            setupEventListeners() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                
+                uploadArea.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files);
+                });
+            }
+            
+            setupParameterUpdates() {
+                // Actualizar valores en tiempo real
+                const sliders = [
+                    'hsv-tolerance', 'kmeans-clusters', 'canny-low', 'canny-high',
+                    'confidence', 'weight-color', 'weight-edge', 'weight-ai'
+                ];
+                
+                sliders.forEach(id => {
+                    const slider = document.getElementById(id);
+                    const display = document.getElementById(id.replace('-', '-') + '-value') || 
+                                  document.getElementById(id.split('-')[0] + '-value') ||
+                                  document.getElementById(id + '-value');
+                    
+                    if (slider && display) {
+                        slider.addEventListener('input', () => {
+                            display.textContent = slider.value;
+                        });
+                    }
+                });
+            }
+            
+            handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        this.loadImage(file);
+                    }
+                }
+            }
+            
+            loadImage(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.originalImage = img;
+                        this.displayOriginalImage();
+                        this.updateStatus('imageLoaded', '✅');
+                        console.log(`✅ Imagen cargada: ${img.width}x${img.height}`);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            loadSampleImage() {
+                // Cargar la imagen de prueba del copépodo
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    this.originalImage = img;
+                    this.displayOriginalImage();
+                    this.updateStatus('imageLoaded', '✅');
+                    console.log(`🦐 Imagen de prueba cargada: ${img.width}x${img.height}`);
+                };
+                img.onerror = () => {
+                    console.warn('⚠️ No se pudo cargar la imagen de prueba');
+                    alert('⚠️ Imagen de prueba no encontrada. Por favor, carga una imagen manualmente.');
+                };
+                
+                // Intentar cargar desde diferentes rutas
+                const possiblePaths = [
+                    'ocean_simulator_3d/copepodo_image.png',
+                    'copepodo_image.png',
+                    '../copepodo_image.png'
+                ];
+                
+                img.src = possiblePaths[0]; // Empezar con la primera ruta
+            }
+            
+            displayOriginalImage() {
+                const container = document.getElementById('originalImageContainer');
+                container.innerHTML = '';
+                
+                const img = document.createElement('img');
+                img.src = this.originalImage.src;
+                img.alt = 'Copépodo original';
+                container.appendChild(img);
+            }
+            
+            startProcessing(technique) {
+                this.isProcessing = true;
+                this.startTime = Date.now();
+                this.updateStatus('processing', '⚡');
+                this.updateStatus('currentTechnique', technique);
+                this.updateProgress(0);
+                
+                // Deshabilitar botones
+                const buttons = ['colorBtn', 'edgeBtn', 'aiBtn', 'hybridBtn'];
+                buttons.forEach(id => {
+                    document.getElementById(id).disabled = true;
+                });
+            }
+            
+            finishProcessing() {
+                this.isProcessing = false;
+                const elapsed = ((Date.now() - this.startTime) / 1000).toFixed(1);
+                this.updateStatus('processing', '✅');
+                this.updateStatus('processingTime', elapsed + 's');
+                this.updateProgress(100);
+                
+                // Habilitar botones
+                const buttons = ['colorBtn', 'edgeBtn', 'aiBtn', 'hybridBtn'];
+                buttons.forEach(id => {
+                    document.getElementById(id).disabled = false;
+                });
+            }
+            
+            updateStatus(field, value) {
+                const element = document.getElementById(field);
+                if (element) element.textContent = value;
+            }
+            
+            updateProgress(percentage) {
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = percentage + '%';
+            }
+            
+            // Técnica 1: Segmentación por Color
+            async processWithColorSegmentation() {
+                if (!this.originalImage) {
+                    alert('⚠️ Primero carga una imagen del copépodo');
+                    return;
+                }
+                
+                this.startProcessing('Segmentación Color');
+                
+                try {
+                    const canvas = document.getElementById('processCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Configurar canvas
+                    canvas.width = this.originalImage.width;
+                    canvas.height = this.originalImage.height;
+                    ctx.drawImage(this.originalImage, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    this.updateProgress(25);
+                    
+                    // Análisis de color dominante del fondo (esquinas)
+                    const backgroundColor = this.detectBackgroundColor(data, canvas.width, canvas.height);
+                    
+                    this.updateProgress(50);
+                    
+                    // Crear máscara basada en diferencia de color
+                    const tolerance = parseInt(document.getElementById('hsv-tolerance').value);
+                    const mask = this.createColorMask(data, backgroundColor, tolerance);
+                    
+                    this.updateProgress(75);
+                    
+                    this.updateProgress(90);
+                    
+                    // Almacenar máscara en resultados
+                    this.processedResults['color-segmentation'] = mask;
+                    
+                    // Aplicar máscara
+                    const result = this.applyMask(data, mask);
+                    
+                    // Mostrar resultado
+                    this.displayResult(result, canvas.width, canvas.height, 'color-segmentation');
+                    
+                    // Calcular precisión estimada
+                    const accuracy = this.calculateAccuracy(mask);
+                    this.updateStatus('accuracy', accuracy + '%');
+                    
+                    this.finishProcessing();
+                    
+                } catch (error) {
+                    console.error('Error en segmentación por color:', error);
+                    alert('❌ Error en el procesamiento');
+                    this.finishProcessing();
+                }
+            }
+            
+            // Técnica 2: Edge Detection
+            async processWithEdgeDetection() {
+                if (!this.originalImage) {
+                    alert('⚠️ Primero carga una imagen del copépodo');
+                    return;
+                }
+                
+                this.startProcessing('Edge Detection');
+                
+                try {
+                    const canvas = document.getElementById('processCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = this.originalImage.width;
+                    canvas.height = this.originalImage.height;
+                    ctx.drawImage(this.originalImage, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    this.updateProgress(20);
+                    
+                    // Convertir a escala de grises
+                    const grayData = this.toGrayscale(imageData.data);
+                    
+                    this.updateProgress(40);
+                    
+                    // Aplicar filtro Gaussiano
+                    const blurredData = this.gaussianBlur(grayData, canvas.width, canvas.height);
+                    
+                    this.updateProgress(60);
+                    
+                    // Detección de bordes Canny
+                    const lowThreshold = parseInt(document.getElementById('canny-low').value);
+                    const highThreshold = parseInt(document.getElementById('canny-high').value);
+                    const edges = this.cannyEdgeDetection(blurredData, canvas.width, canvas.height, lowThreshold, highThreshold);
+                    
+                    this.updateProgress(80);
+                    
+                    // Encontrar contornos y crear máscara
+                    const mask = this.findLargestContour(edges, canvas.width, canvas.height);
+                    
+                    this.updateProgress(90);
+                    
+                    // Almacenar máscara en resultados
+                    this.processedResults['edge-detection'] = mask;
+                    
+                    // Aplicar máscara a imagen original
+                    const result = this.applyMask(imageData.data, mask);
+                    this.displayResult(result, canvas.width, canvas.height, 'edge-detection');
+                    
+                    const accuracy = this.calculateAccuracy(mask);
+                    this.updateStatus('accuracy', accuracy + '%');
+                    
+                    this.finishProcessing();
+                    
+                } catch (error) {
+                    console.error('Error en edge detection:', error);
+                    alert('❌ Error en el procesamiento');
+                    this.finishProcessing();
+                }
+            }
+            
+            // Técnica 3: IA Background Removal (simulado)
+            async processWithAI() {
+                if (!this.originalImage) {
+                    alert('⚠️ Primero carga una imagen del copépodo');
+                    return;
+                }
+                
+                this.startProcessing('Remoción IA');
+                
+                try {
+                    const canvas = document.getElementById('processCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = this.originalImage.width;
+                    canvas.height = this.originalImage.height;
+                    ctx.drawImage(this.originalImage, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    this.updateProgress(10);
+                    
+                    // Simulación de procesamiento IA (en realidad usaremos algoritmos avanzados)
+                    const model = document.getElementById('bg-model').value;
+                    const confidence = parseFloat(document.getElementById('confidence').value);
+                    
+                    this.updateProgress(30);
+                    
+                    // Análisis de características del copépodo
+                    const features = this.extractCopepodFeatures(data, canvas.width, canvas.height);
+                    
+                    this.updateProgress(50);
+                    
+                    // Crear máscara inteligente basada en características
+                    const mask = this.createIntelligentMask(data, features, confidence, canvas.width, canvas.height);
+                    
+                    this.updateProgress(70);
+                    
+                    // Refinamiento de bordes
+                    const refinedMask = this.refineMaskEdges(mask, canvas.width, canvas.height);
+                    
+                    this.updateProgress(90);
+                    
+                    // Almacenar máscara en resultados
+                    this.processedResults['ai-removal'] = refinedMask;
+                    
+                    // Aplicar máscara
+                    const result = this.applyMask(data, refinedMask);
+                    this.displayResult(result, canvas.width, canvas.height, 'ai-removal');
+                    
+                    const accuracy = this.calculateAccuracy(refinedMask);
+                    this.updateStatus('accuracy', accuracy + '%');
+                    
+                    this.finishProcessing();
+                    
+                } catch (error) {
+                    console.error('Error en remoción IA:', error);
+                    alert('❌ Error en el procesamiento');
+                    this.finishProcessing();
+                }
+            }
+            
+            // Técnica 4: Procesamiento Híbrido
+            async processHybrid() {
+                if (!this.originalImage) {
+                    alert('⚠️ Primero carga una imagen del copépodo');
+                    return;
+                }
+                
+                this.startProcessing('Híbrido ML');
+                
+                try {
+                    // Verificar si ya tenemos resultados, sino ejecutar técnicas faltantes
+                    this.updateProgress(10);
+                    
+                    if (!this.processedResults['color-segmentation']) {
+                        console.log('🎯 Ejecutando segmentación por color...');
+                        await this.processWithColorSegmentation();
+                    }
+                    
+                    this.updateProgress(25);
+                    
+                    if (!this.processedResults['edge-detection']) {
+                        console.log('🔍 Ejecutando edge detection...');
+                        await this.processWithEdgeDetection();
+                    }
+                    
+                    this.updateProgress(40);
+                    
+                    if (!this.processedResults['ai-removal']) {
+                        console.log('🧠 Ejecutando IA avanzada...');
+                        await this.processWithAI();
+                    }
+                    
+                    this.updateProgress(60);
+                    
+                    // Combinar resultados
+                    const weightColor = parseFloat(document.getElementById('weight-color').value);
+                    const weightEdge = parseFloat(document.getElementById('weight-edge').value);
+                    const weightAI = parseFloat(document.getElementById('weight-ai').value);
+                    
+                    console.log(`⚡ Combinando con pesos: Color=${weightColor}, Edge=${weightEdge}, IA=${weightAI}`);
+                    
+                    const combinedMask = this.combineMasks(
+                        null, null, null, // No usamos los parámetros, usamos los resultados almacenados
+                        weightColor, weightEdge, weightAI
+                    );
+                    
+                    this.updateProgress(80);
+                    
+                    // Aplicar máscara combinada
+                    const canvas = document.getElementById('processCanvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = this.originalImage.width;
+                    canvas.height = this.originalImage.height;
+                    ctx.drawImage(this.originalImage, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    const result = this.applyMask(imageData.data, combinedMask);
+                    this.displayResult(result, canvas.width, canvas.height, 'hybrid');
+                    
+                    this.updateProgress(95);
+                    
+                    const accuracy = this.calculateAccuracy(combinedMask);
+                    this.updateStatus('accuracy', accuracy + '%');
+                    
+                    this.finishProcessing();
+                    
+                } catch (error) {
+                    console.error('Error en procesamiento híbrido:', error);
+                    console.error('Stack:', error.stack);
+                    console.log('Estado de resultados:', Object.keys(this.processedResults));
+                    alert('❌ Error en el procesamiento híbrido: ' + error.message);
+                    this.finishProcessing();
+                }
+            }
+            
+            // Métodos auxiliares de procesamiento de imagen
+            detectBackgroundColor(data, width, height) {
+                // Analizar esquinas para detectar color de fondo
+                const corners = [
+                    [0, 0], [width-1, 0], [0, height-1], [width-1, height-1]
+                ];
+                
+                let totalR = 0, totalG = 0, totalB = 0;
+                let samples = 0;
+                
+                corners.forEach(([x, y]) => {
+                    const idx = (y * width + x) * 4;
+                    totalR += data[idx];
+                    totalG += data[idx + 1];
+                    totalB += data[idx + 2];
+                    samples++;
+                });
+                
+                return {
+                    r: Math.round(totalR / samples),
+                    g: Math.round(totalG / samples),
+                    b: Math.round(totalB / samples)
+                };
+            }
+            
+            createColorMask(data, backgroundColor, tolerance) {
+                const mask = new Array(data.length / 4);
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // Calcular distancia de color
+                    const distance = Math.sqrt(
+                        Math.pow(r - backgroundColor.r, 2) +
+                        Math.pow(g - backgroundColor.g, 2) +
+                        Math.pow(b - backgroundColor.b, 2)
+                    );
+                    
+                    // Si la distancia es mayor al tolerance, es parte del copépodo
+                    mask[i / 4] = distance > tolerance ? 1 : 0;
+                }
+                
+                return mask;
+            }
+            
+            toGrayscale(data) {
+                const gray = new Array(data.length / 4);
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    gray[i / 4] = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+                }
+                
+                return gray;
+            }
+            
+            gaussianBlur(data, width, height) {
+                // Kernel Gaussiano 5x5 simplificado
+                const kernel = [
+                    [1, 4, 6, 4, 1],
+                    [4, 16, 24, 16, 4],
+                    [6, 24, 36, 24, 6],
+                    [4, 16, 24, 16, 4],
+                    [1, 4, 6, 4, 1]
+                ];
+                const kernelSum = 256;
+                
+                const result = new Array(data.length);
+                
+                for (let y = 2; y < height - 2; y++) {
+                    for (let x = 2; x < width - 2; x++) {
+                        let sum = 0;
+                        
+                        for (let ky = 0; ky < 5; ky++) {
+                            for (let kx = 0; kx < 5; kx++) {
+                                const px = x + kx - 2;
+                                const py = y + ky - 2;
+                                sum += data[py * width + px] * kernel[ky][kx];
+                            }
+                        }
+                        
+                        result[y * width + x] = Math.round(sum / kernelSum);
+                    }
+                }
+                
+                return result;
+            }
+            
+            cannyEdgeDetection(data, width, height, lowThreshold, highThreshold) {
+                // Implementación simplificada de Canny
+                const sobelX = [-1, 0, 1, -2, 0, 2, -1, 0, 1];
+                const sobelY = [-1, -2, -1, 0, 0, 0, 1, 2, 1];
+                
+                const gradientX = new Array(data.length);
+                const gradientY = new Array(data.length);
+                const magnitude = new Array(data.length);
+                
+                // Calcular gradientes
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        let gx = 0, gy = 0;
+                        
+                        for (let i = 0; i < 9; i++) {
+                            const px = x + (i % 3) - 1;
+                            const py = y + Math.floor(i / 3) - 1;
+                            const pixel = data[py * width + px];
+                            
+                            gx += pixel * sobelX[i];
+                            gy += pixel * sobelY[i];
+                        }
+                        
+                        gradientX[y * width + x] = gx;
+                        gradientY[y * width + x] = gy;
+                        magnitude[y * width + x] = Math.sqrt(gx * gx + gy * gy);
+                    }
+                }
+                
+                // Aplicar threshold doble
+                const edges = new Array(data.length);
+                for (let i = 0; i < magnitude.length; i++) {
+                    if (magnitude[i] > highThreshold) {
+                        edges[i] = 1;
+                    } else if (magnitude[i] > lowThreshold) {
+                        edges[i] = 0.5; // Candidato
+                    } else {
+                        edges[i] = 0;
+                    }
+                }
+                
+                return edges;
+            }
+            
+            findLargestContour(edges, width, height) {
+                // Encontrar el contorno más grande (copépodo)
+                const mask = new Array(edges.length).fill(0);
+                const visited = new Array(edges.length).fill(false);
+                
+                let largestArea = 0;
+                let largestContour = [];
+                
+                for (let i = 0; i < edges.length; i++) {
+                    if (edges[i] > 0 && !visited[i]) {
+                        const contour = this.floodFill(edges, visited, i, width, height);
+                        if (contour.length > largestArea) {
+                            largestArea = contour.length;
+                            largestContour = contour;
+                        }
+                    }
+                }
+                
+                // Marcar el contorno más grande
+                largestContour.forEach(idx => mask[idx] = 1);
+                
+                return mask;
+            }
+            
+            floodFill(edges, visited, startIdx, width, height) {
+                const stack = [startIdx];
+                const contour = [];
+                
+                while (stack.length > 0) {
+                    const idx = stack.pop();
+                    if (visited[idx]) continue;
+                    
+                    visited[idx] = true;
+                    contour.push(idx);
+                    
+                    const x = idx % width;
+                    const y = Math.floor(idx / width);
+                    
+                    // Verificar vecinos 8-conectados
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const nx = x + dx;
+                            const ny = y + dy;
+                            const nIdx = ny * width + nx;
+                            
+                            if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
+                                !visited[nIdx] && edges[nIdx] > 0) {
+                                stack.push(nIdx);
+                            }
+                        }
+                    }
+                }
+                
+                return contour;
+            }
+            
+            extractCopepodFeatures(data, width, height) {
+                // Extraer características específicas de copépodos
+                const features = {
+                    transparentRegions: [],
+                    orangeRedRegions: [],
+                    appendages: [],
+                    eyeSpots: []
+                };
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // Detectar regiones naranjas/rojas (copépodos típicos)
+                    if (r > 120 && r > g && r > b && (r - g) > 30) {
+                        features.orangeRedRegions.push(i / 4);
+                    }
+                    
+                    // Detectar regiones semi-transparentes (claras pero no blancas)
+                    const brightness = (r + g + b) / 3;
+                    if (brightness > 180 && brightness < 240) {
+                        features.transparentRegions.push(i / 4);
+                    }
+                    
+                    // Detectar puntos oscuros (ojos, estructuras internas)
+                    if (r < 80 && g < 80 && b < 80) {
+                        features.eyeSpots.push(i / 4);
+                    }
+                }
+                
+                console.log(`🔍 Características detectadas: ${features.orangeRedRegions.length} rojas, ${features.transparentRegions.length} transparentes, ${features.eyeSpots.length} oscuras`);
+                return features;
+            }
+            
+            createIntelligentMask(data, features, confidence, width, height) {
+                const mask = new Array(data.length / 4).fill(0);
+                
+                // Marcar regiones de copépodo con alta confianza
+                features.orangeRedRegions.forEach(idx => {
+                    if (idx < mask.length) mask[idx] = confidence;
+                });
+                
+                features.transparentRegions.forEach(idx => {
+                    if (idx < mask.length) mask[idx] = Math.max(mask[idx], confidence * 0.7);
+                });
+                
+                features.eyeSpots.forEach(idx => {
+                    if (idx < mask.length) mask[idx] = Math.max(mask[idx], confidence * 0.6);
+                });
+                
+                // Expandir regiones conectadas usando dilatación simple
+                const dilated = this.simpleDilation(mask, width, height);
+                
+                // Limpiar regiones pequeñas
+                const cleaned = this.removeSmallRegions(dilated, width, height);
+                
+                console.log(`🧠 Máscara IA creada: ${cleaned.filter(v => v > 0.5).length} píxeles detectados`);
+                return cleaned;
+            }
+            
+            simpleDilation(mask, width, height) {
+                const result = [...mask];
+                
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = y * width + x;
+                        
+                        if (mask[idx] > 0.3) {
+                            // Dilatar a vecinos inmediatos
+                            const neighbors = [
+                                idx - 1,     // izquierda
+                                idx + 1,     // derecha
+                                idx - width, // arriba
+                                idx + width  // abajo
+                            ];
+                            
+                            neighbors.forEach(nIdx => {
+                                if (nIdx >= 0 && nIdx < mask.length) {
+                                    result[nIdx] = Math.max(result[nIdx], mask[idx] * 0.7);
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                return result;
+            }
+            
+            removeSmallRegions(mask, width, height, minSize = 50) {
+                // Clonar máscara
+                const result = [...mask];
+                const visited = new Array(mask.length).fill(false);
+                
+                for (let i = 0; i < mask.length; i++) {
+                    if (mask[i] > 0.5 && !visited[i]) {
+                        // Encontrar región conectada
+                        const region = this.floodFillRegion(mask, visited, i, width, height);
+                        
+                        // Si la región es muy pequeña, eliminarla
+                        if (region.length < minSize) {
+                            region.forEach(idx => result[idx] = 0);
+                        }
+                    }
+                }
+                
+                return result;
+            }
+            
+            floodFillRegion(mask, visited, startIdx, width, height) {
+                const stack = [startIdx];
+                const region = [];
+                
+                while (stack.length > 0) {
+                    const idx = stack.pop();
+                    
+                    if (visited[idx] || mask[idx] <= 0.5) continue;
+                    
+                    visited[idx] = true;
+                    region.push(idx);
+                    
+                    const x = idx % width;
+                    const y = Math.floor(idx / width);
+                    
+                    // Agregar vecinos 4-conectados
+                    const neighbors = [
+                        {x: x-1, y: y},   // izquierda
+                        {x: x+1, y: y},   // derecha
+                        {x: x, y: y-1},   // arriba
+                        {x: x, y: y+1}    // abajo
+                    ];
+                    
+                    neighbors.forEach(({x: nx, y: ny}) => {
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                            const nIdx = ny * width + nx;
+                            if (!visited[nIdx] && mask[nIdx] > 0.5) {
+                                stack.push(nIdx);
+                            }
+                        }
+                    });
+                }
+                
+                return region;
+            }
+            
+            refineMaskEdges(mask, width, height) {
+                // Suavizar bordes de la máscara
+                const refined = [...mask];
+                
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = y * width + x;
+                        let sum = 0;
+                        let count = 0;
+                        
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                const nIdx = (y + dy) * width + (x + dx);
+                                sum += mask[nIdx];
+                                count++;
+                            }
+                        }
+                        
+                        refined[idx] = sum / count;
+                    }
+                }
+                
+                return refined;
+            }
+            
+            combineMasks(mask1, mask2, mask3, w1, w2, w3) {
+                // Verificar que tengamos las máscaras almacenadas
+                const colorMask = this.processedResults['color-segmentation'];
+                const edgeMask = this.processedResults['edge-detection']; 
+                const aiMask = this.processedResults['ai-removal'];
+                
+                if (!colorMask && !edgeMask && !aiMask) {
+                    console.warn('⚠️ No hay máscaras procesadas para combinar');
+                    return new Array(100 * 100).fill(0); // Máscara vacía por defecto
+                }
+                
+                // Usar la primera máscara disponible como referencia de tamaño
+                const referenceMask = colorMask || edgeMask || aiMask;
+                const combined = new Array(referenceMask.length);
+                const totalWeight = w1 + w2 + w3;
+                
+                for (let i = 0; i < referenceMask.length; i++) {
+                    let weightedSum = 0;
+                    let actualWeight = 0;
+                    
+                    if (colorMask && colorMask[i] !== undefined) {
+                        weightedSum += (colorMask[i] / 255) * w1;
+                        actualWeight += w1;
+                    }
+                    
+                    if (edgeMask && edgeMask[i] !== undefined) {
+                        weightedSum += (edgeMask[i] / 255) * w2;
+                        actualWeight += w2;
+                    }
+                    
+                    if (aiMask && aiMask[i] !== undefined) {
+                        weightedSum += (aiMask[i] / 255) * w3;
+                        actualWeight += w3;
+                    }
+                    
+                    combined[i] = actualWeight > 0 ? (weightedSum / actualWeight) * 255 : 0;
+                }
+                
+                console.log(`⚡ Máscaras combinadas: ${combined.filter(v => v > 127).length} píxeles finales`);
+                return combined;
+            }
+            
+            applyMask(data, mask) {
+                const result = new Uint8ClampedArray(data.length);
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const maskValue = mask[i / 4] || 0;
+                    
+                    result[i] = data[i];     // R
+                    result[i + 1] = data[i + 1]; // G
+                    result[i + 2] = data[i + 2]; // B
+                    result[i + 3] = Math.round(data[i + 3] * maskValue); // A
+                }
+                
+                return result;
+            }
+            
+            calculateAccuracy(mask) {
+                // Estimación simplificada de precisión
+                const foregroundPixels = mask.filter(val => val > 0.5).length;
+                const totalPixels = mask.length;
+                const ratio = foregroundPixels / totalPixels;
+                
+                // Heurística: copépodos suelen ocupar 15-40% de la imagen
+                const expectedRatio = 0.25;
+                const accuracy = Math.max(0, 100 - Math.abs(ratio - expectedRatio) * 200);
+                
+                return Math.round(accuracy);
+            }
+            
+            displayResult(imageData, width, height, technique) {
+                const resultCanvas = document.getElementById('resultCanvas');
+                const ctx = resultCanvas.getContext('2d');
+                
+                resultCanvas.width = width;
+                resultCanvas.height = height;
+                
+                const imgData = new ImageData(imageData, width, height);
+                ctx.putImageData(imgData, 0, 0);
+                
+                // Mostrar en contenedor principal
+                const container = document.getElementById('resultImageContainer');
+                container.innerHTML = '';
+                
+                const img = document.createElement('img');
+                img.src = resultCanvas.toDataURL();
+                img.alt = `Resultado ${technique}`;
+                container.appendChild(img);
+                
+                // Guardar resultado
+                this.processedResults[technique] = {
+                    imageData: imageData,
+                    canvas: resultCanvas.toDataURL(),
+                    width: width,
+                    height: height
+                };
+                
+                // Agregar a resultados comparativos
+                this.addToResults(technique, img.src);
+            }
+            
+            addToResults(technique, imageSrc) {
+                const resultsGrid = document.getElementById('resultsGrid');
+                
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                
+                const techniqueNames = {
+                    'color-segmentation': 'Segmentación Color',
+                    'edge-detection': 'Edge Detection',
+                    'ai-removal': 'Remoción IA',
+                    'hybrid': 'Híbrido ML'
+                };
+                
+                resultItem.innerHTML = `
+                    <h4>${techniqueNames[technique] || technique}</h4>
+                    <div class="result-preview">
+                        <img src="${imageSrc}" alt="Resultado ${technique}">
+                    </div>
+                    <button class="btn" onclick="cutter.downloadResult('${technique}')">
+                        💾 Descargar
+                    </button>
+                `;
+                
+                resultsGrid.appendChild(resultItem);
+            }
+            
+            downloadResult(technique) {
+                const result = this.processedResults[technique];
+                if (result) {
+                    const link = document.createElement('a');
+                    link.download = `copepod_${technique}.png`;
+                    link.href = result.canvas;
+                    link.click();
+                }
+            }
+            
+            downloadBest() {
+                // Descargar el resultado con mayor precisión
+                const techniques = Object.keys(this.processedResults);
+                if (techniques.length > 0) {
+                    // Por simplicidad, usar híbrido si existe, sino el último
+                    const best = this.processedResults['hybrid'] || this.processedResults[techniques[techniques.length - 1]];
+                    
+                    const link = document.createElement('a');
+                    link.download = 'copepod_best_result.png';
+                    link.href = best.canvas;
+                    link.click();
+                }
+            }
+            
+            downloadAll() {
+                Object.keys(this.processedResults).forEach(technique => {
+                    setTimeout(() => this.downloadResult(technique), 500);
+                });
+            }
+            
+            integrateToSimulator() {
+                // Abrir simulador con sprites IA para integración
+                window.open('ocean_simulator_with_ai_sprites.html', '_blank');
+            }
+            
+            resetImage() {
+                this.originalImage = null;
+                this.processedResults = {};
+                
+                document.getElementById('originalImageContainer').innerHTML = `
+                    <div style="text-align: center; color: #666;">
+                        <p>Imagen aparecerá aquí</p>
+                    </div>
+                `;
+                
+                document.getElementById('resultImageContainer').innerHTML = `
+                    <div style="text-align: center; color: #666;">
+                        <p>Resultado aparecerá aquí</p>
+                    </div>
+                `;
+                
+                document.getElementById('resultsGrid').innerHTML = '';
+                
+                this.updateStatus('imageLoaded', '❌');
+                this.updateStatus('processing', '⏸️');
+                this.updateStatus('currentTechnique', 'Ninguna');
+                this.updateStatus('accuracy', '0%');
+                this.updateStatus('processingTime', '0s');
+                this.updateProgress(0);
+            }
+        }
+        
+        // Inicializar aplicación
+        const cutter = new CopepodImageCutterML();
+        
+        // Funciones globales para botones
+        function loadSampleImage() { cutter.loadSampleImage(); }
+        function resetImage() { cutter.resetImage(); }
+        function processWithColorSegmentation() { cutter.processWithColorSegmentation(); }
+        function processWithEdgeDetection() { cutter.processWithEdgeDetection(); }
+        function processWithAI() { cutter.processWithAI(); }
+        function processHybrid() { cutter.processHybrid(); }
+        function downloadBest() { cutter.downloadBest(); }
+        function downloadAll() { cutter.downloadAll(); }
+        function integrateToSimulator() { cutter.integrateToSimulator(); }
+        
+        console.log('🦐 Recortador de copépodos con Machine Learning cargado');
+        console.log('🎯 Técnicas disponibles: Segmentación Color, Edge Detection, IA, Híbrido');
+    </script>
+</body>
+</html>

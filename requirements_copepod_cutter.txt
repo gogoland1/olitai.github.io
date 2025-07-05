@@ -1,0 +1,26 @@
+# 🦐 Recortador de Copépodos ML - Dependencias Python
+# Instalar con: pip install -r requirements_copepod_cutter.txt
+
+# Procesamiento de imágenes
+opencv-python>=4.8.0
+Pillow>=9.5.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+scipy>=1.10.0
+
+# Machine Learning y análisis
+scikit-image>=0.20.0
+scikit-learn>=1.3.0
+
+# Opcional: Remoción de fondo con IA (requiere instalación adicional)
+# rembg>=2.0.0  # Descomenta si quieres usar rembg
+# torch>=2.0.0  # Requerido por rembg
+# torchvision>=0.15.0  # Requerido por rembg
+
+# Utilidades
+requests>=2.31.0
+tqdm>=4.65.0
+
+# Opcional: Análisis avanzado
+# tensorflow>=2.12.0  # Para modelos de deep learning
+# keras>=2.12.0

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦐 Migración Vertical de Copépodos - Simulación Simple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1e3a8a 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .simulation-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(180deg, 
+                rgba(135, 206, 235, 0.8) 0%,     /* Superficie (0-50m) */
+                rgba(70, 130, 180, 0.85) 8%,     /* Zona fótica alta (100m) */
+                rgba(25, 25, 112, 0.9) 15%,      /* Zona fótica baja (200m) */
+                rgba(16, 16, 80, 0.95) 25%,      /* Zona mesopelágica (300m) */
+                rgba(8, 8, 40, 0.97) 42%,        /* Zona batipelágica (500m) */
+                rgba(4, 4, 20, 0.98) 67%,        /* Zona abisopelágica (800m) */
+                rgba(2, 2, 10, 1) 100%);         /* Zona hadal (1200m) */
+        }
+
+        .depth-scale {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+        }
+
+        .depth-marker {
+            position: absolute;
+            right: 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .controls-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            z-index: 1000;
+            min-width: 250px;
+        }
+
+        .control-group {
+            margin: 15px 0;
+        }
+
+        .control-group label {
+            display: block;
+            color: #93c5fd;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 10px 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(45deg, #16a34a, #15803d);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
+        }
+
+        .play-button.playing {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+
+        .info-display {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .copepod {
+            position: absolute;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .copepod img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: contrast(1.1) brightness(1.05);
+        }
+
+        /* Animaciones de natación */
+        .copepod.swimming {
+            animation: swim 3s ease-in-out infinite;
+        }
+
+        .copepod.migrating-up {
+            animation: migrate-up 2s ease-in-out infinite;
+        }
+
+        .copepod.migrating-down {
+            animation: migrate-down 2s ease-in-out infinite;
+        }
+
+        @keyframes swim {
+            0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+            25% { transform: translateY(-2px) rotateZ(-1deg); }
+            50% { transform: translateY(-1px) rotateZ(0deg); }
+            75% { transform: translateY(-2px) rotateZ(1deg); }
+        }
+
+        @keyframes migrate-up {
+            0%, 100% { transform: translateY(0px) rotateZ(-5deg); }
+            50% { transform: translateY(-8px) rotateZ(-3deg); }
+        }
+
+        @keyframes migrate-down {
+            0%, 100% { transform: translateY(0px) rotateZ(3deg); }
+            50% { transform: translateY(4px) rotateZ(5deg); }
+        }
+
+        .time-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            font-size: 18px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .migration-info {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.9);
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .migration-info.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="simulation-container">
+        <!-- Escala de profundidad -->
+        <div class="depth-scale" id="depthScale"></div>
+        
+        <!-- Panel de controles -->
+        <div class="controls-panel">
+            <h3 style="color: #60a5fa; margin-bottom: 15px; text-align: center;">🦐 Control de Migración</h3>
+            
+            <button class="play-button" id="playButton" onclick="toggleSimulation()">
+                ▶️ Iniciar Migración
+            </button>
+            
+            <div class="control-group">
+                <label>⏰ Hora del Día: <span id="timeDisplay">12:00</span></label>
+                <input type="range" class="slider" id="timeSlider" min="0" max="23" value="12" oninput="updateTime()">
+            </div>
+            
+            <div class="control-group">
+                <label>🏊 Velocidad Migración: <span id="speedDisplay">1.0x</span></label>
+                <input type="range" class="slider" id="speedSlider" min="0.2" max="3.0" step="0.2" value="1.0" oninput="updateSpeed()">
+            </div>
+            
+            <div class="control-group">
+                <label>🦐 Cantidad Copépodos: <span id="countDisplay">15</span></label>
+                <input type="range" class="slider" id="countSlider" min="5" max="30" value="15" oninput="updateCount()">
+            </div>
+            
+            <div class="info-display">
+                <div><strong>Estado:</strong> <span id="migrationState">Reposo diurno</span></div>
+                <div><strong>Profundidad promedio:</strong> <span id="avgDepth">150m</span></div>
+                <div><strong>Copépodos activos:</strong> <span id="activeCopepods">0</span></div>
+                <div><strong>Velocidad migración:</strong> <span id="avgSpeed">45 m/h</span></div>
+                <div><strong>Tipos poblacionales:</strong></div>
+                <div style="font-size: 11px; margin-left: 10px;">
+                    <div>🔵 Superficial: <span id="surfaceCount">0</span> (0-150m)</div>
+                    <div>🟡 Intermedio: <span id="midCount">0</span> (200-500m)</div>
+                    <div>🔴 Profundo: <span id="deepCount">0</span> (500-1000m)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Indicador de tiempo -->
+        <div class="time-indicator" id="timeIndicator">12:00 - Mediodía</div>
+        
+        <!-- Información de migración -->
+        <div class="migration-info" id="migrationInfo">
+            🌅 Migración vertical nocturna iniciada
+        </div>
+    </div>
+
+    <script>
+        class CopepodMigrationSimulator {
+            constructor() {
+                this.copepods = [];
+                this.isPlaying = false;
+                this.currentHour = 12;
+                this.migrationSpeed = 1.0;
+                this.copepodCount = 15;
+                this.animationFrame = null;
+                this.timeInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.createDepthScale();
+                this.createCopepods();
+                this.updateMigrationState();
+                this.animate();
+                
+                console.log('🦐 Simulador de migración de copépodos inicializado');
+            }
+            
+            createDepthScale() {
+                const depthScale = document.getElementById('depthScale');
+                
+                // Crear marcadores de profundidad realistas (0-1200m)
+                const maxDepth = 1200; // Basado en estudios científicos
+                for (let depth = 0; depth <= maxDepth; depth += 100) {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.style.top = `${(depth / maxDepth) * 100}%`;
+                    marker.textContent = `${depth}m`;
+                    depthScale.appendChild(marker);
+                }
+                
+                // Marcadores adicionales para zonas críticas
+                const criticalDepths = [50, 150, 250, 500, 800];
+                criticalDepths.forEach(depth => {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.style.top = `${(depth / maxDepth) * 100}%`;
+                    marker.style.color = 'rgba(255, 193, 7, 0.8)';
+                    marker.style.fontSize = '10px';
+                    marker.textContent = `${depth}m`;
+                    depthScale.appendChild(marker);
+                });
+            }
+            
+            createCopepods() {
+                // Limpiar copépodos existentes
+                this.copepods.forEach(copepod => {
+                    if (copepod.element && copepod.element.parentNode) {
+                        copepod.element.parentNode.removeChild(copepod.element);
+                    }
+                });
+                this.copepods = [];
+                
+                const container = document.querySelector('.simulation-container');
+                
+                for (let i = 0; i < this.copepodCount; i++) {
+                    const copepod = document.createElement('div');
+                    copepod.className = 'copepod swimming';
+                    
+                    // Sistema de copépodo visual mejorado
+                    let imageLoaded = false;
+                    
+                    const setupCopepodFallback = () => {
+                        copepod.innerHTML = ''; // Limpiar contenido
+                        copepod.style.width = '48px';  // Duplicado: era 24px
+                        copepod.style.height = '28px'; // Duplicado: era 14px
+                        copepod.style.background = 'linear-gradient(45deg, #ff6b35 0%, #f7931e 50%, #ff6b35 100%)';
+                        copepod.style.borderRadius = '60% 40% 40% 60%';
+                        copepod.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+                        copepod.style.boxShadow = 'inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 1px 3px rgba(0,0,0,0.3)';
+                        copepod.style.position = 'relative';
+                        
+                        // Agregar "ojos" (duplicados en tamaño)
+                        const eye1 = document.createElement('div');
+                        eye1.style.cssText = `
+                            position: absolute;
+                            width: 6px;
+                            height: 6px;
+                            background: #333;
+                            border-radius: 50%;
+                            top: 6px;
+                            left: 12px;
+                            box-shadow: 0 0 2px rgba(255,255,255,0.5);
+                        `;
+                        const eye2 = document.createElement('div');
+                        eye2.style.cssText = `
+                            position: absolute;
+                            width: 6px;
+                            height: 6px;
+                            background: #333;
+                            border-radius: 50%;
+                            top: 6px;
+                            left: 24px;
+                            box-shadow: 0 0 2px rgba(255,255,255,0.5);
+                        `;
+                        
+                        // Agregar "antenas" (duplicadas en tamaño)
+                        const antenna1 = document.createElement('div');
+                        antenna1.style.cssText = `
+                            position: absolute;
+                            width: 2px;
+                            height: 12px;
+                            background: rgba(255, 107, 53, 0.8);
+                            top: -6px;
+                            left: 16px;
+                            transform: rotate(-15deg);
+                        `;
+                        const antenna2 = document.createElement('div');
+                        antenna2.style.cssText = `
+                            position: absolute;
+                            width: 2px;
+                            height: 12px;
+                            background: rgba(255, 107, 53, 0.8);
+                            top: -6px;
+                            left: 28px;
+                            transform: rotate(15deg);
+                        `;
+                        
+                        copepod.appendChild(eye1);
+                        copepod.appendChild(eye2);
+                        copepod.appendChild(antenna1);
+                        copepod.appendChild(antenna2);
+                        
+                        imageLoaded = true;
+                    };
+                    
+                    // Intentar cargar imagen sprite real
+                    const img = document.createElement('img');
+                    img.src = 'cop2.png';
+                    img.alt = `Copépodo ${i + 1}`;
+                    img.style.width = '100%';
+                    img.style.height = 'auto';
+                    img.style.objectFit = 'contain';
+                    
+                    img.onload = () => {
+                        imageLoaded = true;
+                        console.log('✅ Sprite cop2.png cargado correctamente');
+                        // Asegurar que la imagen se vea bien
+                        copepod.style.backgroundColor = 'transparent';
+                    };
+                    
+                    img.onerror = () => {
+                        console.warn('⚠️ No se pudo cargar cop2.png, usando copépodo CSS');
+                        setupCopepodFallback();
+                    };
+                    
+                    // Fallback después de 500ms si no carga
+                    setTimeout(() => {
+                        if (!imageLoaded && (!img.complete || img.naturalWidth === 0)) {
+                            setupCopepodFallback();
+                        }
+                    }, 500);
+                    
+                    copepod.appendChild(img);
+                    
+                    // Tamaño variable para realismo (duplicado para mejor visibilidad)
+                    const size = 56 + Math.random() * 24; // 56-80px (duplicado del anterior)
+                    copepod.style.width = `${size}px`;
+                    copepod.style.height = 'auto';
+                    
+                    // Distribución realista basada en investigación científica
+                    const maxDepth = 1200;
+                    
+                    // Diferentes tipos de copépodos según investigación
+                    const copepodTypes = [
+                        { name: 'superficial', dayDepth: [50, 150], nightDepth: [5, 30], abundance: 0.6 },
+                        { name: 'intermedio', dayDepth: [200, 500], nightDepth: [20, 80], abundance: 0.3 },
+                        { name: 'profundo', dayDepth: [500, 1000], nightDepth: [100, 300], abundance: 0.1 }
+                    ];
+                    
+                    // Seleccionar tipo basado en abundancia
+                    const rand = Math.random();
+                    let selectedType;
+                    if (rand < 0.6) selectedType = copepodTypes[0]; // 60% superficial
+                    else if (rand < 0.9) selectedType = copepodTypes[1]; // 30% intermedio
+                    else selectedType = copepodTypes[2]; // 10% profundo
+                    
+                    // Profundidades realistas según tipo
+                    const dayDepth = selectedType.dayDepth[0] + 
+                        Math.random() * (selectedType.dayDepth[1] - selectedType.dayDepth[0]);
+                    const nightDepth = selectedType.nightDepth[0] + 
+                        Math.random() * (selectedType.nightDepth[1] - selectedType.nightDepth[0]);
+                    
+                    const x = 100 + Math.random() * (window.innerWidth - 200);
+                    const y = (dayDepth / maxDepth) * window.innerHeight;
+                    
+                    copepod.style.left = `${x}px`;
+                    copepod.style.top = `${y}px`;
+                    
+                    // Velocidades reales de migración (10-170 m/h según estudios)
+                    const baseSpeed = 10 + Math.random() * 160; // 10-170 m/h
+                    const migrationDistance = Math.abs(dayDepth - nightDepth);
+                    
+                    // Datos del copépodo con parámetros científicos
+                    const copepodData = {
+                        element: copepod,
+                        id: i,
+                        x: x,
+                        currentDepth: dayDepth,
+                        dayDepth: dayDepth,
+                        nightDepth: nightDepth,
+                        migrationSpeed: baseSpeed / 100, // Normalizado para animación
+                        swimSpeed: baseSpeed, // Velocidad real en m/h
+                        migrationDistance: migrationDistance,
+                        type: selectedType.name,
+                        phase: Math.random() * Math.PI * 2,
+                        size: size,
+                        isActive: true,
+                        maxDepth: maxDepth
+                    };
+                    
+                    copepod.copepodData = copepodData;
+                    container.appendChild(copepod);
+                    this.copepods.push(copepodData);
+                }
+                
+                this.updateActiveCopepods();
+            }
+            
+            updateMigrationState() {
+                const hour = this.currentHour;
+                let migrationFactor = 0;
+                let state = "";
+                let info = "";
+                
+                // Calcular factor de migración basado en hora (patrón científico real)
+                if (hour >= 18 || hour <= 6) {
+                    // Noche: migración hacia arriba (10-170 m/h)
+                    migrationFactor = 0.9;
+                    state = "Migración nocturna activa";
+                    info = "🌙 Mayor migración de biomasa del planeta - Alimentación en superficie";
+                } else if (hour >= 16 && hour < 18) {
+                    // Atardecer: inicio migración
+                    migrationFactor = (hour - 16) / 2 * 0.9;
+                    state = "Iniciando ascenso crepuscular";
+                    info = "🌅 Migración vertical diaria iniciada - Hasta 800m de ascenso";
+                } else if (hour > 6 && hour <= 8) {
+                    // Amanecer: descenso
+                    migrationFactor = (8 - hour) / 2 * 0.9;
+                    state = "Descenso matutino";
+                    info = "🌄 Evitando depredadores - Regreso a zona mesopelágica";
+                } else {
+                    // Día: profundidad máxima
+                    migrationFactor = 0;
+                    state = "Reposo diurno en zona batial";
+                    info = "☀️ Distribución hasta 1200m - 172 especies documentadas";
+                }
+                
+                // Actualizar UI
+                document.getElementById('migrationState').textContent = state;
+                
+                const migrationInfoElement = document.getElementById('migrationInfo');
+                migrationInfoElement.textContent = info;
+                migrationInfoElement.classList.toggle('active', migrationFactor > 0.3);
+                
+                // Actualizar posiciones de copépodos
+                this.copepods.forEach(copepodData => {
+                    if (!copepodData.isActive) return;
+                    
+                    // Calcular profundidad objetivo
+                    const targetDepth = copepodData.dayDepth - 
+                        (migrationFactor * (copepodData.dayDepth - copepodData.nightDepth));
+                    
+                    // Movimiento suave hacia objetivo
+                    const depthDiff = targetDepth - copepodData.currentDepth;
+                    copepodData.currentDepth += depthDiff * 0.02 * this.migrationSpeed;
+                    
+                    // Aplicar posición usando profundidad máxima realista
+                    const y = (copepodData.currentDepth / copepodData.maxDepth) * window.innerHeight;
+                    copepodData.element.style.top = `${y}px`;
+                    
+                    // Cambiar animación según migración
+                    const element = copepodData.element;
+                    element.classList.remove('swimming', 'migrating-up', 'migrating-down');
+                    
+                    if (Math.abs(depthDiff) > 5) {
+                        if (depthDiff < 0) {
+                            element.classList.add('migrating-up');
+                        } else {
+                            element.classList.add('migrating-down');
+                        }
+                    } else {
+                        element.classList.add('swimming');
+                    }
+                    
+                    // Movimiento horizontal sutil
+                    const horizontalDrift = Math.sin(Date.now() * 0.001 + copepodData.phase) * 0.5;
+                    const newX = copepodData.x + horizontalDrift;
+                    copepodData.element.style.left = `${newX}px`;
+                });
+                
+                // Actualizar estadísticas científicas
+                if (this.copepods.length > 0) {
+                    const avgDepth = this.copepods.reduce((sum, c) => sum + c.currentDepth, 0) / this.copepods.length;
+                    const avgSpeed = this.copepods.reduce((sum, c) => sum + c.swimSpeed, 0) / this.copepods.length;
+                    
+                    // Contar tipos poblacionales
+                    const surfaceCount = this.copepods.filter(c => c.type === 'superficial').length;
+                    const midCount = this.copepods.filter(c => c.type === 'intermedio').length;
+                    const deepCount = this.copepods.filter(c => c.type === 'profundo').length;
+                    
+                    document.getElementById('avgDepth').textContent = `${avgDepth.toFixed(0)}m`;
+                    document.getElementById('avgSpeed').textContent = `${avgSpeed.toFixed(0)} m/h`;
+                    document.getElementById('surfaceCount').textContent = surfaceCount;
+                    document.getElementById('midCount').textContent = midCount;
+                    document.getElementById('deepCount').textContent = deepCount;
+                }
+            }
+            
+            updateTimeDisplay() {
+                const hour = this.currentHour;
+                const timeString = `${hour.toString().padStart(2, '0')}:00`;
+                
+                let period = "";
+                if (hour >= 6 && hour < 12) period = "Mañana";
+                else if (hour >= 12 && hour < 18) period = "Tarde";
+                else if (hour >= 18 && hour < 22) period = "Atardecer";
+                else period = "Noche";
+                
+                document.getElementById('timeDisplay').textContent = timeString;
+                document.getElementById('timeIndicator').textContent = `${timeString} - ${period}`;
+            }
+            
+            updateActiveCopepods() {
+                const activeCount = this.copepods.filter(c => c.isActive).length;
+                document.getElementById('activeCopepods').textContent = activeCount;
+            }
+            
+            toggleSimulation() {
+                const button = document.getElementById('playButton');
+                
+                if (this.isPlaying) {
+                    this.isPlaying = false;
+                    clearInterval(this.timeInterval);
+                    button.textContent = "▶️ Iniciar Migración";
+                    button.classList.remove('playing');
+                } else {
+                    this.isPlaying = true;
+                    button.textContent = "⏸️ Pausar Migración";
+                    button.classList.add('playing');
+                    
+                    // Avanzar tiempo cada 2 segundos (1 hora simulada)
+                    this.timeInterval = setInterval(() => {
+                        this.currentHour = (this.currentHour + 1) % 24;
+                        document.getElementById('timeSlider').value = this.currentHour;
+                        this.updateTimeDisplay();
+                        this.updateMigrationState();
+                    }, 2000);
+                }
+            }
+            
+            updateTime() {
+                this.currentHour = parseInt(document.getElementById('timeSlider').value);
+                this.updateTimeDisplay();
+                this.updateMigrationState();
+            }
+            
+            updateSpeed() {
+                this.migrationSpeed = parseFloat(document.getElementById('speedSlider').value);
+                document.getElementById('speedDisplay').textContent = `${this.migrationSpeed}x`;
+            }
+            
+            updateCount() {
+                this.copepodCount = parseInt(document.getElementById('countSlider').value);
+                document.getElementById('countDisplay').textContent = this.copepodCount;
+                this.createCopepods();
+            }
+            
+            animate() {
+                // Animación continua suave
+                this.animationFrame = requestAnimationFrame(() => this.animate());
+                
+                // Pequeñas variaciones en movimiento
+                this.copepods.forEach(copepodData => {
+                    if (!copepodData.isActive) return;
+                    
+                    // Variación sutil en posición
+                    const time = Date.now() * 0.001;
+                    const wobble = Math.sin(time + copepodData.phase) * 1;
+                    copepodData.element.style.left = `${copepodData.x + wobble}px`;
+                });
+            }
+        }
+        
+        // Inicializar simulador
+        const simulator = new CopepodMigrationSimulator();
+        
+        // Funciones globales para controles
+        function toggleSimulation() {
+            simulator.toggleSimulation();
+        }
+        
+        function updateTime() {
+            simulator.updateTime();
+        }
+        
+        function updateSpeed() {
+            simulator.updateSpeed();
+        }
+        
+        function updateCount() {
+            simulator.updateCount();
+        }
+        
+        console.log('🦐 Simulación de migración vertical de copépodos cargada');
+        console.log('📁 Buscando imagen real de copépodos: cop2.png');
+    </script>
+</body>
+</html>

@@ -350,9 +350,26 @@
                         <p>• <strong>Nutrientes:</strong> Upwelling vs oligotrófico</p>
                     </div>
                     
-                    <button style="background: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 10px;" onclick="openVerticalDistribution()">
-                        🚀 Abrir Simulador Oceánico
-                    </button>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <button style="background: #4caf50; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;" onclick="openVerticalDistribution()">
+                            🌊 Simulador Completo
+                        </button>
+                        <button style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;" onclick="openDualSimulator()">
+                            ⚡ Simulador Dual
+                        </button>
+                        <button style="background: #8b5cf6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;" onclick="openAISpriteSimulator()">
+                            🎨 Copépodos IA
+                        </button>
+                        <button style="background: #f59e0b; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;" onclick="openImageCutter()">
+                            ✂️ Recortador ML
+                        </button>
+                        <button style="background: #22c55e; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;" onclick="openImageCutterFixed()">
+                            ✅ Recortador FIJO
+                        </button>
+                        <button style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;" onclick="openMigrationSimulator()">
+                            🦐 Migración Simple
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -420,8 +437,33 @@
         }
 
         function openVerticalDistribution() {
-            // Abrir simulador oceánico en nueva ventana/pestaña
+            // Abrir simulador oceánico completo en nueva ventana/pestaña
             window.open('simulador_oceanico_vertical_interactivo.html', '_blank', 'width=1400,height=900');
+        }
+
+        function openDualSimulator() {
+            // Abrir simulador dual especializado en nueva ventana/pestaña
+            window.open('simulador_dual_oceanico.html', '_blank', 'width=1600,height=1000');
+        }
+
+        function openAISpriteSimulator() {
+            // Abrir simulador con sprites de copépodos generados con IA
+            window.open('ocean_simulator_with_ai_sprites.html', '_blank', 'width=1600,height=1000');
+        }
+
+        function openImageCutter() {
+            // Abrir recortador de imágenes con machine learning
+            window.open('copepod_image_cutter_ml.html', '_blank', 'width=1600,height=1000');
+        }
+
+        function openImageCutterFixed() {
+            // Abrir versión corregida del recortador de imágenes
+            window.open('copepod_cutter_fixed.html', '_blank', 'width=1600,height=1000');
+        }
+
+        function openMigrationSimulator() {
+            // Abrir simulador simple de migración de copépodos
+            window.open('copepod_migration_working.html', '_blank', 'width=1600,height=1000');
         }
 
         // Animación de entrada

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Oceánico Avanzado - OlitAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e1a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .simulator-header {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.1));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .simulator-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .scenario-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .scenario-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .scenario-btn:hover, .scenario-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .main-grid {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        .ocean-simulator {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 2rem;
+            height: 80vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .depth-column {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                rgba(135, 206, 235, 0.8) 0%,    /* Superficie - azul claro */
+                rgba(70, 130, 180, 0.6) 15%,    /* Zona eufótica */
+                rgba(25, 25, 112, 0.4) 30%,     /* Zona disfótica */
+                rgba(0, 0, 139, 0.3) 60%,       /* Batial */
+                rgba(0, 0, 0, 0.9) 100%);       /* Abisal */
+            position: relative;
+            border-radius: 15px;
+        }
+
+        .organism-layer {
+            position: absolute;
+            width: 100%;
+            height: 15%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 2rem;
+        }
+
+        .layer-epipelagic { top: 5%; }
+        .layer-mesopelagic { top: 25%; }
+        .layer-bathypelagic { top: 50%; }
+        .layer-abyssopelagic { top: 75%; }
+
+        .organism-particle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .organism-particle:hover {
+            transform: scale(1.5);
+            z-index: 10;
+        }
+
+        .diatom { background: radial-gradient(circle, #10b981, #059669); }
+        .coccolith { background: radial-gradient(circle, #f59e0b, #d97706); }
+        .zooplankton { background: radial-gradient(circle, #ef4444, #dc2626); }
+        .fish { background: radial-gradient(circle, #3b82f6, #2563eb); }
+        .sponge { background: radial-gradient(circle, #8b5cf6, #7c3aed); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+        }
+
+        .depth-labels {
+            position: absolute;
+            left: -60px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .data-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-widget {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1.5rem;
+        }
+
+        .widget-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .parameter {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .parameter-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .parameter-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .parameter-trend {
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+        }
+
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-stable { color: #f59e0b; }
+
+        .chart-mini {
+            height: 150px;
+            margin-top: 1rem;
+        }
+
+        .interactive-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .control-slider {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-slider label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(59, 130, 246, 0.2);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .time-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .time-btn:hover, .time-btn.active {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+
+        .ecosystem-health {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+        }
+
+        .health-indicator {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(#10b981 0deg 270deg, rgba(16, 185, 129, 0.2) 270deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .flux-visualization {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .carbon-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #60a5fa;
+            border-radius: 50%;
+            animation: carbon-flow 5s linear infinite;
+        }
+
+        @keyframes carbon-flow {
+            0% { transform: translateY(-10px) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(210px) scale(1); opacity: 0; }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-panel {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                display: grid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="simulator-header">
+        <div class="header-content">
+            <h1 class="simulator-title">
+                🌊 Simulador Oceánico Avanzado
+            </h1>
+            <p style="text-align: center; color: #94a3b8; margin-bottom: 1rem;">
+                Explora la biogeoquímica marina en tiempo real
+            </p>
+            <div class="scenario-controls">
+                <button class="scenario-btn active" data-scenario="actual">Condiciones Actuales</button>
+                <button class="scenario-btn" data-scenario="lgm">Último Máximo Glacial</button>
+                <button class="scenario-btn" data-scenario="warming">Calentamiento +2°C</button>
+                <button class="scenario-btn" data-scenario="acidification">Acidificación Extrema</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="ocean-simulator">
+            <div class="depth-labels">
+                <div>0m - Epipelágico</div>
+                <div>200m - Mesopelágico</div>
+                <div>1000m - Batipelágico</div>
+                <div>4000m - Abisopelágico</div>
+            </div>
+            <div class="depth-column" id="oceanColumn">
+                <div class="organism-layer layer-epipelagic" id="epipelagic">
+                    <!-- Organismos se generarán aquí -->
+                </div>
+                <div class="organism-layer layer-mesopelagic" id="mesopelagic">
+                    <!-- Organismos se generarán aquí -->
+                </div>
+                <div class="organism-layer layer-bathypelagic" id="bathypelagic">
+                    <!-- Organismos se generarán aquí -->
+                </div>
+                <div class="organism-layer layer-abyssopelagic" id="abyssopelagic">
+                    <!-- Organismos se generarán aquí -->
+                </div>
+            </div>
+            <div class="flux-visualization" id="carbonFlux"></div>
+        </div>
+
+        <div class="data-panel">
+            <!-- Panel de Parámetros Oceánicos -->
+            <div class="panel-widget">
+                <div class="widget-header">
+                    <i class="fas fa-thermometer-half"></i>
+                    Parámetros Oceánicos
+                </div>
+                <div class="parameter-grid">
+                    <div class="parameter">
+                        <div class="parameter-value" id="temperature">15.2</div>
+                        <div class="parameter-label">Temperatura (°C)</div>
+                        <div class="parameter-trend trend-up" id="tempTrend">↗ +0.1</div>
+                    </div>
+                    <div class="parameter">
+                        <div class="parameter-value" id="ph">8.05</div>
+                        <div class="parameter-label">pH</div>
+                        <div class="parameter-trend trend-down" id="phTrend">↘ -0.02</div>
+                    </div>
+                    <div class="parameter">
+                        <div class="parameter-value" id="salinity">34.7</div>
+                        <div class="parameter-label">Salinidad (PSU)</div>
+                        <div class="parameter-trend trend-stable" id="salTrend">→ 0.0</div>
+                    </div>
+                    <div class="parameter">
+                        <div class="parameter-value" id="oxygen">6.2</div>
+                        <div class="parameter-label">O₂ (mg/L)</div>
+                        <div class="parameter-trend trend-down" id="o2Trend">↘ -0.05</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Biogeoquímica -->
+            <div class="panel-widget">
+                <div class="widget-header">
+                    <i class="fas fa-flask"></i>
+                    Ciclos Biogeoquímicos
+                </div>
+                <div class="parameter-grid">
+                    <div class="parameter">
+                        <div class="parameter-value" id="silica">45.2</div>
+                        <div class="parameter-label">Si(OH)₄ (μM)</div>
+                    </div>
+                    <div class="parameter">
+                        <div class="parameter-value" id="carbonate">2.1</div>
+                        <div class="parameter-label">Ω Calcita</div>
+                    </div>
+                    <div class="parameter">
+                        <div class="parameter-value" id="nitrate">12.5</div>
+                        <div class="parameter-label">NO₃⁻ (μM)</div>
+                    </div>
+                    <div class="parameter">
+                        <div class="parameter-value" id="phosphate">0.8</div>
+                        <div class="parameter-label">PO₄³⁻ (μM)</div>
+                    </div>
+                </div>
+                <div class="chart-mini">
+                    <canvas id="nutrientChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Panel de Control Temporal -->
+            <div class="panel-widget">
+                <div class="widget-header">
+                    <i class="fas fa-clock"></i>
+                    Control Temporal
+                </div>
+                <div class="time-controls">
+                    <button class="time-btn" data-speed="0.1">Lento</button>
+                    <button class="time-btn active" data-speed="1">Normal</button>
+                    <button class="time-btn" data-speed="5">Rápido</button>
+                    <button class="time-btn" data-speed="0">Pausa</button>
+                </div>
+                <div class="interactive-controls">
+                    <div class="control-slider">
+                        <label>Temperatura Global <span id="tempValue">+1.1°C</span></label>
+                        <input type="range" class="slider" id="tempSlider" min="0" max="4" step="0.1" value="1.1">
+                    </div>
+                    <div class="control-slider">
+                        <label>CO₂ Atmosférico <span id="co2Value">420 ppm</span></label>
+                        <input type="range" class="slider" id="co2Slider" min="280" max="800" step="10" value="420">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Salud del Ecosistema -->
+            <div class="panel-widget">
+                <div class="widget-header">
+                    <i class="fas fa-heartbeat"></i>
+                    Salud del Ecosistema
+                </div>
+                <div class="ecosystem-health">
+                    <div class="health-indicator" id="healthIndicator">75%</div>
+                    <div>
+                        <div style="font-weight: 600; color: #10b981;">Estado: Saludable</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem;">
+                            Biodiversidad y flujos biogeoquímicos en equilibrio
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
+                    <div>• Productividad primaria: Normal</div>
+                    <div>• Preservación carbonatos: Buena</div>
+                    <div>• Cinturón de ópalo: Estable</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Variables globales del simulador
+        let currentScenario = 'actual';
+        let simulationSpeed = 1;
+        let animationId;
+        let charts = {};
+
+        // Datos de organismos por capa
+        const organisms = {
+            epipelagic: [
+                { type: 'diatom', count: 20, name: 'Diatomeas' },
+                { type: 'coccolith', count: 15, name: 'Cocolitóforos' }
+            ],
+            mesopelagic: [
+                { type: 'zooplankton', count: 12, name: 'Zooplancton' },
+                { type: 'fish', count: 8, name: 'Peces' }
+            ],
+            bathypelagic: [
+                { type: 'fish', count: 5, name: 'Peces Profundos' }
+            ],
+            abyssopelagic: [
+                { type: 'sponge', count: 3, name: 'Esponjas' }
+            ]
+        };
+
+        // Escenarios predefinidos
+        const scenarios = {
+            actual: {
+                temp: 15.2, ph: 8.05, salinity: 34.7, oxygen: 6.2,
+                silica: 45.2, carbonate: 2.1, nitrate: 12.5, phosphate: 0.8
+            },
+            lgm: {
+                temp: 12.8, ph: 8.15, salinity: 35.2, oxygen: 7.1,
+                silica: 58.7, carbonate: 1.8, nitrate: 18.2, phosphate: 1.2
+            },
+            warming: {
+                temp: 17.8, ph: 7.85, salinity: 34.4, oxygen: 5.4,
+                silica: 38.9, carbonate: 1.6, nitrate: 9.8, phosphate: 0.6
+            },
+            acidification: {
+                temp: 16.1, ph: 7.65, salinity: 34.6, oxygen: 5.8,
+                silica: 42.1, carbonate: 0.9, nitrate: 11.2, phosphate: 0.7
+            }
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSimulator();
+            initializeCharts();
+            initializeControls();
+            startSimulation();
+        });
+
+        function initializeSimulator() {
+            // Generar organismos en cada capa
+            Object.keys(organisms).forEach(layerId => {
+                const layer = document.getElementById(layerId);
+                organisms[layerId].forEach(orgType => {
+                    for (let i = 0; i < orgType.count; i++) {
+                        const organism = document.createElement('div');
+                        organism.className = `organism-particle ${orgType.type}`;
+                        organism.dataset.type = orgType.type;
+                        organism.dataset.name = orgType.name;
+                        organism.style.animationDelay = Math.random() * 3 + 's';
+                        
+                        organism.addEventListener('mouseenter', showTooltip);
+                        organism.addEventListener('mouseleave', hideTooltip);
+                        
+                        layer.appendChild(organism);
+                    }
+                });
+            });
+
+            // Generar partículas de carbono
+            const carbonFlux = document.getElementById('carbonFlux');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'carbon-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                carbonFlux.appendChild(particle);
+            }
+        }
+
+        function initializeCharts() {
+            const nutrientCtx = document.getElementById('nutrientChart').getContext('2d');
+            charts.nutrients = new Chart(nutrientCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0h', '6h', '12h', '18h', '24h'],
+                    datasets: [{
+                        label: 'Si(OH)₄',
+                        data: [45, 44, 43, 44, 45],
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'NO₃⁻',
+                        data: [12, 11, 10, 11, 12],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false
+                        },
+                        y: {
+                            display: false
+                        }
+                    },
+                    elements: {
+                        point: {
+                            radius: 0
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeControls() {
+            // Controles de escenario
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentScenario = this.dataset.scenario;
+                    updateScenario();
+                });
+            });
+
+            // Controles de velocidad
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    simulationSpeed = parseFloat(this.dataset.speed);
+                });
+            });
+
+            // Sliders
+            document.getElementById('tempSlider').addEventListener('input', function() {
+                document.getElementById('tempValue').textContent = '+' + this.value + '°C';
+                updateParameters();
+            });
+
+            document.getElementById('co2Slider').addEventListener('input', function() {
+                document.getElementById('co2Value').textContent = this.value + ' ppm';
+                updateParameters();
+            });
+        }
+
+        function updateScenario() {
+            const scenario = scenarios[currentScenario];
+            
+            // Actualizar parámetros con animación
+            animateValue('temperature', scenario.temp, 1);
+            animateValue('ph', scenario.ph, 2);
+            animateValue('salinity', scenario.salinity, 1);
+            animateValue('oxygen', scenario.oxygen, 1);
+            animateValue('silica', scenario.silica, 1);
+            animateValue('carbonate', scenario.carbonate, 1);
+            animateValue('nitrate', scenario.nitrate, 1);
+            animateValue('phosphate', scenario.phosphate, 1);
+
+            // Actualizar visualización de organismos
+            updateOrganismVisibility();
+        }
+
+        function animateValue(elementId, targetValue, decimals) {
+            const element = document.getElementById(elementId);
+            const startValue = parseFloat(element.textContent);
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentValue = startValue + (targetValue - startValue) * progress;
+                element.textContent = currentValue.toFixed(decimals);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function updateOrganismVisibility() {
+            const scenario = scenarios[currentScenario];
+            
+            // Ajustar opacidad basada en condiciones
+            document.querySelectorAll('.organism-particle').forEach(org => {
+                let opacity = 1;
+                
+                if (org.dataset.type === 'coccolith' && scenario.carbonate < 1.5) {
+                    opacity = 0.3; // Cocolitóforos afectados por baja saturación
+                }
+                
+                if (org.dataset.type === 'diatom' && scenario.silica > 50) {
+                    opacity = 1; // Diatomeas favorecidas por alto sílice
+                }
+                
+                org.style.opacity = opacity;
+            });
+        }
+
+        function updateParameters() {
+            // Actualizar parámetros basados en controles
+            const tempAnomaly = parseFloat(document.getElementById('tempSlider').value);
+            const co2Level = parseFloat(document.getElementById('co2Slider').value);
+            
+            // Calcular salud del ecosistema
+            let health = 100;
+            if (tempAnomaly > 2) health -= (tempAnomaly - 2) * 20;
+            if (co2Level > 450) health -= (co2Level - 450) * 0.1;
+            
+            health = Math.max(0, Math.min(100, health));
+            
+            document.getElementById('healthIndicator').textContent = health.toFixed(0) + '%';
+            
+            // Actualizar color del indicador
+            const indicator = document.getElementById('healthIndicator');
+            if (health > 70) {
+                indicator.style.background = 'conic-gradient(#10b981 0deg ' + (health * 3.6) + 'deg, rgba(16, 185, 129, 0.2) ' + (health * 3.6) + 'deg)';
+            } else if (health > 40) {
+                indicator.style.background = 'conic-gradient(#f59e0b 0deg ' + (health * 3.6) + 'deg, rgba(245, 158, 11, 0.2) ' + (health * 3.6) + 'deg)';
+            } else {
+                indicator.style.background = 'conic-gradient(#ef4444 0deg ' + (health * 3.6) + 'deg, rgba(239, 68, 68, 0.2) ' + (health * 3.6) + 'deg)';
+            }
+        }
+
+        function showTooltip(event) {
+            const tooltip = document.getElementById('tooltip');
+            const organism = event.target;
+            
+            tooltip.innerHTML = `
+                <strong>${organism.dataset.name}</strong><br>
+                Tipo: ${organism.dataset.type}<br>
+                Profundidad: ${getDepthFromLayer(organism.parentElement.id)}
+            `;
+            
+            tooltip.style.left = event.pageX + 10 + 'px';
+            tooltip.style.top = event.pageY + 10 + 'px';
+            tooltip.style.opacity = 1;
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.opacity = 0;
+        }
+
+        function getDepthFromLayer(layerId) {
+            const depths = {
+                epipelagic: '0-200m',
+                mesopelagic: '200-1000m',
+                bathypelagic: '1000-4000m',
+                abyssopelagic: '>4000m'
+            };
+            return depths[layerId];
+        }
+
+        function startSimulation() {
+            function animate() {
+                if (simulationSpeed > 0) {
+                    // Simular variaciones de parámetros
+                    const variation = (Math.sin(Date.now() * 0.001) * 0.1) * simulationSpeed;
+                    
+                    // Actualizar gráfico de nutrientes si es necesario
+                    updateCharts();
+                }
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        function updateCharts() {
+            // Actualizar datos de gráficos con variaciones simuladas
+            if (Math.random() < 0.01) { // Actualizar ocasionalmente
+                const chart = charts.nutrients;
+                const newSiData = chart.data.datasets[0].data.slice(1);
+                newSiData.push(45 + (Math.random() - 0.5) * 5);
+                chart.data.datasets[0].data = newSiData;
+                
+                const newNData = chart.data.datasets[1].data.slice(1);
+                newNData.push(12 + (Math.random() - 0.5) * 3);
+                chart.data.datasets[1].data = newNData;
+                
+                chart.update('none');
+            }
+        }
+
+        // Inicializar escenario actual
+        updateScenario();
+    </script>
+</body>
+</html>

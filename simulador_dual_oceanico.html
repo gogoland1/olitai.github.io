@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Dual Oceánico - Zona Fótica vs Zona Profunda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1e3a8a 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .header {
+            height: 80px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .header h1 {
+            color: #60a5fa;
+            font-size: 24px;
+        }
+
+        .global-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .time-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-slider {
+            width: 150px;
+            height: 6px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f59e0b;
+            cursor: pointer;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            height: 60px;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .panel-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photic-zone {
+            background: linear-gradient(to bottom,
+                rgba(135, 206, 235, 0.9) 0%,    /* Superficie brillante */
+                rgba(100, 149, 237, 0.8) 20%,   /* 20m */
+                rgba(70, 130, 180, 0.7) 50%,    /* 50m */
+                rgba(25, 25, 112, 0.6) 80%,     /* 80m */
+                rgba(0, 0, 139, 0.5) 100%       /* 100m */
+            );
+        }
+
+        .deep-zone {
+            background: linear-gradient(to bottom,
+                rgba(0, 0, 139, 0.5) 0%,        /* 100m */
+                rgba(0, 0, 80, 0.7) 25%,        /* 500m */
+                rgba(0, 0, 40, 0.8) 50%,        /* 1000m */
+                rgba(0, 0, 20, 0.9) 75%,        /* 1500m */
+                rgba(0, 0, 0, 0.95) 100%        /* 2000m */
+            );
+        }
+
+        .depth-scale {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            height: 100%;
+            width: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border-right: 2px solid rgba(59, 130, 246, 0.3);
+            z-index: 10;
+        }
+
+        .depth-marker {
+            position: absolute;
+            right: 5px;
+            font-size: 11px;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .light-column {
+            position: absolute;
+            left: 70px;
+            top: 0;
+            width: 80px;
+            height: 100%;
+            z-index: 5;
+        }
+
+        .photic-light {
+            /* Gradiente espectral por defecto - se actualiza dinámicamente */
+            background: linear-gradient(to bottom,
+                rgba(255, 0, 0, 0.8) 0%,        /* Rojo superficie */
+                rgba(255, 165, 0, 0.7) 10%,     /* Naranja 10m */
+                rgba(255, 255, 0, 0.6) 20%,     /* Amarillo 20m */
+                rgba(0, 255, 0, 0.5) 40%,       /* Verde 40m */
+                rgba(0, 0, 255, 0.4) 60%,       /* Azul 60m */
+                rgba(75, 0, 130, 0.2) 80%,      /* Índigo 80m */
+                rgba(148, 0, 211, 0.1) 100%     /* Violeta 100m */
+            );
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .spectrum-display {
+            position: absolute;
+            right: 5px;
+            top: 10px;
+            width: 15px;
+            height: 80%;
+            background: linear-gradient(to bottom,
+                #ff0000 0%,     /* Rojo */
+                #ff6500 14%,    /* Naranja */
+                #ffff00 28%,    /* Amarillo */
+                #00ff00 42%,    /* Verde */
+                #0000ff 57%,    /* Azul */
+                #4b0082 71%,    /* Índigo */
+                #9400d3 85%,    /* Violeta */
+                #000000 100%    /* Negro */
+            );
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 3px;
+        }
+
+        .deep-light {
+            background: linear-gradient(to bottom,
+                rgba(255, 255, 0, 0.05) 0%,     /* 5% luz 100m */
+                rgba(255, 255, 0, 0.01) 25%,    /* 1% luz 500m */
+                rgba(255, 255, 0, 0) 50%        /* 0% luz 1000m+ */
+            );
+            border-right: 1px solid rgba(255, 255, 0, 0.2);
+        }
+
+        .organisms-area {
+            position: absolute;
+            left: 150px;
+            top: 0;
+            width: calc(100% - 350px);
+            height: 100%;
+        }
+
+        .controls-sidebar {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            overflow-y: auto;
+            border-left: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .organism {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .phytoplankton {
+            background: radial-gradient(circle, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+        }
+
+        .diatom {
+            background: radial-gradient(circle, #84cc16 0%, #65a30d 100%);
+            box-shadow: 0 0 6px rgba(132, 204, 22, 0.6);
+            border-radius: 20%;
+        }
+
+        .dinoflagellate {
+            background: radial-gradient(circle, #eab308 0%, #ca8a04 100%);
+            box-shadow: 0 0 6px rgba(234, 179, 8, 0.6);
+        }
+
+        .copepod {
+            background: radial-gradient(circle, #f97316 0%, #ea580c 100%);
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+        }
+
+        .krill {
+            background: radial-gradient(circle, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+        }
+
+        .bacteria {
+            background: radial-gradient(circle, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 0 4px rgba(139, 92, 246, 0.8);
+        }
+
+        .archaea {
+            background: radial-gradient(circle, #ec4899 0%, #db2777 100%);
+            box-shadow: 0 0 5px rgba(236, 72, 153, 0.7);
+        }
+
+        .fecal-pellet {
+            background: radial-gradient(circle, #78716c 0%, #57534e 100%);
+            box-shadow: 0 0 4px rgba(120, 113, 108, 0.6);
+            border-radius: 30%;
+        }
+
+        .marine-snow {
+            background: radial-gradient(circle, #d6d3d1 0%, #a8a29e 100%);
+            box-shadow: 0 0 3px rgba(214, 211, 209, 0.5);
+        }
+
+        .dcm-layer {
+            position: absolute;
+            left: 70px;
+            width: calc(100% - 270px);
+            height: 20px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(34, 197, 94, 0.6) 20%, 
+                rgba(34, 197, 94, 0.8) 50%, 
+                rgba(34, 197, 94, 0.6) 80%, 
+                transparent 100%
+            );
+            border: 1px solid rgba(34, 197, 94, 0.8);
+            border-radius: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .control-group h4 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .mini-slider {
+            width: 100%;
+            height: 4px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 5px 0;
+        }
+
+        .mini-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-size: 10px;
+            color: #93c5fd;
+            margin-top: 3px;
+        }
+
+        .legend {
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .info-display {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            font-size: 11px;
+            z-index: 20;
+        }
+
+        @keyframes photosynthesize {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+            }
+            50% { 
+                transform: scale(1.1) rotate(5deg);
+                box-shadow: 0 0 15px rgba(34, 197, 94, 1);
+            }
+        }
+
+        @keyframes migrate {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        @keyframes sink {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(50px) rotate(360deg); }
+        }
+
+        @keyframes decompose {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        .organism.active-photosynthesis {
+            animation: photosynthesize 2s ease-in-out infinite;
+        }
+
+        .organism.migrating {
+            animation: migrate 6s ease-in-out infinite;
+        }
+
+        .organism.sinking {
+            animation: sink 8s linear infinite;
+        }
+
+        .organism.decomposing {
+            animation: decompose 4s ease-in-out infinite;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin: 2px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌊 Simulador Dual Oceánico - Zona Fótica vs Profunda</h1>
+        <div class="global-controls">
+            <div class="time-control">
+                <span style="font-size: 14px;">⏰</span>
+                <input type="range" class="time-slider" id="globalTime" min="0" max="23" value="12" step="1">
+                <span id="timeDisplay" style="font-size: 14px; color: #f59e0b;">12:00</span>
+            </div>
+            <button class="btn btn-primary" onclick="startAllAnimations()">▶️ Play</button>
+            <button class="btn btn-secondary" onclick="pauseAllAnimations()">⏸️ Pausa</button>
+            <button class="btn btn-secondary" onclick="resetAllSimulations()">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Panel Zona Fótica (0-100m) -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 style="color: #22c55e;">☀️ Zona Fótica (0-100m) - Procesos Fotosintéticos</h2>
+            </div>
+            <div class="panel-content photic-zone">
+                <!-- Escala de profundidad fótica -->
+                <div class="depth-scale" id="phototicDepthScale"></div>
+                
+                <!-- Columna de luz fótica -->
+                <div class="light-column photic-light" id="phototicLightColumn">
+                    <div class="spectrum-display" title="Espectro electromagnético visible"></div>
+                </div>
+                
+                <!-- DCM Layer -->
+                <div class="dcm-layer" id="dcmLayer"></div>
+                
+                <!-- Área de organismos fóticos -->
+                <div class="organisms-area" id="phototicOrganisms"></div>
+                
+                <!-- Controles específicos zona fótica -->
+                <div class="controls-sidebar">
+                    <div class="control-group">
+                        <h4>💡 Intensidad Lumínica</h4>
+                        <input type="range" class="mini-slider" id="phototicLight" min="0" max="100" value="80" step="5">
+                        <div class="value-display" id="phototicLightValue">80%</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🌊 Tipo de Ambiente</h4>
+                        <select id="waterType" style="width: 100%; padding: 6px; background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px; font-size: 11px;">
+                            <option value="oceanic">Oceánico (clara)</option>
+                            <option value="coastal">Costero (moderada)</option>
+                            <option value="estuarine">Estuarino (turbia)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🧪 Nutrientes (N-P-Si)</h4>
+                        <input type="range" class="mini-slider" id="phototicNutrients" min="0" max="30" value="15" step="1">
+                        <div class="value-display" id="phototicNutrientsValue">15 μM</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🌡️ Temperatura</h4>
+                        <input type="range" class="mini-slider" id="phototicTemp" min="5" max="25" value="18" step="1">
+                        <div class="value-display" id="phototicTempValue">18°C</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🌊 Mezcla Vertical</h4>
+                        <input type="range" class="mini-slider" id="phototicMixing" min="0" max="100" value="50" step="10">
+                        <div class="value-display" id="phototicMixingValue">50%</div>
+                    </div>
+                    
+                    <div class="legend">
+                        <h4>Organismos Fóticos</h4>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #22c55e;"></div>
+                            <span>Fitoplancton</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #84cc16; border-radius: 20%;"></div>
+                            <span>Diatomeas</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #eab308;"></div>
+                            <span>Dinoflagelados</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f97316;"></div>
+                            <span>Copépodos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info display zona fótica -->
+                <div class="info-display" id="phototicInfo">
+                    <div><strong>Productividad Primaria:</strong> <span id="primaryProd">85%</span></div>
+                    <div><strong>Clorofila-a:</strong> <span id="chlorophyll">3.2 mg/m³</span></div>
+                    <div><strong>Penetración Luz:</strong> <span id="lightPen">60%</span></div>
+                    <div><strong>Tipo de Agua:</strong> <span id="waterTypeInfo">Oceánica</span></div>
+                    <div><strong>Zona Eufótica:</strong> <span id="euphoticDepth">80m</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Zona Profunda (100-2000m) -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 style="color: #8b5cf6;">🌊 Zona Profunda (100-2000m) - Loop Microbiano & Zooplancton</h2>
+            </div>
+            <div class="panel-content deep-zone">
+                <!-- Escala de profundidad profunda -->
+                <div class="depth-scale" id="deepDepthScale"></div>
+                
+                <!-- Columna de luz profunda -->
+                <div class="light-column deep-light" id="deepLight"></div>
+                
+                <!-- Área de organismos profundos -->
+                <div class="organisms-area" id="deepOrganisms"></div>
+                
+                <!-- Controles específicos zona profunda -->
+                <div class="controls-sidebar">
+                    <div class="control-group">
+                        <h4>🦠 Actividad Microbiana</h4>
+                        <input type="range" class="mini-slider" id="microbialActivity" min="0" max="100" value="60" step="5">
+                        <div class="value-display" id="microbialActivityValue">60%</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🔄 Remineralización</h4>
+                        <input type="range" class="mini-slider" id="remineralization" min="0" max="100" value="75" step="5">
+                        <div class="value-display" id="remineralizationValue">75%</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>⬇️ Flux de Carbono</h4>
+                        <input type="range" class="mini-slider" id="carbonFlux" min="0" max="100" value="40" step="5">
+                        <div class="value-display" id="carbonFluxValue">40 mg C/m²/día</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>🌊 Migración Vertical</h4>
+                        <input type="range" class="mini-slider" id="verticalMigration" min="0" max="100" value="70" step="10">
+                        <div class="value-display" id="verticalMigrationValue">70%</div>
+                    </div>
+                    
+                    <div class="legend">
+                        <h4>Organismos Profundos</h4>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ef4444;"></div>
+                            <span>Krill</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #8b5cf6;"></div>
+                            <span>Bacterias</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ec4899;"></div>
+                            <span>Arqueobacterias</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #78716c; border-radius: 30%;"></div>
+                            <span>Pellets Fecales</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #d6d3d1;"></div>
+                            <span>Nieve Marina</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info display zona profunda -->
+                <div class="info-display" id="deepInfo">
+                    <div><strong>Respiración:</strong> <span id="respiration">70%</span></div>
+                    <div><strong>Descomposición:</strong> <span id="decomposition">85%</span></div>
+                    <div><strong>Biomasa Microbiana:</strong> <span id="microbialBiomass">2.1 mg C/L</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class DualOceanSimulator {
+            constructor() {
+                this.isAnimating = false;
+                this.time = 0;
+                this.phototicOrganisms = [];
+                this.deepOrganisms = [];
+                
+                this.initializeDepthScales();
+                this.initializeControls();
+                this.populatePhototicZone();
+                this.populateDeepZone();
+                this.updateAllSimulations();
+            }
+
+            initializeDepthScales() {
+                // Escala zona fótica (0-100m)
+                const phototicScale = document.getElementById('phototicDepthScale');
+                const phototicDepths = [0, 20, 40, 60, 80, 100];
+                phototicDepths.forEach(depth => {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.textContent = `${depth}m`;
+                    marker.style.top = `${(depth / 100) * 100}%`;
+                    phototicScale.appendChild(marker);
+                });
+
+                // Escala zona profunda (100-2000m)
+                const deepScale = document.getElementById('deepDepthScale');
+                const deepDepths = [100, 300, 500, 800, 1200, 1600, 2000];
+                deepDepths.forEach(depth => {
+                    const marker = document.createElement('div');
+                    marker.className = 'depth-marker';
+                    marker.textContent = `${depth}m`;
+                    marker.style.top = `${((depth - 100) / 1900) * 100}%`;
+                    deepScale.appendChild(marker);
+                });
+            }
+
+            initializeControls() {
+                // Control global de tiempo
+                document.getElementById('globalTime').addEventListener('input', () => {
+                    const time = parseInt(document.getElementById('globalTime').value);
+                    document.getElementById('timeDisplay').textContent = `${time}:00`;
+                    this.updateAllSimulations();
+                });
+
+                // Controles zona fótica
+                ['phototicLight', 'phototicNutrients', 'phototicTemp', 'phototicMixing'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => this.updatePhototicZone());
+                });
+                
+                // Control tipo de agua
+                document.getElementById('waterType').addEventListener('change', () => this.updatePhototicZone());
+
+                // Controles zona profunda
+                ['microbialActivity', 'remineralization', 'carbonFlux', 'verticalMigration'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => this.updateDeepZone());
+                });
+            }
+
+            populatePhototicZone() {
+                const container = document.getElementById('phototicOrganisms');
+                container.innerHTML = '';
+                this.phototicOrganisms = [];
+
+                // Fitoplancton abundante en superficie
+                for (let i = 0; i < 40; i++) {
+                    this.createPhototicOrganism('phytoplankton', Math.random() * 300, Math.random() * 150);
+                }
+
+                // Diatomeas especializadas
+                for (let i = 0; i < 25; i++) {
+                    this.createPhototicOrganism('diatom', Math.random() * 350, Math.random() * 200);
+                }
+
+                // Dinoflagelados móviles
+                for (let i = 0; i < 20; i++) {
+                    this.createPhototicOrganism('dinoflagellate', Math.random() * 320, Math.random() * 180);
+                }
+
+                // Copépodos pastoreadores
+                for (let i = 0; i < 15; i++) {
+                    this.createPhototicOrganism('copepod', Math.random() * 380, Math.random() * 250);
+                }
+
+                // Posicionar DCM
+                this.updateDCMPosition();
+            }
+
+            populateDeepZone() {
+                const container = document.getElementById('deepOrganisms');
+                container.innerHTML = '';
+                this.deepOrganisms = [];
+
+                // Krill migratorio
+                for (let i = 0; i < 20; i++) {
+                    this.createDeepOrganism('krill', Math.random() * 300, 50 + Math.random() * 200);
+                }
+
+                // Bacterias abundantes
+                for (let i = 0; i < 60; i++) {
+                    this.createDeepOrganism('bacteria', Math.random() * 350, Math.random() * 400);
+                }
+
+                // Arqueobacterias extremófilas
+                for (let i = 0; i < 30; i++) {
+                    this.createDeepOrganism('archaea', Math.random() * 320, 200 + Math.random() * 300);
+                }
+
+                // Pellets fecales hundiéndose
+                for (let i = 0; i < 35; i++) {
+                    this.createDeepOrganism('fecal-pellet', Math.random() * 380, Math.random() * 500);
+                }
+
+                // Nieve marina
+                for (let i = 0; i < 25; i++) {
+                    this.createDeepOrganism('marine-snow', Math.random() * 360, Math.random() * 450);
+                }
+            }
+
+            createPhototicOrganism(type, x, y) {
+                const organism = document.createElement('div');
+                organism.className = `organism ${type}`;
+                
+                const sizes = {
+                    'phytoplankton': Math.random() * 5 + 3,
+                    'diatom': Math.random() * 8 + 4,
+                    'dinoflagellate': Math.random() * 6 + 3,
+                    'copepod': Math.random() * 10 + 6
+                };
+                
+                const size = sizes[type];
+                organism.style.width = `${size}px`;
+                organism.style.height = `${size}px`;
+                organism.style.left = `${x}px`;
+                organism.style.top = `${y}px`;
+                
+                organism.organismData = { type, x, y, size, originalY: y };
+                
+                document.getElementById('phototicOrganisms').appendChild(organism);
+                this.phototicOrganisms.push(organism);
+            }
+
+            createDeepOrganism(type, x, y) {
+                const organism = document.createElement('div');
+                organism.className = `organism ${type}`;
+                
+                const sizes = {
+                    'krill': Math.random() * 12 + 8,
+                    'bacteria': Math.random() * 3 + 2,
+                    'archaea': Math.random() * 4 + 2,
+                    'fecal-pellet': Math.random() * 6 + 4,
+                    'marine-snow': Math.random() * 5 + 3
+                };
+                
+                const size = sizes[type];
+                organism.style.width = `${size}px`;
+                organism.style.height = `${size}px`;
+                organism.style.left = `${x}px`;
+                organism.style.top = `${y}px`;
+                
+                organism.organismData = { type, x, y, size, originalY: y };
+                
+                document.getElementById('deepOrganisms').appendChild(organism);
+                this.deepOrganisms.push(organism);
+            }
+
+            updateDCMPosition() {
+                const dcmLayer = document.getElementById('dcmLayer');
+                const nutrients = parseInt(document.getElementById('phototicNutrients').value);
+                
+                // DCM típicamente entre 40-80m
+                const dcmDepth = 60 + (15 - nutrients);
+                dcmLayer.style.top = `${Math.max(40, Math.min(85, dcmDepth))}%`;
+            }
+
+            updatePhototicZone() {
+                const light = parseInt(document.getElementById('phototicLight').value);
+                const nutrients = parseInt(document.getElementById('phototicNutrients').value);
+                const temp = parseInt(document.getElementById('phototicTemp').value);
+                const mixing = parseInt(document.getElementById('phototicMixing').value);
+                const waterType = document.getElementById('waterType').value;
+                const time = parseInt(document.getElementById('globalTime').value);
+
+                // Actualizar displays
+                document.getElementById('phototicLightValue').textContent = `${light}%`;
+                document.getElementById('phototicNutrientsValue').textContent = `${nutrients} μM`;
+                document.getElementById('phototicTempValue').textContent = `${temp}°C`;
+                document.getElementById('phototicMixingValue').textContent = `${mixing}%`;
+
+                // Calcular productividad
+                const dayFactor = this.getDayIntensity(time);
+                const productivity = (light / 100) * (nutrients / 30) * (temp / 25) * dayFactor * 100;
+                const chlorophyll = productivity * 0.04;
+                
+                document.getElementById('primaryProd').textContent = `${Math.min(100, productivity).toFixed(0)}%`;
+                document.getElementById('chlorophyll').textContent = `${chlorophyll.toFixed(1)} mg/m³`;
+                document.getElementById('lightPen').textContent = `${(light * dayFactor).toFixed(0)}%`;
+
+                // Actualizar información del tipo de agua
+                const waterTypeNames = {
+                    'oceanic': 'Oceánica (K=0.05)',
+                    'coastal': 'Costera (K=0.15)', 
+                    'estuarine': 'Estuarina (K=0.5)'
+                };
+                document.getElementById('waterTypeInfo').textContent = waterTypeNames[waterType];
+                
+                // Calcular profundidad eufótica (1% de luz superficial)
+                const attenuationCoeff = waterType === 'oceanic' ? 0.05 : waterType === 'coastal' ? 0.15 : 0.5;
+                const euphoticDepth = Math.round(4.6 / attenuationCoeff); // ln(100) ≈ 4.6
+                document.getElementById('euphoticDepth').textContent = `${Math.min(100, euphoticDepth)}m`;
+
+                // Actualizar gradiente espectral según tipo de agua
+                this.updateSpectralAttenuation(light, dayFactor, waterType);
+
+                // Animar fitoplancton según condiciones
+                this.phototicOrganisms.forEach(organism => {
+                    if (['phytoplankton', 'diatom', 'dinoflagellate'].includes(organism.organismData.type)) {
+                        if (productivity > 50 && dayFactor > 0.3) {
+                            organism.classList.add('active-photosynthesis');
+                        } else {
+                            organism.classList.remove('active-photosynthesis');
+                        }
+                    }
+                });
+
+                this.updateDCMPosition();
+            }
+
+            updateSpectralAttenuation(light, dayFactor, waterType) {
+                const lightColumn = document.getElementById('phototicLightColumn');
+                const totalIntensity = (light / 100) * dayFactor;
+                
+                // Coeficientes de atenuación por longitud de onda y tipo de agua (m⁻¹)
+                const attenuationCoeffs = {
+                    oceanic: {    // Agua oceánica clara
+                        red: 0.45,     // Rojo se atenúa rápido
+                        orange: 0.25,  
+                        yellow: 0.15,
+                        green: 0.08,   // Verde penetra más
+                        blue: 0.05,    // Azul penetra mejor
+                        indigo: 0.12,
+                        violet: 0.35
+                    },
+                    coastal: {    // Agua costera con más partículas
+                        red: 0.65,
+                        orange: 0.45,
+                        yellow: 0.35,
+                        green: 0.25,
+                        blue: 0.20,
+                        indigo: 0.30,
+                        violet: 0.55
+                    },
+                    estuarine: {  // Agua estuarina turbia
+                        red: 1.2,
+                        orange: 0.95,
+                        yellow: 0.75,
+                        green: 0.60,
+                        blue: 0.50,
+                        indigo: 0.65,
+                        violet: 0.85
+                    }
+                };
+
+                const coeffs = attenuationCoeffs[waterType];
+                
+                // Calcular atenuación espectral con profundidad
+                const spectralGradient = [];
+                for (let depth = 0; depth <= 100; depth += 10) {
+                    const redIntensity = totalIntensity * Math.exp(-coeffs.red * depth / 10);
+                    const orangeIntensity = totalIntensity * Math.exp(-coeffs.orange * depth / 10);
+                    const yellowIntensity = totalIntensity * Math.exp(-coeffs.yellow * depth / 10);
+                    const greenIntensity = totalIntensity * Math.exp(-coeffs.green * depth / 10);
+                    const blueIntensity = totalIntensity * Math.exp(-coeffs.blue * depth / 10);
+                    const indigoIntensity = totalIntensity * Math.exp(-coeffs.indigo * depth / 10);
+                    const violetIntensity = totalIntensity * Math.exp(-coeffs.violet * depth / 10);
+                    
+                    spectralGradient.push(
+                        `rgba(255, 0, 0, ${redIntensity}) ${depth}%`,
+                        `rgba(255, 165, 0, ${orangeIntensity}) ${depth + 1.4}%`,
+                        `rgba(255, 255, 0, ${yellowIntensity}) ${depth + 2.8}%`,
+                        `rgba(0, 255, 0, ${greenIntensity}) ${depth + 4.2}%`,
+                        `rgba(0, 0, 255, ${blueIntensity}) ${depth + 5.7}%`,
+                        `rgba(75, 0, 130, ${indigoIntensity}) ${depth + 7.1}%`,
+                        `rgba(148, 0, 211, ${violetIntensity}) ${depth + 8.5}%`
+                    );
+                }
+                
+                // Aplicar gradiente dinámico
+                lightColumn.style.background = `linear-gradient(to bottom, ${spectralGradient.slice(0, 35).join(', ')})`;
+                
+                // Actualizar border según penetración
+                const avgPenetration = (coeffs.red + coeffs.blue) / 2;
+                const borderOpacity = Math.max(0.2, 1 - avgPenetration * 0.1);
+                lightColumn.style.borderRight = `2px solid rgba(255, 255, 255, ${borderOpacity})`;
+            }
+
+            updateDeepZone() {
+                const microbial = parseInt(document.getElementById('microbialActivity').value);
+                const reminer = parseInt(document.getElementById('remineralization').value);
+                const flux = parseInt(document.getElementById('carbonFlux').value);
+                const migration = parseInt(document.getElementById('verticalMigration').value);
+                const time = parseInt(document.getElementById('globalTime').value);
+
+                // Actualizar displays
+                document.getElementById('microbialActivityValue').textContent = `${microbial}%`;
+                document.getElementById('remineralizationValue').textContent = `${reminer}%`;
+                document.getElementById('carbonFluxValue').textContent = `${flux} mg C/m²/día`;
+                document.getElementById('verticalMigrationValue').textContent = `${migration}%`;
+
+                // Calcular parámetros profundos
+                const respiration = microbial * 0.8;
+                const decomposition = reminer * 0.9;
+                const microbialBiomass = (microbial + reminer) * 0.02;
+
+                document.getElementById('respiration').textContent = `${respiration.toFixed(0)}%`;
+                document.getElementById('decomposition').textContent = `${decomposition.toFixed(0)}%`;
+                document.getElementById('microbialBiomass').textContent = `${microbialBiomass.toFixed(1)} mg C/L`;
+
+                // Migración nocturna del krill
+                const migrationFactor = this.getMigrationFactor(time) * (migration / 100);
+                
+                this.deepOrganisms.forEach(organism => {
+                    const data = organism.organismData;
+                    
+                    if (data.type === 'krill') {
+                        const newY = data.originalY - (migrationFactor * 100);
+                        organism.style.top = `${Math.max(0, newY)}px`;
+                        
+                        if (migrationFactor > 0.3) {
+                            organism.classList.add('migrating');
+                        } else {
+                            organism.classList.remove('migrating');
+                        }
+                    }
+                    
+                    if (data.type === 'fecal-pellet' || data.type === 'marine-snow') {
+                        organism.classList.add('sinking');
+                    }
+                    
+                    if (['bacteria', 'archaea'].includes(data.type)) {
+                        if (microbial > 50) {
+                            organism.classList.add('decomposing');
+                        } else {
+                            organism.classList.remove('decomposing');
+                        }
+                    }
+                });
+            }
+
+            updateAllSimulations() {
+                this.updatePhototicZone();
+                this.updateDeepZone();
+            }
+
+            getDayIntensity(time) {
+                if (time >= 6 && time <= 18) {
+                    const hoursSinceSunrise = time - 6;
+                    return Math.sin((hoursSinceSunrise / 12) * Math.PI);
+                }
+                return 0;
+            }
+
+            getMigrationFactor(time) {
+                if (time >= 20 || time <= 6) {
+                    return 0.8;
+                } else if (time >= 18 && time < 20) {
+                    return (time - 18) / 2 * 0.8;
+                } else if (time > 6 && time <= 8) {
+                    return (8 - time) / 2 * 0.8;
+                }
+                return 0;
+            }
+
+            animate() {
+                if (!this.isAnimating) return;
+                
+                this.time += 0.01;
+                
+                // Animaciones continuas para pellets y nieve marina
+                this.deepOrganisms.forEach(organism => {
+                    const data = organism.organismData;
+                    
+                    if (data.type === 'fecal-pellet' || data.type === 'marine-snow') {
+                        data.y += 0.5;
+                        if (data.y > 500) data.y = 0;
+                        organism.style.top = `${data.y}px`;
+                    }
+                });
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Funciones globales
+        function startAllAnimations() {
+            if (window.dualSimulator) {
+                window.dualSimulator.isAnimating = true;
+                window.dualSimulator.animate();
+            }
+        }
+
+        function pauseAllAnimations() {
+            if (window.dualSimulator) {
+                window.dualSimulator.isAnimating = false;
+            }
+        }
+
+        function resetAllSimulations() {
+            if (window.dualSimulator) {
+                pauseAllAnimations();
+                window.dualSimulator.time = 0;
+                window.dualSimulator.populatePhototicZone();
+                window.dualSimulator.populateDeepZone();
+                window.dualSimulator.updateAllSimulations();
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            window.dualSimulator = new DualOceanSimulator();
+        });
+    </script>
+</body>
+</html>
