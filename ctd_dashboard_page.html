@@ -172,49 +172,33 @@
 
         <section class="installation-steps">
             <div class="container">
-                <h2 style="text-align: center; margin-bottom: 50px;">🚀 Cómo usar el Dashboard CTD</h2>
+                <h2 style="text-align: center; margin-bottom: 30px;">⚡ INICIO SÚPER RÁPIDO</h2>
                 
+                <div style="background: #059669; color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 1.5rem;">🚀 Solo 2 comandos en terminal:</h3>
+                    <div class="code-block" style="background: #064e3b; margin: 15px 0;">
+cd ~/proyectos/olitai
+python3 run_dashboard.py
+                    </div>
+                    <p style="margin: 15px 0 0 0; font-size: 1.1rem;">¡El navegador se abre automáticamente! 🎉</p>
+                </div>
+
                 <div class="step-card">
-                    <span class="step-number">1</span>
-                    <h3>Requisitos del Sistema</h3>
-                    <p>Asegúrate de tener instalado Python 3.8 o superior en tu sistema.</p>
+                    <span class="step-number">?</span>
+                    <h3>¿No funciona? Instala dependencias primero:</h3>
                     <div class="code-block">
-python --version
-# Debe mostrar Python 3.8 o superior
+pip3 install flask flask-cors plotly numpy matplotlib scipy pandas
+python3 run_dashboard.py
                     </div>
                 </div>
 
                 <div class="step-card">
-                    <span class="step-number">2</span>
-                    <h3>Descargar el Código</h3>
-                    <p>Clona o descarga el repositorio de OLITAI desde GitHub.</p>
-                    <div class="code-block">
-git clone https://github.com/gogoland1/olitai.github.io.git
-cd olitai.github.io
-                    </div>
-                </div>
-
-                <div class="step-card">
-                    <span class="step-number">3</span>
-                    <h3>Instalar Dependencias</h3>
-                    <p>Ejecuta el script de instalación automática o instala manualmente.</p>
-                    <div class="code-block">
-# Opción 1: Instalación automática
-python install_dependencies.py
-
-# Opción 2: Instalación manual
-pip install -r requirements_web.txt
-                    </div>
-                </div>
-
-                <div class="step-card">
-                    <span class="step-number">4</span>
-                    <h3>Ejecutar el Dashboard</h3>
-                    <p>Lanza el dashboard con el script de ejecución automática.</p>
-                    <div class="code-block">
-python run_dashboard.py
-                    </div>
-                    <p style="margin-top: 15px;"><strong>El navegador se abrirá automáticamente en:</strong> <code>http://localhost:5000</code></p>
+                    <span class="step-number">📱</span>
+                    <h3>¿Qué verás?</h3>
+                    <p>✅ Dashboard interactivo con sliders modulares<br>
+                    ✅ 4 ambientes marinos (fiordo, delta, costero, oceánico)<br>
+                    ✅ Gráficos en tiempo real con Plotly<br>
+                    ✅ Perfiles de temperatura, salinidad y oxígeno</p>
                 </div>
             </div>
         </section>
@@ -324,8 +308,8 @@ python run_dashboard.py
                     <i class="fas fa-book"></i> Documentación Completa
                 </a>
                 
-                <a href="javascript:void(0)" onclick="showLocalInstructions()" class="btn-primary">
-                    <i class="fas fa-play"></i> Ejecutar Localmente
+                <a href="javascript:void(0)" onclick="showQuickStart()" class="btn-primary">
+                    <i class="fas fa-rocket"></i> ¡Ejecutar Ahora!
                 </a>
             </div>
         </section>
@@ -339,15 +323,14 @@ python run_dashboard.py
 
     <script src="./js/script.js"></script>
     <script>
-        function showLocalInstructions() {
-            alert('🌊 Instrucciones para Ejecutar Localmente\n\n' +
-                  '1. Asegúrate de tener Python 3.8+\n' +
-                  '2. Clona: git clone https://github.com/gogoland1/olitai.github.io.git\n' +
-                  '3. Navega: cd olitai.github.io\n' +
-                  '4. Instala: python install_dependencies.py\n' +
-                  '5. Ejecuta: python run_dashboard.py\n' +
-                  '6. Abre: http://localhost:5000\n\n' +
-                  '¡El navegador se abrirá automáticamente!');
+        function showQuickStart() {
+            alert('🚀 INICIO SÚPER RÁPIDO\n\n' +
+                  '1. Abre terminal\n' +
+                  '2. cd ~/proyectos/olitai\n' +
+                  '3. python3 run_dashboard.py\n\n' +
+                  '¡El navegador se abre automáticamente!\n\n' +
+                  '❓ ¿No funciona? Primero instala:\n' +
+                  'pip3 install flask flask-cors plotly numpy matplotlib scipy pandas');
         }
         
         // Efecto de scroll suave para la navegación
