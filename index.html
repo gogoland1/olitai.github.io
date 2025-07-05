@@ -161,6 +161,13 @@
                         <p>Modulos de aprendizaje de biología, química, física y geología de los océanos </p>
                         <a href="./biologia_marina_pagina.html" class="btn">Pincha aquí</a>
                     </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Dashboard CTD</h3>
+                        <p>Perfiles interactivos de temperatura, salinidad y oxígeno para ambientes marinos: fiordos, deltas, costeros y oceánicos.</p>
+                        <a href="javascript:void(0)" onclick="openCTDDashboard()" class="btn">Explorar</a>
+                    </div>
                     
                     <div class="feature-card">
                         <i class="fas fa-wave-square"></i>
@@ -187,5 +194,16 @@
     </footer>
 
     <script src="./js/script.js"></script>
+    <script>
+        function openCTDDashboard() {
+            // Mostrar mensaje informativo sobre el dashboard CTD
+            alert('🌊 Dashboard CTD - Sistema Interactivo\n\nPara usar el dashboard:\n1. Instala Python 3.8+\n2. Ejecuta: python run_dashboard.py\n3. Abre: http://localhost:5000\n\n📊 Características:\n• Perfiles CTD para 4 ambientes marinos\n• Controles modulares en tiempo real\n• Visualización con Plotly\n• Exportación de datos\n\n🔗 Código fuente disponible en GitHub');
+            
+            // Opcional: redirigir a documentación
+            if (confirm('¿Deseas ver la documentación completa del Dashboard CTD?')) {
+                window.open('https://github.com/gogoland1/olitai.github.io/blob/main/README_CTD_Dashboard.md', '_blank');
+            }
+        }
+    </script>
 </body>
 </html>
